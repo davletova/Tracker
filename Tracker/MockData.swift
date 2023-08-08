@@ -19,8 +19,17 @@ let schedule = Schedule(startDate: Date(), repetition: [Weekday.friday, Weekday.
 let category1 = Category(id: UUID.init(), name: "category1")
 let category2 = Category(id: UUID.init(), name: "category2")
 let category3 = Category(id: UUID.init(), name: "category3")
+let category4 = Category(id: UUID.init(), name: "category4")
+let category5 = Category(id: UUID.init(), name: "category5")
+let category6 = Category(id: UUID.init(), name: "category6")
+let category7 = Category(id: UUID.init(), name: "category7")
+let category8 = Category(id: UUID.init(), name: "category8")
+let category9 = Category(id: UUID.init(), name: "category9")
+let category10 = Category(id: UUID.init(), name: "categor10")
+let category11 = Category(id: UUID.init(), name: "category11")
+let category12 = Category(id: UUID.init(), name: "category12")
 
-let mockCategories = [category1, category2, category3]
+let mockCategories = [category1, category2, category3, category4, category5, category6, category7, category8, category10, category11, category12]
 
 let habit1 = Habit(id: UUID.init(), name: "habit 1", category: category1, emoji: "❤️", color: color1, schedule: schedule)
 let habit2 = Habit(id: UUID.init(), name: "habit 2", category: category2, emoji: "😡", color: color2, schedule: schedule)
