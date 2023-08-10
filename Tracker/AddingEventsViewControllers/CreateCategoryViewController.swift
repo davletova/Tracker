@@ -11,10 +11,15 @@ import UIKit
 final class CreateCategoryViewController: UIViewController {
     @IBOutlet weak var titleLabel: UILabel!
     @IBOutlet weak var nameInput: UITextField!
-    @IBOutlet weak var done: UIButton!
+    @IBOutlet weak var doneButton: UIButton!
+    
+    var categoryService: CategoryServiceProtocol?
     
     override func viewDidLoad() {
         super.viewDidLoad()
+        
+        categoryService = CategoryService()
+        
         view.backgroundColor = UIColor(named: "WhiteDay")
         createTitle()
         createNameInput()
@@ -56,7 +61,7 @@ final class CreateCategoryViewController: UIViewController {
         input.topAnchor.constraint(equalTo: titleLabel.bottomAnchor, constant: 10).isActive = true
         input.centerXAnchor.constraint(equalTo: view.centerXAnchor).isActive = true
         
-        input.addTarget(self, action: #selector(textFieldDidChange(_:)), for: <#T##UIControl.Event#>)
+        input.addTarget(self, action: #selector(textFieldDidChange(textField:)), for: .editingChanged)
         
         nameInput = input
     }
@@ -70,7 +75,7 @@ final class CreateCategoryViewController: UIViewController {
         button.titleLabel?.font = UIFont.systemFont(ofSize: 16)
         button.titleLabel?.textColor = UIColor(named: "WhiteDay")
         button.titleLabel?.textAlignment = .center
-//        button.addTarget(self, action: #selector(createCategory), for: .touchUpInside)
+        button.addTarget(self, action: #selector(createCategory), for: .touchUpInside)
 
         view.addSubview(button)
         
@@ -79,10 +84,32 @@ final class CreateCategoryViewController: UIViewController {
         button.heightAnchor.constraint(equalToConstant: 60).isActive = true
         button.centerXAnchor.constraint(equalTo: view.centerXAnchor).isActive = true
         button.bottomAnchor.constraint(equalTo: view.bottomAnchor, constant: -24).isActive = true
-        done = button
+        
+        if let nameInputText = nameInput.text,
+           nameInputText.isEmpty {
+            print("--------- want disable button ------------")
+            
+            button.isEnabled = false
+            button.backgroundColor = UIColor(named: "Gray")
+        }
+        
+        doneButton = button
     }
     
-    @objc private func textFieldDidChange(_ textField: UITextField) {
-        //do something here
+    @objc func textFieldDidChange(textField: UITextField) {
+        print("=========== text changed ===========")
+        if let nameInputText = nameInput.text,
+           !nameInputText.isEmpty {
+            doneButton.isEnabled = true
+            doneButton.backgroundColor = UIColor(named: "BlackDay")
+            return
+        }
+        
+        doneButton.isEnabled = false
+        doneButton.backgroundColor = UIColor(named: "Gray")
+    }
+    
+    @objc func createCategory() {
+        print("------------- create category ----------------")
     }
 }

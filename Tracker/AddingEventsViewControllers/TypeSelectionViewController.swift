@@ -10,9 +10,8 @@ import Foundation
 import UIKit
 
 final class TypeSelectionViewController: UIViewController {
-    
-    @IBOutlet weak var habitButton: UIButton!
-    @IBOutlet weak var eventButton: UIButton!
+    let habitButton = UIButton()
+    let eventButton = UIButton()
     
     override func viewDidLoad() {
         super.viewDidLoad()
@@ -22,60 +21,50 @@ final class TypeSelectionViewController: UIViewController {
     }
     
     func createButtons() {
-//        let buttonsView = UIView()
-//        buttonsView.translatesAutoresizingMaskIntoConstraints = false
-//        view.addSubview(buttonsView)
-//        
-        let habit = UIButton()
-        habit.backgroundColor = UIColor(named: "BlackDay")
-        habit.translatesAutoresizingMaskIntoConstraints = false
-        habit.layer.cornerRadius = 16
-        habit.setTitle("Привычка", for: .normal)
-        habit.titleLabel?.font = UIFont.systemFont(ofSize: 16)
-        habit.titleLabel?.textColor = UIColor(named: "WhiteDay")
-        habit.titleLabel?.textAlignment = .center
-        habit.addTarget(self, action: #selector(goToCreateHabit), for: .touchUpInside)
-        view.addSubview(habit)
-        habitButton = habit
+        view.addSubview(habitButton)
+        habitButton.backgroundColor = UIColor(named: "BlackDay")
+        habitButton.translatesAutoresizingMaskIntoConstraints = false
+        habitButton.layer.cornerRadius = 16
+        habitButton.setTitle("Привычка", for: .normal)
+        habitButton.titleLabel?.font = UIFont.systemFont(ofSize: 16)
+        habitButton.titleLabel?.textColor = UIColor(named: "WhiteDay")
+        habitButton.titleLabel?.textAlignment = .center
+        habitButton.addTarget(self, action: #selector(goToCreateHabit), for: .touchUpInside)
         
-        
-        let event = UIButton()
-        event.backgroundColor = UIColor(named: "BlackDay")
-        event.translatesAutoresizingMaskIntoConstraints = false
-        event.layer.cornerRadius = 16
-        event.setTitle("Нерегулярное событие", for: .normal)
-        event.titleLabel?.font = UIFont.systemFont(ofSize: 16)
-        event.titleLabel?.textColor = UIColor(named: "WhiteDay")
-        event.titleLabel?.textAlignment = .center
-        
-//        buttonsView.addSubview(event)
-        view.addSubview(event)
-        
-        eventButton = event
+        view.addSubview(eventButton)
+        eventButton.backgroundColor = UIColor(named: "BlackDay")
+        eventButton.translatesAutoresizingMaskIntoConstraints = false
+        eventButton.layer.cornerRadius = 16
+        eventButton.setTitle("Нерегулярное событие", for: .normal)
+        eventButton.titleLabel?.font = UIFont.systemFont(ofSize: 16)
+        eventButton.titleLabel?.textColor = UIColor(named: "WhiteDay")
+        eventButton.titleLabel?.textAlignment = .center
         eventButton.addTarget(self, action: #selector(goToCreateEvent), for: .touchUpInside)
         
+        habitButton.centerYAnchor.constraint(equalTo: view.centerYAnchor).isActive = true
+        habitButton.leadingAnchor.constraint(equalTo: view.leadingAnchor, constant: 16).isActive = true
+        habitButton.trailingAnchor.constraint(equalTo: view.trailingAnchor, constant: -16).isActive = true
+        habitButton.heightAnchor.constraint(equalToConstant: 60).isActive = true
+        habitButton.centerXAnchor.constraint(equalTo: view.centerXAnchor).isActive = true
         
-//        buttonsView.centerYAnchor.constraint(equalTo: view.centerYAnchor).isActive = true
-        habit.centerYAnchor.constraint(equalTo: view.centerYAnchor).isActive = true
-        habit.widthAnchor.constraint(equalToConstant: 280).isActive = true
-        habit.heightAnchor.constraint(equalToConstant: 60).isActive = true
-        habit.centerXAnchor.constraint(equalTo: view.centerXAnchor).isActive = true
-        event.widthAnchor.constraint(equalToConstant: 280).isActive = true
-        event.heightAnchor.constraint(equalToConstant: 60).isActive = true
-        event.centerXAnchor.constraint(equalTo: view.centerXAnchor).isActive = true
-        event.topAnchor.constraint(equalTo: habit.bottomAnchor, constant: 10).isActive = true
+        eventButton.leadingAnchor.constraint(equalTo: view.leadingAnchor, constant: 16).isActive = true
+        eventButton.trailingAnchor.constraint(equalTo: view.trailingAnchor, constant: -16).isActive = true
+        eventButton.heightAnchor.constraint(equalToConstant: 60).isActive = true
+        eventButton.centerXAnchor.constraint(equalTo: view.centerXAnchor).isActive = true
+        eventButton.topAnchor.constraint(equalTo: habitButton.bottomAnchor, constant: 10).isActive = true
     }
     
-    
     @objc func goToCreateEvent() {
-        print("-------- goToCreateEvent ----------")
-        let popup = AddingEvent()
-        popup.modalPresentationStyle = .popover
-//        popup.popoverPresentationController?.passthroughViews = nil
-        self.present(popup, animated: true)
+        let addingEventViewController = AddingEventViewController()
+        addingEventViewController.isHabit = false
+//        addingEventViewController.modalPresentationStyle = .popover
+        self.present(addingEventViewController, animated: true)
     }
     
     @objc func goToCreateHabit() {
-        print("-------------- go to create habit --------------")
+        let addingEventViewController = AddingEventViewController()
+        addingEventViewController.isHabit = true
+//        addingEventViewController.modalPresentationStyle = .popover
+        self.present(addingEventViewController, animated: true)
     }
 }

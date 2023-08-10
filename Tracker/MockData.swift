@@ -29,7 +29,8 @@ let category10 = Category(id: UUID.init(), name: "categor10")
 let category11 = Category(id: UUID.init(), name: "category11")
 let category12 = Category(id: UUID.init(), name: "category12")
 
-let mockCategories = [category1, category2, category3, category4, category5, category6, category7, category8, category10, category11, category12]
+//let mockCategories = [category1, category2, category3, category4, category5, category6, category7, category8, category10, category11, category12]
+let mockCategories = [category1, category2, category3]
 
 let habit1 = Habit(id: UUID.init(), name: "habit 1", category: category1, emoji: "❤️", color: color1, schedule: schedule)
 let habit2 = Habit(id: UUID.init(), name: "habit 2", category: category2, emoji: "😡", color: color2, schedule: schedule)

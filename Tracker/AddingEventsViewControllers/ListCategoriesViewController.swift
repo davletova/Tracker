@@ -22,11 +22,7 @@ final class ListCategoriesViewController: UIViewController {
         view.backgroundColor = UIColor(named: "WhiteDay")
         
         createTitle()
-        
-//        var table = UITableView()
         createTable()
-//        tableView = table
-        
         createButton()
         
         if categories.count == 0 {
@@ -64,16 +60,13 @@ final class ListCategoriesViewController: UIViewController {
         
         table.translatesAutoresizingMaskIntoConstraints = false
         table.backgroundColor = UIColor(named: "BackgroundDay")
-//        table.backgroundColor = .lightGray
         table.layer.cornerRadius = 16
-        table.separatorColor = .gray
-        table.separatorStyle = .singleLine
+        table.tableFooterView = UIView(frame: CGRect(x: 0, y: 0, width: table.frame.size.width, height: 1))
         
         table.topAnchor.constraint(equalTo: titleLabel.bottomAnchor, constant: 24).isActive = true
         table.leadingAnchor.constraint(equalTo: view.leadingAnchor, constant: 10).isActive = true
         table.trailingAnchor.constraint(equalTo: view.trailingAnchor, constant: -10).isActive = true
         table.heightAnchor.constraint(equalToConstant: rowHeight * CGFloat(categories.count)).isActive = true
-//        table.bottomAnchor.constraint(lessThanOrEqualTo: view.bottomAnchor, constant: -(buttonWidth + CGFloat(34))).isActive = true
         table.bottomAnchor.constraint(lessThanOrEqualTo: view.bottomAnchor, constant: -buttonHeight - CGFloat(44)).isActive = true
     }
     
@@ -109,7 +102,7 @@ final class ListCategoriesViewController: UIViewController {
     }
     
     @objc func createCategory() {
-        var createCategoryVC = CreateCategoryViewController()
+        let createCategoryVC = CreateCategoryViewController()
         
         createCategoryVC.modalPresentationStyle = .popover
 //        popup.popoverPresentationController?.passthroughViews = nil
@@ -123,57 +116,17 @@ extension ListCategoriesViewController: UITableViewDataSource {
     }
     
     func tableView(_ tableView: UITableView, cellForRowAt indexPath: IndexPath) -> UITableViewCell {
-        print(categories)
-        
         let cell = tableView.dequeueReusableCell(withIdentifier: cellIdentifier, for: indexPath)
         cell.textLabel?.text = categories[indexPath.row].name
         cell.backgroundColor = UIColor(named: "BackgroundDay")
-        return cell
-//
-//        let cell: UITableViewCell
-//
-//        if let reusedCell = tableView.dequeueReusableCell(withIdentifier: cellIdentifier) {
-//            cell = reusedCell
-//        } else {
-//            cell = UITableViewCell(style: .default, reuseIdentifier: cellIdentifier)
-//        }
-//
-//        cell.textLabel?.text = categories[indexPath.row].name
-
         return cell
     }
 }
 
 extension ListCategoriesViewController: UITableViewDelegate {
     func tableView(_ tableView: UITableView, didSelectRowAt indexPath: IndexPath) {
+        
 //        tableView.deselectRow(at: indexPath, animated: true)
-        dismiss(animated: true, completion: nil)
+//        dismiss(animated: true, completion: nil)
     }
 }
-
-
-
-//
-//class ViewController: UIViewController {
-//    let words = [
-//        ["Apple", "Pear", "Watermelon"],
-//        ["Carrot", "Pickle", "Potato", "Tomato"],
-//        ["Strawberry", "Rasberry", "Blackberry", "Blueberry"]
-//    ]
-//
-//    let headers = ["Fruits", "Vegetables", "Berries"]
-//
-//    @IBOutlet weak var tableView: UITableView!
-//
-//    override func viewDidLoad() {
-//        super.viewDidLoad()
-//
-//        tableView.sectionHeaderHeight = 32
-//
-//        // Do any additional setup after loading the view.
-//    }
-//}
-//
-//extension ViewController: UITableViewDataSource {
-//
-
