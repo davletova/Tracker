@@ -8,10 +8,11 @@
 import Foundation
 import UIKit
 
-class Event: EventProtocol {
+class Event {
     let id: UUID
     var name: String
     var category: Category
+    var trackedDaysCount: Int
     var emoji: String
     var color: UIColor
     
@@ -19,19 +20,8 @@ class Event: EventProtocol {
         self.id = id
         self.name = name
         self.category = category
+        self.trackedDaysCount = 0
         self.emoji = emoji
         self.color = color
     }
-    
-    func getID() -> UUID { return id }
-    
-    func getName() -> String { return name }
-    
-    func getEmoji() -> String { return emoji }
-    
-    func getSchedule() -> Schedule? { return nil }
-    
-    func getCategory() -> Category { return category }
-    
-    func getColor() -> UIColor { return color }
 }

@@ -13,6 +13,8 @@ final class TypeSelectionViewController: UIViewController {
     let habitButton = UIButton()
     let eventButton = UIButton()
     
+    var trackerService: TrackerServiceProtocol?
+    
     override func viewDidLoad() {
         super.viewDidLoad()
         
@@ -56,15 +58,15 @@ final class TypeSelectionViewController: UIViewController {
     
     @objc func goToCreateEvent() {
         let addingEventViewController = AddingEventViewController()
+        addingEventViewController.trackerService = trackerService
         addingEventViewController.isHabit = false
-//        addingEventViewController.modalPresentationStyle = .popover
         self.present(addingEventViewController, animated: true)
     }
     
     @objc func goToCreateHabit() {
         let addingEventViewController = AddingEventViewController()
+        addingEventViewController.trackerService = trackerService
         addingEventViewController.isHabit = true
-//        addingEventViewController.modalPresentationStyle = .popover
         self.present(addingEventViewController, animated: true)
     }
 }

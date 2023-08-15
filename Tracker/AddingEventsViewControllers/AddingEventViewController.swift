@@ -33,6 +33,8 @@ final class AddingEventViewController: UIViewController {
     private let titleColorsList = UILabel()
     private let cancelButton = UIButton()
     private let createButton = UIButton()
+    
+    var trackerService: TrackerServiceProtocol?
 
     private let emojiCollectionView: UICollectionView = {
         let collectionView = UICollectionView(
@@ -53,10 +55,10 @@ final class AddingEventViewController: UIViewController {
         super.viewDidLoad()
         view.backgroundColor = UIColor(named: "WhiteDay")
     
+        tableButtons.append(TableButton(name: "Категория", callback:  openCategories))
         if let isHabit = isHabit, isHabit {
-            tableButtons.append(TableButton(name: "Категория", callback: openCategories))
+            tableButtons.append(TableButton(name: "Расписание", callback: openSchedule))
         }
-        tableButtons.append(TableButton(name: "Расписание", callback:  openSchedule))
         
         createTitle()
         createNameInput()
@@ -161,8 +163,6 @@ final class AddingEventViewController: UIViewController {
         
         if let inputText = nameInput.text,
            inputText.isEmpty {
-            print("--------- want disable button ------------")
-            
             createButton.isEnabled = false
             createButton.backgroundColor = UIColor(named: "Gray")
         }
@@ -194,18 +194,35 @@ final class AddingEventViewController: UIViewController {
     
     @objc func cancelCreateEvent() {
         self.view.window?.rootViewController?.dismiss(animated: true, completion: nil)
-//        dismiss(animated: true)
     }
     
-    @objc func  createEvent() {
+    @objc func createEvent() {
         guard let value = nameInput.text else {
             print("createEvent: nameInput.text is empty")
             return
         }
         
-        // Здесь будет создание ивэнта
+        if let trackerService = trackerService {
+            let newEvent = Habit(
+                id: UUID(),
+                name: value,
+                category: category2,
+                emoji: "🏓",
+                color: UIColor(named: "ColorSelection3")!,
+                schedule: Schedule(startDate: Calendar.current.startOfDay(for: Date()), repetition: [Weekday.friday])
+            )
+            trackerService.createEvent(event: newEvent)
+            
+            NotificationCenter.default.post(
+                name: TrackerCollectionView.CreateEventNotification,
+                object: self,
+                userInfo: ["event": newEvent]
+            )
+        } else {
+            print("createEvent: trackerService is empty")
+        }
         
-        dismiss(animated: true)
+        self.view.window?.rootViewController?.dismiss(animated: true, completion: nil)
     }
     
     @objc func textFieldDidChange(textField: UITextField) {

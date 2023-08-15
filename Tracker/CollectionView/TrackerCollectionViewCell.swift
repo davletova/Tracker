@@ -9,7 +9,6 @@ import Foundation
 import UIKit
 
 final class TrackerCollectionViewCell: UICollectionViewCell {
-    
     var eventNameView = UIView()
     var trackView = UIView()
     var emogiLabel = UILabel()
@@ -17,19 +16,36 @@ final class TrackerCollectionViewCell: UICollectionViewCell {
     var trackedDaysLabel = UILabel()
     var trackButton = UIButton()
     
-    var event: EventProtocol? {
+    var event: Event? {
         didSet {
             guard let event = event else {
-                print("didSet: event is empty")
+                print("event didSet: event is empty")
                 return
             }
-            emogiLabel.text = event.getEmoji()
-            nameLabel.text = event.getName()
-//            trackedDaysLabel.text = formatTrackedDays(days: event.getTrackedDays())
-            trackedDaysLabel.text = "5 days"
-            eventNameView.backgroundColor = event.getColor()
+            emogiLabel.text = event.emoji
+            nameLabel.text = event.name
+            nameLabel.lineBreakMode = .byWordWrapping
+            nameLabel.numberOfLines = 0
+            trackedDaysLabel.text = formatTrackedDays(days: event.trackedDaysCount)
+            eventNameView.backgroundColor = event.color
             emogiLabel.backgroundColor = .white.withAlphaComponent(0.3)
-            trackButton.backgroundColor = event.getColor()
+            trackButton.backgroundColor = event.color
+        }
+    }
+    var isCompletedEvent: Bool? {
+        didSet {
+            guard let isCompletedEvent = isCompletedEvent else {
+                print("isCompletedEvent didSet: isCompletedEvent id empty")
+                return
+            }
+            if isCompletedEvent {
+                trackButton.setImage(UIImage(systemName: "checkmark"), for: .normal)
+                trackButton.backgroundColor = trackButton.backgroundColor?.withAlphaComponent(0.3)
+            } else {
+                trackButton.setImage(UIImage(systemName: "plus"), for: .normal)
+                trackButton.backgroundColor = trackButton.backgroundColor?.withAlphaComponent(1)
+                trackButton.tintColor = .white
+            }
         }
     }
     
@@ -62,7 +78,7 @@ final class TrackerCollectionViewCell: UICollectionViewCell {
         trackButton.layer.cornerRadius = trackButton.frame.height / 2
         trackButton.setImage(UIImage(systemName: "plus"), for: .normal)
         trackButton.tintColor = .white
-        trackButton.addTarget(self, action: #selector(track), for: .touchUpInside)
+        trackButton.addTarget(self, action: #selector(trackEvent), for: .touchUpInside)
 
         trackedDaysLabel.textColor = .black
         trackedDaysLabel.translatesAutoresizingMaskIntoConstraints = false
@@ -78,6 +94,7 @@ final class TrackerCollectionViewCell: UICollectionViewCell {
             eventNameView.leadingAnchor.constraint(equalTo: contentView.leadingAnchor),
             eventNameView.widthAnchor.constraint(equalToConstant: frame.width),
             eventNameView.heightAnchor.constraint(equalToConstant: 90),
+            nameLabel.widthAnchor.constraint(equalTo: eventNameView.widthAnchor),
             trackView.topAnchor.constraint(equalTo: eventNameView.bottomAnchor),
             trackView.leadingAnchor.constraint(equalTo: contentView.leadingAnchor),
             trackView.widthAnchor.constraint(equalToConstant: frame.width),
@@ -101,7 +118,7 @@ final class TrackerCollectionViewCell: UICollectionViewCell {
         fatalError("init(coder:) has not been implemented")
     }
     
-    @objc private func track() {
+    @objc private func trackEvent() {
         print("track")
         
         guard let event = event else {
@@ -109,17 +126,30 @@ final class TrackerCollectionViewCell: UICollectionViewCell {
             return
         }
         
-        NotificationCenter.default.post(
-                name: TrackerRecordService.AddEventNotification,
-                object: self,
-                userInfo: ["record": TrackerRecord(eventID: event.getID(), date: Date())]
-            )
+        guard let isCompletedEvent = self.isCompletedEvent else {
+            print("isCompletedEvent didSet: isCompletedEvent id empty")
+            return
+        }
+        self.isCompletedEvent = !isCompletedEvent
         
-        trackButton.setImage(UIImage(systemName: "checkmark"), for: .normal)
-        trackButton.backgroundColor = trackButton.backgroundColor?.withAlphaComponent(0.3)
+        if self.isCompletedEvent! {
+            NotificationCenter.default.post(
+                name: TrackerRecordService.AddTrackerRecordNotification,
+                object: self,
+                userInfo: ["record": TrackerRecord(eventID: event.id, date: Calendar.current.startOfDay(for: Date()))]
+            )
+        } else {
+            NotificationCenter.default.post(
+                name: TrackerRecordService.DeleteTrackerRecordNotification,
+                object: self,
+                userInfo: ["record": TrackerRecord(eventID: event.id, date: Calendar.current.startOfDay(for: Date()))]
+            )
+        }
+        
+        trackedDaysLabel.text = formatTrackedDays(days: event.trackedDaysCount)
     }
     
-    @objc private func deleteTrack() {
+    private func deleteTrack() {
         print("delete track")
         
         guard let event = event else {
@@ -127,16 +157,19 @@ final class TrackerCollectionViewCell: UICollectionViewCell {
             return
         }
         
-        NotificationCenter.default.post(
-                name: TrackerRecordService.DeleteEventNotification,
-                object: self,
-                userInfo: ["record": TrackerRecord(eventID: event.getID(), date: Date())]
-            )
+       
         
+        guard let isCompletedEvent = self.isCompletedEvent else {
+            print("isCompletedEvent didSet: isCompletedEvent id empty")
+            return
+        }
+        self.isCompletedEvent = !isCompletedEvent
+        
+        trackedDaysLabel.text = formatTrackedDays(days: event.trackedDaysCount)
     }
     
     private func formatTrackedDays(days: Int) -> String {
-        if days >= 11 || days <= 14 {
+        if days >= 11 && days <= 14 {
             return "\(days) дней"
         }
         
@@ -152,24 +185,3 @@ final class TrackerCollectionViewCell: UICollectionViewCell {
         }
     }
 }
-
-
-//class LetterCollectionViewCell: UICollectionViewCell {
-//    let label = UILabel()
-//
-//    override init(frame: CGRect) {
-//        super.init(frame: frame)
-//
-//        contentView.addSubview(label)
-//        label.translatesAutoresizingMaskIntoConstraints = false
-//
-//        NSLayoutConstraint.activate([
-//            label.centerXAnchor.constraint(equalTo: contentView.centerXAnchor),
-//            label.centerYAnchor.constraint(equalTo: contentView.centerYAnchor)
-//        ])
-//    }
-//
-//    required init?(coder: NSCoder) {
-//        fatalError("init(coder:) has not been implemented")
-//    }
-//}

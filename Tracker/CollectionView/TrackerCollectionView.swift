@@ -27,18 +27,57 @@ struct GeometricParams {
 }
 
 final class TrackerCollectionView: UIViewController {
+    static let CreateEventNotification = Notification.Name(rawValue: "CreateEvent")
+    
     var collectionView = UICollectionView(frame: .zero, collectionViewLayout: UICollectionViewFlowLayout())
     
-    var trackerService: TrackerService?
-    private var collection = [Section]()
+    private var trackerService: TrackerServiceProtocol?
+    private var eventsCollection = [Section]()
+    private var completedEvents = Set<UUID>()
     private var datePicker: UIDatePicker = UIDatePicker()
     private let params = GeometricParams(cellCount: 2, leftInset: 10, rightInset: 10, cellSpacing: 10)
+    
+    let emptyCollectionImageViewTag = 0
+    private let emptyCollectionImageView = UIImageView(image: UIImage(named: "star"))
+    private let searchController = UISearchController(searchResultsController: nil)
+    private var currentTask: DispatchWorkItem?
     
     override func viewDidLoad() {
         super.viewDidLoad()
         
+        NotificationCenter.default.addObserver(
+            forName: TrackerCollectionView.CreateEventNotification,
+            object: nil,
+            queue: OperationQueue.main
+        ) { notification in
+            guard let event = notification.userInfo?["event"] as? Event else {
+                print("failed to convert event: \(String(describing: notification.userInfo?["event"]))")
+                return
+            }
+            
+            var sectionIndex = self.eventsCollection.firstIndex(where: { $0.categoryName == event.category.name })
+            
+            if sectionIndex == nil {
+                sectionIndex = self.eventsCollection.count
+                self.eventsCollection.append(Section(categoryName: event.category.name, events: [event]))
+            } else {
+                var section = self.eventsCollection[sectionIndex!]
+                section.events.append(event)
+                self.eventsCollection[sectionIndex!] = section
+            }
+        
+            let indexPath = IndexPath(row: self.eventsCollection[sectionIndex!].events.count-1, section: sectionIndex!)
+            
+            self.collectionView.performBatchUpdates {
+                self.collectionView.insertItems(at: [indexPath])
+            }
+        }
+        
         trackerService = TrackerService(trackerRecordService: TrackerRecordService())
-        collection = trackerService!.getEventsByDate(date: datePicker.date)
+        eventsCollection = trackerService!.getEvents(by: datePicker.date)
+        completedEvents = trackerService!.getCompletedEvents(by: datePicker.date)
+        
+        searchController.searchResultsUpdater = self
         
         view.backgroundColor = UIColor(named: "WhiteDay")
         createNavigationBar()
@@ -56,19 +95,19 @@ final class TrackerCollectionView: UIViewController {
         collectionView.dataSource = self
         collectionView.delegate = self
         
-        if collection.count == 0 {
+        emptyCollectionImageView.tag = emptyCollectionImageViewTag
+        if eventsCollection.count == 0 {
             showEmptyCollection()
         }
     }
 
     func showEmptyCollection() {
-        let imageView = UIImageView(image: UIImage(named: "star"))
-        imageView.translatesAutoresizingMaskIntoConstraints = false
+        emptyCollectionImageView.translatesAutoresizingMaskIntoConstraints = false
 
-        collectionView.addSubview(imageView)
+        collectionView.addSubview(emptyCollectionImageView)
         
-        imageView.centerXAnchor.constraint(equalTo: view.centerXAnchor).isActive = true
-        imageView.centerYAnchor.constraint(equalTo: view.centerYAnchor).isActive = true
+        emptyCollectionImageView.centerXAnchor.constraint(equalTo: view.centerXAnchor).isActive = true
+        emptyCollectionImageView.centerYAnchor.constraint(equalTo: view.centerYAnchor).isActive = true
     }
     
     func setConstraint() {
@@ -85,7 +124,7 @@ final class TrackerCollectionView: UIViewController {
             navigationBar.backgroundColor = UIColor(named: "WhiteDay")
             navigationBar.tintColor = .black
             
-            navigationItem.leftBarButtonItem = UIBarButtonItem(image: UIImage(named: "add"), style: .plain, target: self, action: #selector(add))
+            navigationItem.leftBarButtonItem = UIBarButtonItem(image: UIImage(named: "add"), style: .plain, target: self, action: #selector(createEvent))
             
             datePicker.preferredDatePickerStyle = .compact
             datePicker.datePickerMode = UIDatePicker.Mode.date
@@ -97,7 +136,7 @@ final class TrackerCollectionView: UIViewController {
             paragraphStyle.alignment = .left
             
             navigationBar.titleTextAttributes = [
-                NSAttributedString.Key.foregroundColor: UIColor(named: "BlackDay"),
+                NSAttributedString.Key.foregroundColor: UIColor(named: "BlackDay") as Any,
                 NSAttributedString.Key.font: UIFont.systemFont(ofSize: 34, weight: UIFont.Weight.bold),
                 NSAttributedString.Key.paragraphStyle: paragraphStyle
             ] as [NSAttributedString.Key : Any]
@@ -105,15 +144,15 @@ final class TrackerCollectionView: UIViewController {
 
             navigationBar.prefersLargeTitles = true
             
-            navigationItem.searchController = UISearchController()
+            navigationItem.searchController = searchController
         }
     }
     
-    @objc func add() {
-        let popup = TypeSelectionViewController()
-        popup.modalPresentationStyle = .popover
-//        popup.popoverPresentationController?.passthroughViews = nil
-        self.present(popup, animated: true)
+    @objc func createEvent() {
+        let typeSelectionViewController = TypeSelectionViewController()
+        typeSelectionViewController.trackerService = trackerService
+        typeSelectionViewController.modalPresentationStyle = .popover
+        self.present(typeSelectionViewController, animated: true)
     }
     
     @objc func changeDate(_ datePicker: UIDatePicker) {
@@ -121,20 +160,80 @@ final class TrackerCollectionView: UIViewController {
             print("changeDate: trackerService is empty")
             return
         }
-        collection = trackerService.getEventsByDate(date: datePicker.date)
-//        datePicker.state = .
+        eventsCollection = trackerService.getEvents(by: datePicker.date)
+        completedEvents = trackerService.getCompletedEvents(by: datePicker.date)
+        print(completedEvents)
         collectionView.reloadData()
         presentedViewController?.dismiss(animated: true)
     }
 }
 
+extension TrackerCollectionView: UISearchResultsUpdating {
+    func updateSearchResults(for searchController: UISearchController) {
+        // Отменяем предыдущую задачу
+        currentTask?.cancel()
+        
+        // Создаем новую задачу для выполнения поискового запроса
+        let newTask = DispatchWorkItem { [weak self] in
+            // Выполняем поисковый запрос
+            self?.performSearch(with: searchController.searchBar.text)
+        }
+        
+        // Сохраняем новую задачу для последующей отмены
+        currentTask = newTask
+        
+        // Запускаем новую задачу с небольшой задержкой
+        DispatchQueue.main.asyncAfter(deadline: .now() + 1, execute: newTask)
+    }
+    
+    func performSearch(with query: String?) {
+        guard let query = query else {
+            return
+        }
+        
+        // Выполняем поиск на основе запроса
+        print("Searching for: \(query)")
+        
+        guard let trackerService = trackerService else {
+            print("performSearch: trackerService is empty")
+            return
+        }
+    
+        var events = trackerService.getEvents(by: datePicker.date)
+        
+        if query.isEmpty {
+            if events.count == eventsCollection.count {
+                return
+            }
+            eventsCollection = events
+            collectionView.reloadData()
+            return
+        }
+        
+        for i in (0..<events.count).reversed() {
+            events[i].events = events[i].events.filter({ $0.name.lowercased().contains(query.lowercased()) })
+            
+            if events[i].events.isEmpty {
+                events.remove(at: i)
+            }
+        }
+        
+        reloadCollection(events: events)
+    }
+    
+    func reloadCollection(events: [Section]) {
+        eventsCollection = events
+        collectionView.reloadData()
+    }
+}
+
 extension TrackerCollectionView: UICollectionViewDataSource {
     func numberOfSections(in collectionView: UICollectionView) -> Int {
-        collection.count
+        eventsCollection.count
     }
     
     func collectionView(_ collectionView: UICollectionView, numberOfItemsInSection section: Int) -> Int {
-        guard let section = collection.safelyAccessElement(at: section) else {
+        guard let section = eventsCollection.safelyAccessElement(at: section) else {
             print("failed to get section from collection by index \(section)")
             return 0
         }
@@ -148,7 +247,7 @@ extension TrackerCollectionView: UICollectionViewDataSource {
             return UICollectionViewCell()
         }
         
-        guard let section = collection.safelyAccessElement(at: indexPath.section) else {
+        guard let section = eventsCollection.safelyAccessElement(at: indexPath.section) else {
             print("failed to get section from collection by index \(indexPath.section)")
             return UICollectionViewCell()
         }
@@ -159,6 +258,7 @@ extension TrackerCollectionView: UICollectionViewDataSource {
         }
         
         cell.event = event
+        cell.isCompletedEvent = completedEvents.contains(event.id)
         cell.contentView.layer.cornerRadius = 16
         return cell
     }
@@ -179,7 +279,7 @@ extension TrackerCollectionView: UICollectionViewDataSource {
             return UICollectionReusableView()
         }
         
-        view.titleLabel.text = collection[indexPath.section].categoryName
+        view.titleLabel.text = eventsCollection[indexPath.section].categoryName
         
         return view
     }
@@ -214,3 +314,42 @@ extension TrackerCollectionView: UICollectionViewDelegateFlowLayout {
             verticalFittingPriority: .fittingSizeLevel)
     }
 }
+
+class MyViewController: UIViewController, UISearchResultsUpdating {
+    let searchController = UISearchController(searchResultsController: nil)
+    var currentTask: DispatchWorkItem?
+    
+    override func viewDidLoad() {
+        super.viewDidLoad()
+        
+        searchController.searchResultsUpdater = self
+        navigationItem.searchController = searchController
+    }
+    
+    func updateSearchResults(for searchController: UISearchController) {
+        // Отменяем предыдущую задачу
+        currentTask?.cancel()
+        
+        // Создаем новую задачу для выполнения поискового запроса
+        let newTask = DispatchWorkItem { [weak self] in
+            // Выполняем поисковый запрос
+            self?.performSearch(with: searchController.searchBar.text)
+        }
+        
+        // Сохраняем новую задачу для последующей отмены
+        currentTask = newTask
+        
+        // Запускаем новую задачу с небольшой задержкой
+        DispatchQueue.main.asyncAfter(deadline: .now() + 0.5, execute: newTask)
+    }
+    
+    func performSearch(with query: String?) {
+        guard let query = query else {
+            return
+        }
+        
+        // Выполняем поиск на основе запроса
+        print("Searching for: \(query)")
+    }
+}
+

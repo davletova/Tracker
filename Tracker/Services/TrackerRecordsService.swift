@@ -14,20 +14,18 @@ struct TrackerRecord {
 }
 
 final class TrackerRecordService: TrackerRecordServiceProtocol {
-    static let AddEventNotification = Notification.Name(rawValue: "AddEvent")
-    static let DeleteEventNotification = Notification.Name(rawValue: "DeleteEvent")
+    static let AddTrackerRecordNotification = Notification.Name(rawValue: "AddRecordTracker")
+    static let DeleteTrackerRecordNotification = Notification.Name(rawValue: "DeleteEvent")
     
     var trackerRecords: [TrackerRecord] = mockTrackerRecords
     
     init() {
-        let serialQueue = DispatchQueue(label: "serialQueue")
-        
         NotificationCenter.default.addObserver(
-            forName: TrackerRecordService.AddEventNotification,
+            forName: TrackerRecordService.AddTrackerRecordNotification,
             object: nil,
             queue: OperationQueue.main
         ) { record in
-            guard let record = record.object as? TrackerRecord else {
+            guard let record = record.userInfo?["record"] as? TrackerRecord else {
                 print("failed to convert notification: \(record) to TrackerRecord")
                 return
             }
@@ -36,11 +34,11 @@ final class TrackerRecordService: TrackerRecordServiceProtocol {
         }
         
         NotificationCenter.default.addObserver(
-            forName: TrackerRecordService.DeleteEventNotification,
+            forName: TrackerRecordService.DeleteTrackerRecordNotification,
             object: nil,
             queue: OperationQueue.main
         ) { record in
-            guard let record = record.object as? TrackerRecord else {
+            guard let record = record.userInfo?["record"] as? TrackerRecord else {
                 print("failed to convert notification: \(record) to TrackerRecord")
                 return
             }
@@ -49,15 +47,19 @@ final class TrackerRecordService: TrackerRecordServiceProtocol {
         }
     }
     
-    func getRecordsByDate(date: Date) -> [TrackerRecord] {
+    func getRecords(by date: Date) -> [TrackerRecord] {
         var result = [TrackerRecord]()
+        let startDate = Calendar.current.startOfDay(for: date)
         
         for record in trackerRecords {
-            if let isDateRight = record.date.inDay(day: date),
-               isDateRight {
+            print("record date: \(record.date.description)")
+            print("date: \(startDate.description)")
+            if record.date == startDate {
                 result.append(record)
             }
         }
+        
+        print("records: /n \(result)")
         
         return result
     }

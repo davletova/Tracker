@@ -32,30 +32,21 @@ extension Date {
         }
     }
     
-    func getBeginningOfDay() -> Date? {
+    func getBeginningOfDay() -> Date {
+        return Calendar.current.startOfDay(for: self)
+    }
+    
+    func getEndOfDay() -> Date? {
         guard let nextDay = Calendar.current.date(byAdding: .day, value: 1, to: self) else {
             print("failed to create next date from \(self)")
             return nil
         }
-        guard let begin = Calendar.current.date(bySettingHour: 0, minute: 0, second: 0, of: nextDay) else {
-            print("failed to set time to finish date \(nextDay)")
-            return nil
-        }
-        return begin
-    }
-    
-    func getEndOfDay() -> Date? {
-        guard let end = Calendar.current.date(bySettingHour: 0, minute: 0, second: 0, of: self) else {
-            print("failed to set time to start date \(self)")
-            return nil
-        }
-        return end
+        return Calendar.current.startOfDay(for: nextDay)
     }
     
     func inDay(day: Date) -> Bool? {
-        guard let begin = day.getBeginningOfDay(),
-              let end = day.getEndOfDay()
-        else {
+        let begin = day.getBeginningOfDay()
+        guard let end = day.getEndOfDay() else {
             return nil
         }
         

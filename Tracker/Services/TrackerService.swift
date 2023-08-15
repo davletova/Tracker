@@ -8,95 +8,164 @@
 import Foundation
 
 protocol TrackerServiceProtocol {
-    func getEventsByDate(date: Date) -> [Section]
+    func getEvents(by date: Date) -> [Section]
+    
+    func getCompletedEvents(by date: Date) -> Set<UUID>
+    
+    func createEvent(event: Event)
+    
+    func updateEvent(event: Event) -> Event?
+    
+    func deleteEvent(eventID: UUID)
 }
 
 protocol TrackerRecordServiceProtocol {
-    func getRecordsByDate(date: Date) -> [TrackerRecord]
+    func getRecords(by date: Date) -> [TrackerRecord]
 }
 
 struct Section {
-    let categoryName: String
-    let events: [EventProtocol]
+    var categoryName: String
+    var events: [Event]
 }
 
-final class TrackerService {
-    var events = [UUID: EventProtocol]()
+final class TrackerService: TrackerServiceProtocol {
+    static let TrackEventNotification = Notification.Name(rawValue: "trackEvent")
+
+    var events = [UUID: Event]()
     
     var trackerRecordService: TrackerRecordServiceProtocol
     
     init(trackerRecordService: TrackerRecordServiceProtocol) {
         self.trackerRecordService = trackerRecordService
-        
+    
         events = createMockEvents()
+        
+        NotificationCenter.default.addObserver(
+            forName: TrackerRecordService.AddTrackerRecordNotification,
+            object: nil,
+            queue: OperationQueue.main
+        ) { record in
+            guard let record = record.userInfo?["record"] as? TrackerRecord else {
+                print("failed to convert notification: \(record) to TrackerRecord")
+                return
+            }
+            
+            self.trackEvent(eventId: record.eventID)
+        }
+        
+        NotificationCenter.default.addObserver(
+            forName: TrackerRecordService.DeleteTrackerRecordNotification,
+            object: nil,
+            queue: OperationQueue.main
+        ) { record in
+            guard let record = record.userInfo?["record"] as? TrackerRecord else {
+                print("failed to convert notification: \(record) to TrackerRecord")
+                return
+            }
+            
+            self.untrackEvent(eventId: record.eventID)
+        }
     }
 
-    func getEventsByDate(date: Date) -> [Section] {
-        guard let endOfDay = date.getEndOfDay() else {
-            return [Section]()
-        }
+    func getEvents(by date: Date) -> [Section] {
+        let startOfDate = Calendar.current.startOfDay(for: date)
         
-        if date < endOfDay {
-            return getFutureEventsByDate(date: date)
-        } else {
-            return getPastEventsByDate(date: date)
-        }
-    }
-    
-    func getPastEventsByDate(date: Date) -> [Section] {
-        print("getPastEventsByDate")
-        var sections = [String: [EventProtocol]]()
-        var eventIds = Set<UUID>()
+        var eventsByDate = [UUID: Event]()
         
-        for record in trackerRecordService.getRecordsByDate(date: date) {
-            eventIds.insert(record.eventID)
-        }
-        
-        for eventId in eventIds {
-            guard let event = events[eventId] else {
-                continue
-            }
-            sections[event.getCategory().name]?.append(event)
-        }
-        
-        return convertDictionaryToArray(dictionary: sections)
-    }
-    
-    func getFutureEventsByDate(date: Date) -> [Section] {
-        print("getFutureEventsByDate")
         guard let dayOfWeek = date.dayNumberOfWeek() else {
-            print("failed to get weekday from \(date)")
+            print("failed to get day of week")
             return [Section]()
         }
-        
-        var eventsCollection = [String: [EventProtocol]]()
         
         for (_, event) in events {
-            if let schedule = event.getSchedule(),
-               !schedule.repetition.contains(dayOfWeek) {
+            if let habit = event as? Timetable {
+                if !habit.getSchedule().repetition.contains(dayOfWeek) {
+                    continue
+                }
+            }
+            eventsByDate[event.id] = event
+        }
+                
+        let completedEvents = getCompletedEvents(by: date)
+        
+        for eventId in completedEvents {
+            guard let event = events[eventId] else {
+                print("event with id \(eventId) not found")
                 continue
             }
-               
-            guard var sectionEvents = eventsCollection[event.getCategory().name] else {
-                eventsCollection.updateValue([event], forKey: event.getCategory().name)
+            
+            eventsByDate.updateValue(event, forKey: eventId)
+        }
+        
+        return putEventsToSections(cellEvents: eventsByDate)
+    }
+    
+    func getCompletedEvents(by date: Date) -> Set<UUID> {
+        var completedEvents = Set<UUID>()
+        
+        for record in trackerRecordService.getRecords(by: date) {
+            completedEvents.insert(record.eventID)
+        }
+        
+        return completedEvents
+    }
+    
+    
+    func createEvent(event: Event) {
+        events.updateValue(event, forKey: event.id)
+    }
+    
+    func updateEvent(event updateEvent: Event) -> Event? {
+        events.updateValue(updateEvent, forKey: updateEvent.id)
+    
+        return events[updateEvent.id]
+    }
+    
+    func deleteEvent(eventID: UUID) {
+        events.removeValue(forKey: eventID)
+    }
+    
+    func trackEvent(eventId: UUID) {
+        guard let event = events[eventId] else {
+            print("event with id \(eventId) not found")
+            return
+        }
+        
+        event.trackedDaysCount += 1
+        events[eventId] = event
+    }
+    
+    func untrackEvent(eventId: UUID) {
+        guard let event = events[eventId] else {
+            print("event with id \(eventId) not found")
+            return
+        }
+        
+        event.trackedDaysCount -= 1
+        if event.trackedDaysCount == -1 {
+            event.trackedDaysCount = 0
+        }
+        events[eventId] = event
+    }
+    
+    func putEventsToSections(cellEvents: [UUID: Event]) -> [Section] {
+        var sectionsDictionary = [String: [Event]]()
+        var sections = [Section]()
+    
+        for (_, event) in cellEvents  {
+            guard var sectionEvents = sectionsDictionary[event.category.name] else {
+                sectionsDictionary[event.category.name] = [event]
                 continue
             }
             
             sectionEvents.append(event)
-            eventsCollection.updateValue(sectionEvents, forKey: event.getCategory().name)
+            sectionsDictionary[event.category.name] = sectionEvents
         }
         
-        return convertDictionaryToArray(dictionary: eventsCollection)
-    }
+        for (categoryName, sectionEvents) in sectionsDictionary {
+            sections.append(Section(categoryName: categoryName, events: sectionEvents))
+        }
     
-    func convertDictionaryToArray(dictionary: [String: [EventProtocol]]) -> [Section] {
-        var sections = [Section]()
-        
-        for key in dictionary  {
-            let section = Section(categoryName: key.key, events: key.value)
-            sections.append(section)
-        }
-        
         return sections
     }
 }
