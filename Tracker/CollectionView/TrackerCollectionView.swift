@@ -32,12 +32,11 @@ final class TrackerCollectionView: UIViewController {
     var collectionView = UICollectionView(frame: .zero, collectionViewLayout: UICollectionViewFlowLayout())
     
     private var trackerService: TrackerServiceProtocol?
-    private var eventsCollection = [Section]()
+    private var visibleEventsByCategory = [Section]()
     private var completedEvents = Set<UUID>()
     private var datePicker: UIDatePicker = UIDatePicker()
     private let params = GeometricParams(cellCount: 2, leftInset: 10, rightInset: 10, cellSpacing: 10)
     
-    let emptyCollectionImageViewTag = 0
     private let emptyCollectionImageView = UIImageView(image: UIImage(named: "star"))
     private let searchController = UISearchController(searchResultsController: nil)
     private var currentTask: DispatchWorkItem?
@@ -55,18 +54,18 @@ final class TrackerCollectionView: UIViewController {
                 return
             }
             
-            var sectionIndex = self.eventsCollection.firstIndex(where: { $0.categoryName == event.category.name })
+            var sectionIndex = self.visibleEventsByCategory.firstIndex(where: { $0.categoryName == event.category.name })
             
             if sectionIndex == nil {
-                sectionIndex = self.eventsCollection.count
-                self.eventsCollection.append(Section(categoryName: event.category.name, events: [event]))
+                sectionIndex = self.visibleEventsByCategory.count
+                self.visibleEventsByCategory.append(Section(categoryName: event.category.name, events: [event]))
             } else {
-                var section = self.eventsCollection[sectionIndex!]
+                var section = self.visibleEventsByCategory[sectionIndex!]
                 section.events.append(event)
-                self.eventsCollection[sectionIndex!] = section
+                self.visibleEventsByCategory[sectionIndex!] = section
             }
         
-            let indexPath = IndexPath(row: self.eventsCollection[sectionIndex!].events.count-1, section: sectionIndex!)
+            let indexPath = IndexPath(row: self.visibleEventsByCategory[sectionIndex!].events.count-1, section: sectionIndex!)
             
             self.collectionView.performBatchUpdates {
                 self.collectionView.insertItems(at: [indexPath])
@@ -74,7 +73,7 @@ final class TrackerCollectionView: UIViewController {
         }
         
         trackerService = TrackerService(trackerRecordService: TrackerRecordService())
-        eventsCollection = trackerService!.getEvents(by: datePicker.date)
+        visibleEventsByCategory = trackerService!.getEvents(by: datePicker.date)
         completedEvents = trackerService!.getCompletedEvents(by: datePicker.date)
         
         searchController.searchResultsUpdater = self
@@ -95,8 +94,7 @@ final class TrackerCollectionView: UIViewController {
         collectionView.dataSource = self
         collectionView.delegate = self
         
-        emptyCollectionImageView.tag = emptyCollectionImageViewTag
-        if eventsCollection.count == 0 {
+        if visibleEventsByCategory.count == 0 {
             showEmptyCollection()
         }
     }
@@ -160,7 +158,7 @@ final class TrackerCollectionView: UIViewController {
             print("changeDate: trackerService is empty")
             return
         }
-        eventsCollection = trackerService.getEvents(by: datePicker.date)
+        visibleEventsByCategory = trackerService.getEvents(by: datePicker.date)
         completedEvents = trackerService.getCompletedEvents(by: datePicker.date)
         print(completedEvents)
         collectionView.reloadData()
@@ -202,10 +200,10 @@ extension TrackerCollectionView: UISearchResultsUpdating {
         var events = trackerService.getEvents(by: datePicker.date)
         
         if query.isEmpty {
-            if events.count == eventsCollection.count {
+            if events.count == visibleEventsByCategory.count {
                 return
             }
-            eventsCollection = events
+            visibleEventsByCategory = events
             collectionView.reloadData()
             return
         }
@@ -222,18 +220,18 @@ extension TrackerCollectionView: UISearchResultsUpdating {
     }
     
     func reloadCollection(events: [Section]) {
-        eventsCollection = events
+        visibleEventsByCategory = events
         collectionView.reloadData()
     }
 }
 
 extension TrackerCollectionView: UICollectionViewDataSource {
     func numberOfSections(in collectionView: UICollectionView) -> Int {
-        eventsCollection.count
+        visibleEventsByCategory.count
     }
     
     func collectionView(_ collectionView: UICollectionView, numberOfItemsInSection section: Int) -> Int {
-        guard let section = eventsCollection.safelyAccessElement(at: section) else {
+        guard let section = visibleEventsByCategory.safelyAccessElement(at: section) else {
             print("failed to get section from collection by index \(section)")
             return 0
         }
@@ -247,7 +245,7 @@ extension TrackerCollectionView: UICollectionViewDataSource {
             return UICollectionViewCell()
         }
         
-        guard let section = eventsCollection.safelyAccessElement(at: indexPath.section) else {
+        guard let section = visibleEventsByCategory.safelyAccessElement(at: indexPath.section) else {
             print("failed to get section from collection by index \(indexPath.section)")
             return UICollectionViewCell()
         }
@@ -279,7 +277,7 @@ extension TrackerCollectionView: UICollectionViewDataSource {
             return UICollectionReusableView()
         }
         
-        view.titleLabel.text = eventsCollection[indexPath.section].categoryName
+        view.titleLabel.text = visibleEventsByCategory[indexPath.section].categoryName
         
         return view
     }

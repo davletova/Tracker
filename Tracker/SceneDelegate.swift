@@ -17,14 +17,36 @@ class SceneDelegate: UIResponder, UIWindowSceneDelegate {
         // If using a storyboard, the `window` property will automatically be initialized and attached to the scene.
         // This delegate does not imply the connecting scene or session are new (see `application:configurationForConnectingSceneSession` instead).
         guard let scene = (scene as? UIWindowScene) else { return }
-        
+               
         window = UIWindow(windowScene: scene)
+        
+
+        let tabBar = UITabBarController()
+        let navigationController = UINavigationController(rootViewController: TrackerCollectionView())
+        navigationController.tabBarItem = UITabBarItem(
+            title: "Трекеры",
+            image: UIImage(named: "record.circle.fill"),
+            tag: 0
+        )
+        
+        let statisticsViewController = StatisticsViewController()
+        statisticsViewController.tabBarItem = UITabBarItem(
+            title: "Статистика",
+            image: UIImage(named: "hare.fill"),
+            tag: 1
+        )
+        tabBar.setViewControllers([navigationController, statisticsViewController], animated: true)
+        
+        window?.rootViewController = tabBar
         window?.makeKeyAndVisible()
         
-        let navigationController = UINavigationController(rootViewController: TrackerCollectionView())
-//        navigationController.navigationBar.barTintColor = UIColor(named: "WhiteDay")
         
-        window?.rootViewController = navigationController
+//        window = UIWindow(windowScene: scene)
+//        window?.makeKeyAndVisible()
+//
+//        let navigationController = UINavigationController(rootViewController: TrackerCollectionView())
+//
+//        window?.rootViewController = navigationController
     }
 
     func sceneDidDisconnect(_ scene: UIScene) {
