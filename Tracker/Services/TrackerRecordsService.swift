@@ -52,14 +52,10 @@ final class TrackerRecordService: TrackerRecordServiceProtocol {
         let startDate = Calendar.current.startOfDay(for: date)
         
         for record in trackerRecords {
-            print("record date: \(record.date.description)")
-            print("date: \(startDate.description)")
             if record.date == startDate {
                 result.append(record)
             }
         }
-        
-        print("records: /n \(result)")
         
         return result
     }

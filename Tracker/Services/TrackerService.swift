@@ -10,6 +10,8 @@ import Foundation
 protocol TrackerServiceProtocol {
     func getEvents(by date: Date) -> [Section]
     
+    func filterEvents(by name: String, date: Date) -> [Section]
+    
     func getCompletedEvents(by date: Date) -> Set<UUID>
     
     func createEvent(event: Event)
@@ -29,7 +31,7 @@ struct Section {
 }
 
 final class TrackerService: TrackerServiceProtocol {
-    static let TrackEventNotification = Notification.Name(rawValue: "trackEvent")
+    static let CreateEventNotification = Notification.Name(rawValue: "creatEvent")
 
     var events = [UUID: Event]()
     
@@ -65,11 +67,27 @@ final class TrackerService: TrackerServiceProtocol {
             
             self.untrackEvent(eventId: record.eventID)
         }
+        
+        NotificationCenter.default.addObserver(
+            forName: TrackerCollectionView.CreateEventNotification,
+            object: nil,
+            queue: OperationQueue.main
+        ) { [weak self] notification in
+            guard let self = self else {
+                print("TrackerService, CreateEventNotification: self is empty")
+                return
+            }
+            
+            guard let event = notification.userInfo?["event"] as? Event else {
+                print("failed to convert event: \(String(describing: notification.userInfo?["event"]))")
+                return
+            }
+            
+            self.createEvent(event: event)
+        }
     }
 
     func getEvents(by date: Date) -> [Section] {
-        let startOfDate = Calendar.current.startOfDay(for: date)
-        
         var eventsByDate = [UUID: Event]()
         
         guard let dayOfWeek = date.dayNumberOfWeek() else {
@@ -100,6 +118,20 @@ final class TrackerService: TrackerServiceProtocol {
         return putEventsToSections(cellEvents: eventsByDate)
     }
     
+    func filterEvents(by name: String, date: Date) -> [Section] {
+        var eventsByDate = getEvents(by: date)
+        
+        for i in (0..<eventsByDate.count).reversed() {
+            eventsByDate[i].events = eventsByDate[i].events.filter({ $0.name.lowercased().contains(name.lowercased()) })
+            
+            if eventsByDate[i].events.isEmpty {
+                eventsByDate.remove(at: i)
+            }
+        }
+        
+        return eventsByDate
+    }
+    
     func getCompletedEvents(by date: Date) -> Set<UUID> {
         var completedEvents = Set<UUID>()
         
@@ -113,6 +145,11 @@ final class TrackerService: TrackerServiceProtocol {
     
     func createEvent(event: Event) {
         events.updateValue(event, forKey: event.id)
+        
+        NotificationCenter.default.post(
+            name: TrackerCollectionView.CreateEventNotification,
+            object: self
+        )
     }
     
     func updateEvent(event updateEvent: Event) -> Event? {

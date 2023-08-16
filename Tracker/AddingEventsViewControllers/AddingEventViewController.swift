@@ -202,8 +202,19 @@ final class AddingEventViewController: UIViewController {
             return
         }
         
-        if let trackerService = trackerService {
-            let newEvent = Habit(
+        guard let trackerService = trackerService else {
+            print("createEvent: trackerService is empty")
+            return
+        }
+        
+        guard let isHabit = isHabit else {
+            print("createEvent: isHabit is empty")
+            return
+        }
+        
+        let newEvent: Event
+        if isHabit {
+            newEvent = Habit(
                 id: UUID(),
                 name: value,
                 category: category2,
@@ -211,17 +222,24 @@ final class AddingEventViewController: UIViewController {
                 color: UIColor(named: "ColorSelection3")!,
                 schedule: Schedule(startDate: Calendar.current.startOfDay(for: Date()), repetition: [Weekday.friday])
             )
-            trackerService.createEvent(event: newEvent)
-            
-            NotificationCenter.default.post(
-                name: TrackerCollectionView.CreateEventNotification,
-                object: self,
-                userInfo: ["event": newEvent]
-            )
         } else {
-            print("createEvent: trackerService is empty")
+            newEvent = Event(
+                id: UUID(),
+                name: value,
+                category: category2,
+                emoji: "🏓",
+                color: UIColor(named: "ColorSelection3")!
+            )
         }
         
+        trackerService.createEvent(event: newEvent)
+        
+        NotificationCenter.default.post(
+            name: TrackerService.CreateEventNotification,
+            object: self,
+            userInfo: ["event": newEvent]
+        )
+    
         self.view.window?.rootViewController?.dismiss(animated: true, completion: nil)
     }
     

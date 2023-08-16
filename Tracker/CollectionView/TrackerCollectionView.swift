@@ -34,12 +34,23 @@ final class TrackerCollectionView: UIViewController {
     private var trackerService: TrackerServiceProtocol?
     private var visibleEventsByCategory = [Section]()
     private var completedEvents = Set<UUID>()
-    private var datePicker: UIDatePicker = UIDatePicker()
+    private var datePicker: UIDatePicker = {
+        var datePicker = UIDatePicker()
+        var datePickerCalendar = Calendar(identifier: .gregorian)
+        datePickerCalendar.firstWeekday = 2
+        datePicker.calendar = datePickerCalendar
+        return datePicker
+    }()
     private let params = GeometricParams(cellCount: 2, leftInset: 10, rightInset: 10, cellSpacing: 10)
     
     private let emptyCollectionImageView = UIImageView(image: UIImage(named: "star"))
+    private let emptyCollecionImageTag = 0
+    private let emptyCollectionLabel = UILabel()
+    private let emptyCollecionLabelTag = 1
+    
     private let searchController = UISearchController(searchResultsController: nil)
     private var currentTask: DispatchWorkItem?
+    
     
     override func viewDidLoad() {
         super.viewDidLoad()
@@ -48,28 +59,20 @@ final class TrackerCollectionView: UIViewController {
             forName: TrackerCollectionView.CreateEventNotification,
             object: nil,
             queue: OperationQueue.main
-        ) { notification in
-            guard let event = notification.userInfo?["event"] as? Event else {
-                print("failed to convert event: \(String(describing: notification.userInfo?["event"]))")
+        ) { [weak self] _ in
+            guard let self = self else {
+                print("TrackerCollectionView, CreateEventNotification: self is empty")
                 return
             }
             
-            var sectionIndex = self.visibleEventsByCategory.firstIndex(where: { $0.categoryName == event.category.name })
-            
-            if sectionIndex == nil {
-                sectionIndex = self.visibleEventsByCategory.count
-                self.visibleEventsByCategory.append(Section(categoryName: event.category.name, events: [event]))
-            } else {
-                var section = self.visibleEventsByCategory[sectionIndex!]
-                section.events.append(event)
-                self.visibleEventsByCategory[sectionIndex!] = section
+            guard let trackerService = self.trackerService else {
+                print("CreateEventNotification: trackerService is empty")
+                return
             }
-        
-            let indexPath = IndexPath(row: self.visibleEventsByCategory[sectionIndex!].events.count-1, section: sectionIndex!)
             
-            self.collectionView.performBatchUpdates {
-                self.collectionView.insertItems(at: [indexPath])
-            }
+            self.visibleEventsByCategory = trackerService.getEvents(by: datePicker.date)
+            
+            self.collectionView.reloadData()
         }
         
         trackerService = TrackerService(trackerRecordService: TrackerRecordService())
@@ -94,18 +97,35 @@ final class TrackerCollectionView: UIViewController {
         collectionView.dataSource = self
         collectionView.delegate = self
         
+        emptyCollectionImageView.tag = emptyCollecionImageTag
+        emptyCollectionLabel.tag = emptyCollecionLabelTag
         if visibleEventsByCategory.count == 0 {
             showEmptyCollection()
         }
     }
 
     func showEmptyCollection() {
-        emptyCollectionImageView.translatesAutoresizingMaskIntoConstraints = false
-
-        collectionView.addSubview(emptyCollectionImageView)
+        let view = UIView()
+        let imageView = UIImageView()
+        let label = UILabel()
         
-        emptyCollectionImageView.centerXAnchor.constraint(equalTo: view.centerXAnchor).isActive = true
-        emptyCollectionImageView.centerYAnchor.constraint(equalTo: view.centerYAnchor).isActive = true
+        view.translatesAutoresizingMaskIntoConstraints = false
+        imageView.translatesAutoresizingMaskIntoConstraints = false
+        label.translatesAutoresizingMaskIntoConstraints = false
+        
+        emptyCollectionImageView.translatesAutoresizingMaskIntoConstraints = false
+        emptyCollectionLabel.translatesAutoresizingMaskIntoConstraints = false
+        emptyCollectionLabel.text = "Что будем отслеживать?"
+        
+        collectionView.addSubview(emptyCollectionImageView)
+        collectionView.addSubview(emptyCollectionLabel)
+        
+        NSLayoutConstraint.activate([
+            emptyCollectionImageView.centerXAnchor.constraint(equalTo: view.centerXAnchor),
+            emptyCollectionImageView.centerYAnchor.constraint(equalTo: view.centerYAnchor),
+            emptyCollectionLabel.topAnchor.constraint(equalTo: emptyCollectionImageView.bottomAnchor, constant: 10),
+            emptyCollectionLabel.centerXAnchor.constraint(equalTo: view.centerXAnchor)
+        ])
     }
     
     func setConstraint() {
@@ -189,38 +209,24 @@ extension TrackerCollectionView: UISearchResultsUpdating {
             return
         }
         
-        // Выполняем поиск на основе запроса
-        print("Searching for: \(query)")
-        
         guard let trackerService = trackerService else {
             print("performSearch: trackerService is empty")
             return
         }
-    
-        var events = trackerService.getEvents(by: datePicker.date)
+        
+        var filteredEvents = [Section]()
         
         if query.isEmpty {
-            if events.count == visibleEventsByCategory.count {
+            filteredEvents = trackerService.getEvents(by: datePicker.date)
+            if filteredEvents.count == visibleEventsByCategory.count {
                 return
             }
-            visibleEventsByCategory = events
-            collectionView.reloadData()
-            return
+        } else {
+            filteredEvents = trackerService.filterEvents(by: query, date: datePicker.date)
         }
         
-        for i in (0..<events.count).reversed() {
-            events[i].events = events[i].events.filter({ $0.name.lowercased().contains(query.lowercased()) })
-            
-            if events[i].events.isEmpty {
-                events.remove(at: i)
-            }
-        }
+        visibleEventsByCategory = filteredEvents
         
-        reloadCollection(events: events)
-    }
-    
-    func reloadCollection(events: [Section]) {
-        visibleEventsByCategory = events
         collectionView.reloadData()
     }
 }
@@ -258,6 +264,11 @@ extension TrackerCollectionView: UICollectionViewDataSource {
         cell.event = event
         cell.isCompletedEvent = completedEvents.contains(event.id)
         cell.contentView.layer.cornerRadius = 16
+        
+        if Calendar.current.startOfDay(for: datePicker.date) > Date() {
+            cell.disableTrackButton()
+        }
+        
         return cell
     }
     

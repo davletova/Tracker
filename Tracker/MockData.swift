@@ -54,21 +54,24 @@ func createMockEvents() -> [UUID: Event] {
     mockEvents[event3.id] = event3
     mockEvents[habit3.id] = habit3
     
-    return mockEvents
+//    return mockEvents
+    return [UUID: Event]()
 }
 
 //let s1 = Section(categoryName: category1.name, events: [habit1, event1, event3])
 //let s2 = Section(categoryName: category2.name, events: [habit2])
 //let s3 = Section(categoryName: category3.name, events: [event2])
 
-let mockTrackerRecords: [TrackerRecord] = [
-    TrackerRecord(eventID: habit2.id, date: Calendar.current.startOfDay(for: dateFromString(date: "2023-08-04T10:44:00"))),
-    TrackerRecord(eventID: habit1.id, date: Calendar.current.startOfDay(for: dateFromString(date: "2023-08-05T10:44:00"))),
-    TrackerRecord(eventID: event1.id, date: Calendar.current.startOfDay(for: dateFromString(date: "2023-08-04T10:44:00"))),
-    TrackerRecord(eventID: event2.id, date: Calendar.current.startOfDay(for: dateFromString(date: "2023-08-03T10:44:00"))),
-    TrackerRecord(eventID: event3.id, date: Calendar.current.startOfDay(for: dateFromString(date: "2023-08-04T10:44:00"))),
-    TrackerRecord(eventID: habit1.id, date: Calendar.current.startOfDay(for: dateFromString(date: "2023-08-14T10:44:00")))
-]
+//let mockTrackerRecords: [TrackerRecord] = [
+//    TrackerRecord(eventID: habit2.id, date: Calendar.current.startOfDay(for: dateFromString(date: "2023-08-04T10:44:00"))),
+//    TrackerRecord(eventID: habit1.id, date: Calendar.current.startOfDay(for: dateFromString(date: "2023-08-05T10:44:00"))),
+//    TrackerRecord(eventID: event1.id, date: Calendar.current.startOfDay(for: dateFromString(date: "2023-08-04T10:44:00"))),
+//    TrackerRecord(eventID: event2.id, date: Calendar.current.startOfDay(for: dateFromString(date: "2023-08-03T10:44:00"))),
+//    TrackerRecord(eventID: event3.id, date: Calendar.current.startOfDay(for: dateFromString(date: "2023-08-04T10:44:00"))),
+//    TrackerRecord(eventID: habit1.id, date: Calendar.current.startOfDay(for: dateFromString(date: "2023-08-14T10:44:00")))
+//]
+
+let mockTrackerRecords = [TrackerRecord]()
 
 func dateFromString(date: String) -> Date {
     let dateFormatter = DateFormatter()

@@ -49,6 +49,8 @@ final class TrackerCollectionViewCell: UICollectionViewCell {
         }
     }
     
+    var date: Date? 
+    
     override init(frame: CGRect) {
         super.init(frame: frame)
         
@@ -71,6 +73,12 @@ final class TrackerCollectionViewCell: UICollectionViewCell {
         contentView.addSubview(eventNameView)
         
         trackView.translatesAutoresizingMaskIntoConstraints = false
+        
+        if let isCompletedEvent = isCompletedEvent,
+           isCompletedEvent {
+            trackButton.setImage(UIImage(systemName: "checkmark"), for: .normal)
+            trackButton.backgroundColor = trackButton.backgroundColor?.withAlphaComponent(0.3)
+        }
         
         trackButton.frame = CGRect(x: 0, y: 0, width: 40, height: 40)
         trackButton.layer.masksToBounds = true
@@ -166,6 +174,10 @@ final class TrackerCollectionViewCell: UICollectionViewCell {
         self.isCompletedEvent = !isCompletedEvent
         
         trackedDaysLabel.text = formatTrackedDays(days: event.trackedDaysCount)
+    }
+    
+    func disableTrackButton() {
+        trackButton.isEnabled = false
     }
     
     private func formatTrackedDays(days: Int) -> String {
