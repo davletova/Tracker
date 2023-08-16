@@ -8,6 +8,21 @@
 import Foundation
 import UIKit
 
+struct CellEvent {
+    let event: Event
+    var tracked: Bool
+    
+    init(event: Event, tracked: Bool) {
+        self.event = event
+        self.tracked = tracked
+    }
+}
+
+protocol TrackEventProtocol {
+    func trackEvent(event: Event)
+    func untrackedEvent(event: Event)
+}
+
 final class TrackerCollectionViewCell: UICollectionViewCell {
     var eventNameView = UIView()
     var trackView = UIView()
@@ -16,29 +31,24 @@ final class TrackerCollectionViewCell: UICollectionViewCell {
     var trackedDaysLabel = UILabel()
     var trackButton = UIButton()
     
-    var event: Event? {
+    var delegate: TrackEventProtocol?
+    
+    var cellEvent: CellEvent? {
         didSet {
-            guard let event = event else {
+            guard var cellEvent = cellEvent else {
                 print("event didSet: event is empty")
                 return
             }
-            emogiLabel.text = event.emoji
-            nameLabel.text = event.name
+            emogiLabel.text = cellEvent.event.emoji
+            nameLabel.text = cellEvent.event.name
             nameLabel.lineBreakMode = .byWordWrapping
             nameLabel.numberOfLines = 0
-            trackedDaysLabel.text = formatTrackedDays(days: event.trackedDaysCount)
-            eventNameView.backgroundColor = event.color
+            trackedDaysLabel.text = formatTrackedDays(days: cellEvent.event.trackedDaysCount)
+            eventNameView.backgroundColor = cellEvent.event.color
             emogiLabel.backgroundColor = .white.withAlphaComponent(0.3)
-            trackButton.backgroundColor = event.color
-        }
-    }
-    var isCompletedEvent: Bool? {
-        didSet {
-            guard let isCompletedEvent = isCompletedEvent else {
-                print("isCompletedEvent didSet: isCompletedEvent id empty")
-                return
-            }
-            if isCompletedEvent {
+            trackButton.backgroundColor = cellEvent.event.color
+            
+            if cellEvent.tracked {
                 trackButton.setImage(UIImage(systemName: "checkmark"), for: .normal)
                 trackButton.backgroundColor = trackButton.backgroundColor?.withAlphaComponent(0.3)
             } else {
@@ -73,18 +83,11 @@ final class TrackerCollectionViewCell: UICollectionViewCell {
         contentView.addSubview(eventNameView)
         
         trackView.translatesAutoresizingMaskIntoConstraints = false
-        
-        if let isCompletedEvent = isCompletedEvent,
-           isCompletedEvent {
-            trackButton.setImage(UIImage(systemName: "checkmark"), for: .normal)
-            trackButton.backgroundColor = trackButton.backgroundColor?.withAlphaComponent(0.3)
-        }
-        
+                
         trackButton.frame = CGRect(x: 0, y: 0, width: 40, height: 40)
         trackButton.layer.masksToBounds = true
         trackButton.translatesAutoresizingMaskIntoConstraints = false
         trackButton.layer.cornerRadius = trackButton.frame.height / 2
-        trackButton.setImage(UIImage(systemName: "plus"), for: .normal)
         trackButton.tintColor = .white
         trackButton.addTarget(self, action: #selector(trackEvent), for: .touchUpInside)
 
@@ -127,57 +130,37 @@ final class TrackerCollectionViewCell: UICollectionViewCell {
     }
     
     @objc private func trackEvent() {
-        print("track")
-        
-        guard let event = event else {
+        guard var cellEvent = cellEvent else {
             print("Event track failed: event is empty")
             return
         }
         
-        guard let isCompletedEvent = self.isCompletedEvent else {
-            print("isCompletedEvent didSet: isCompletedEvent id empty")
+        guard let delegate = delegate else {
+            print("Event track failed: delegate is empty")
             return
         }
-        self.isCompletedEvent = !isCompletedEvent
         
-        if self.isCompletedEvent! {
-            NotificationCenter.default.post(
-                name: TrackerRecordService.AddTrackerRecordNotification,
-                object: self,
-                userInfo: ["record": TrackerRecord(eventID: event.id, date: Calendar.current.startOfDay(for: Date()))]
-            )
+        cellEvent.tracked = !cellEvent.tracked
+        
+        if cellEvent.tracked {
+            delegate.trackEvent(event: cellEvent.event)
+            trackButton.setImage(UIImage(systemName: "checkmark"), for: .normal)
+            trackButton.backgroundColor = trackButton.backgroundColor?.withAlphaComponent(0.3)
         } else {
-            NotificationCenter.default.post(
-                name: TrackerRecordService.DeleteTrackerRecordNotification,
-                object: self,
-                userInfo: ["record": TrackerRecord(eventID: event.id, date: Calendar.current.startOfDay(for: Date()))]
-            )
+            delegate.untrackedEvent(event: cellEvent.event)
+            trackButton.setImage(UIImage(systemName: "plus"), for: .normal)
+            trackButton.backgroundColor = trackButton.backgroundColor?.withAlphaComponent(1)
+            trackButton.tintColor = .white
         }
-        
-        trackedDaysLabel.text = formatTrackedDays(days: event.trackedDaysCount)
-    }
-    
-    private func deleteTrack() {
-        print("delete track")
-        
-        guard let event = event else {
-            print("Event track failed: event is empty")
-            return
-        }
-        
-       
-        
-        guard let isCompletedEvent = self.isCompletedEvent else {
-            print("isCompletedEvent didSet: isCompletedEvent id empty")
-            return
-        }
-        self.isCompletedEvent = !isCompletedEvent
-        
-        trackedDaysLabel.text = formatTrackedDays(days: event.trackedDaysCount)
+        self.cellEvent = cellEvent
+        trackedDaysLabel.text = formatTrackedDays(days: cellEvent.event.trackedDaysCount)
     }
     
     func disableTrackButton() {
         trackButton.isEnabled = false
+    }
+    func enableTrackButton() {
+        trackButton.isEnabled = true
     }
     
     private func formatTrackedDays(days: Int) -> String {

@@ -69,12 +69,9 @@ final class TrackerRecordService: TrackerRecordServiceProtocol {
             if trackerRecords[i].eventID != record.eventID {
                 continue
             }
-            
-            guard let isDateRight = trackerRecords[i].date.inDay(day: record.date) else {
-                return
-            }
-            if isDateRight {
+            if trackerRecords[i].date == record.date {
                 trackerRecords.remove(at: i)
+                break
             }
         }
     }

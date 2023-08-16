@@ -19,6 +19,10 @@ protocol TrackerServiceProtocol {
     func updateEvent(event: Event) -> Event?
     
     func deleteEvent(eventID: UUID)
+    
+    func trackEvent(eventId: UUID)
+    
+    func untrackEvent(eventId: UUID)
 }
 
 protocol TrackerRecordServiceProtocol {
@@ -43,33 +47,7 @@ final class TrackerService: TrackerServiceProtocol {
         events = createMockEvents()
         
         NotificationCenter.default.addObserver(
-            forName: TrackerRecordService.AddTrackerRecordNotification,
-            object: nil,
-            queue: OperationQueue.main
-        ) { record in
-            guard let record = record.userInfo?["record"] as? TrackerRecord else {
-                print("failed to convert notification: \(record) to TrackerRecord")
-                return
-            }
-            
-            self.trackEvent(eventId: record.eventID)
-        }
-        
-        NotificationCenter.default.addObserver(
-            forName: TrackerRecordService.DeleteTrackerRecordNotification,
-            object: nil,
-            queue: OperationQueue.main
-        ) { record in
-            guard let record = record.userInfo?["record"] as? TrackerRecord else {
-                print("failed to convert notification: \(record) to TrackerRecord")
-                return
-            }
-            
-            self.untrackEvent(eventId: record.eventID)
-        }
-        
-        NotificationCenter.default.addObserver(
-            forName: TrackerCollectionView.CreateEventNotification,
+            forName: TrackerService.CreateEventNotification,
             object: nil,
             queue: OperationQueue.main
         ) { [weak self] notification in
@@ -147,8 +125,9 @@ final class TrackerService: TrackerServiceProtocol {
         events.updateValue(event, forKey: event.id)
         
         NotificationCenter.default.post(
-            name: TrackerCollectionView.CreateEventNotification,
-            object: self
+            name: TrackerCollectionView.EventSavedNotification,
+            object: self,
+            userInfo: ["event": event]
         )
     }
     

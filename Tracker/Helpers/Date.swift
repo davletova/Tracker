@@ -31,25 +31,4 @@ extension Date {
             return nil
         }
     }
-    
-    func getBeginningOfDay() -> Date {
-        return Calendar.current.startOfDay(for: self)
-    }
-    
-    func getEndOfDay() -> Date? {
-        guard let nextDay = Calendar.current.date(byAdding: .day, value: 1, to: self) else {
-            print("failed to create next date from \(self)")
-            return nil
-        }
-        return Calendar.current.startOfDay(for: nextDay)
-    }
-    
-    func inDay(day: Date) -> Bool? {
-        let begin = day.getBeginningOfDay()
-        guard let end = day.getEndOfDay() else {
-            return nil
-        }
-        
-        return self >= begin || self < end
-    }
 }

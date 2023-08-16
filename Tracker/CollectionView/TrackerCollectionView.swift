@@ -27,7 +27,7 @@ struct GeometricParams {
 }
 
 final class TrackerCollectionView: UIViewController {
-    static let CreateEventNotification = Notification.Name(rawValue: "CreateEvent")
+    static let EventSavedNotification = Notification.Name(rawValue: "CreateEvent")
     
     var collectionView = UICollectionView(frame: .zero, collectionViewLayout: UICollectionViewFlowLayout())
     
@@ -43,10 +43,29 @@ final class TrackerCollectionView: UIViewController {
     }()
     private let params = GeometricParams(cellCount: 2, leftInset: 10, rightInset: 10, cellSpacing: 10)
     
-    private let emptyCollectionImageView = UIImageView(image: UIImage(named: "star"))
-    private let emptyCollecionImageTag = 0
-    private let emptyCollectionLabel = UILabel()
-    private let emptyCollecionLabelTag = 1
+    lazy var emptyCollectionView: UIView = {
+        let view = UIView()
+        let imageView = UIImageView(image: UIImage(named: "star"))
+        let label = UILabel()
+        label.text = "Что будем отслеживать?"
+        label.textAlignment = .center
+        
+        view.translatesAutoresizingMaskIntoConstraints = false
+        imageView.translatesAutoresizingMaskIntoConstraints = false
+        label.translatesAutoresizingMaskIntoConstraints = false
+        
+        view.addSubview(imageView)
+        view.addSubview(label)
+        
+        NSLayoutConstraint.activate([
+            imageView.topAnchor.constraint(equalTo: view.topAnchor),
+            imageView.centerXAnchor.constraint(equalTo: view.centerXAnchor),
+            label.topAnchor.constraint(equalTo: imageView.bottomAnchor, constant: 10),
+            label.centerXAnchor.constraint(equalTo: view.centerXAnchor)
+        ])
+        
+        return view
+    }()
     
     private let searchController = UISearchController(searchResultsController: nil)
     private var currentTask: DispatchWorkItem?
@@ -56,7 +75,7 @@ final class TrackerCollectionView: UIViewController {
         super.viewDidLoad()
         
         NotificationCenter.default.addObserver(
-            forName: TrackerCollectionView.CreateEventNotification,
+            forName: TrackerCollectionView.EventSavedNotification,
             object: nil,
             queue: OperationQueue.main
         ) { [weak self] _ in
@@ -96,36 +115,19 @@ final class TrackerCollectionView: UIViewController {
         
         collectionView.dataSource = self
         collectionView.delegate = self
-        
-        emptyCollectionImageView.tag = emptyCollecionImageTag
-        emptyCollectionLabel.tag = emptyCollecionLabelTag
-        if visibleEventsByCategory.count == 0 {
-            showEmptyCollection()
-        }
     }
 
     func showEmptyCollection() {
-        let view = UIView()
-        let imageView = UIImageView()
-        let label = UILabel()
-        
-        view.translatesAutoresizingMaskIntoConstraints = false
-        imageView.translatesAutoresizingMaskIntoConstraints = false
-        label.translatesAutoresizingMaskIntoConstraints = false
-        
-        emptyCollectionImageView.translatesAutoresizingMaskIntoConstraints = false
-        emptyCollectionLabel.translatesAutoresizingMaskIntoConstraints = false
-        emptyCollectionLabel.text = "Что будем отслеживать?"
-        
-        collectionView.addSubview(emptyCollectionImageView)
-        collectionView.addSubview(emptyCollectionLabel)
+        collectionView.addSubview(emptyCollectionView)
         
         NSLayoutConstraint.activate([
-            emptyCollectionImageView.centerXAnchor.constraint(equalTo: view.centerXAnchor),
-            emptyCollectionImageView.centerYAnchor.constraint(equalTo: view.centerYAnchor),
-            emptyCollectionLabel.topAnchor.constraint(equalTo: emptyCollectionImageView.bottomAnchor, constant: 10),
-            emptyCollectionLabel.centerXAnchor.constraint(equalTo: view.centerXAnchor)
+            emptyCollectionView.centerXAnchor.constraint(equalTo: view.centerXAnchor),
+            emptyCollectionView.centerYAnchor.constraint(equalTo: view.centerYAnchor)
         ])
+    }
+    
+    func hideEmptyView() {
+        emptyCollectionView.removeFromSuperview()
     }
     
     func setConstraint() {
@@ -186,6 +188,38 @@ final class TrackerCollectionView: UIViewController {
     }
 }
 
+extension TrackerCollectionView: TrackEventProtocol {
+    func untrackedEvent(event: Event) {
+        NotificationCenter.default.post(
+            name: TrackerRecordService.DeleteTrackerRecordNotification,
+            object: self,
+            userInfo: ["record": TrackerRecord(eventID: event.id, date: Calendar.current.startOfDay(for: datePicker.date))]
+        )
+        
+        guard let trackerService = trackerService else {
+            print("changeDate: trackerService is empty")
+            return
+        }
+        
+        trackerService.untrackEvent(eventId: event.id)
+    }
+    
+    func trackEvent(event: Event) {
+        NotificationCenter.default.post(
+            name: TrackerRecordService.AddTrackerRecordNotification,
+            object: self,
+            userInfo: ["record": TrackerRecord(eventID: event.id, date: Calendar.current.startOfDay(for: datePicker.date))]
+        )
+        
+        guard let trackerService = trackerService else {
+            print("changeDate: trackerService is empty")
+            return
+        }
+        
+        trackerService.trackEvent(eventId: event.id)
+    }
+}
+
 extension TrackerCollectionView: UISearchResultsUpdating {
     func updateSearchResults(for searchController: UISearchController) {
         // Отменяем предыдущую задачу
@@ -233,7 +267,13 @@ extension TrackerCollectionView: UISearchResultsUpdating {
 
 extension TrackerCollectionView: UICollectionViewDataSource {
     func numberOfSections(in collectionView: UICollectionView) -> Int {
-        visibleEventsByCategory.count
+        if visibleEventsByCategory.count == 0 {
+            showEmptyCollection()
+        } else {
+            hideEmptyView()
+        }
+        
+        return visibleEventsByCategory.count
     }
     
     func collectionView(_ collectionView: UICollectionView, numberOfItemsInSection section: Int) -> Int {
@@ -261,12 +301,16 @@ extension TrackerCollectionView: UICollectionViewDataSource {
             return UICollectionViewCell()
         }
         
-        cell.event = event
-        cell.isCompletedEvent = completedEvents.contains(event.id)
+        let cellEvent = CellEvent(event: event, tracked: completedEvents.contains(event.id))
+        
+        cell.cellEvent = cellEvent
+        cell.delegate = self
         cell.contentView.layer.cornerRadius = 16
         
         if Calendar.current.startOfDay(for: datePicker.date) > Date() {
             cell.disableTrackButton()
+        } else {
+            cell.enableTrackButton()
         }
         
         return cell
@@ -321,44 +365,6 @@ extension TrackerCollectionView: UICollectionViewDelegateFlowLayout {
             CGSize(width: collectionView.frame.width, height: UIView.layoutFittingExpandedSize.height),
             withHorizontalFittingPriority: .required,
             verticalFittingPriority: .fittingSizeLevel)
-    }
-}
-
-class MyViewController: UIViewController, UISearchResultsUpdating {
-    let searchController = UISearchController(searchResultsController: nil)
-    var currentTask: DispatchWorkItem?
-    
-    override func viewDidLoad() {
-        super.viewDidLoad()
-        
-        searchController.searchResultsUpdater = self
-        navigationItem.searchController = searchController
-    }
-    
-    func updateSearchResults(for searchController: UISearchController) {
-        // Отменяем предыдущую задачу
-        currentTask?.cancel()
-        
-        // Создаем новую задачу для выполнения поискового запроса
-        let newTask = DispatchWorkItem { [weak self] in
-            // Выполняем поисковый запрос
-            self?.performSearch(with: searchController.searchBar.text)
-        }
-        
-        // Сохраняем новую задачу для последующей отмены
-        currentTask = newTask
-        
-        // Запускаем новую задачу с небольшой задержкой
-        DispatchQueue.main.asyncAfter(deadline: .now() + 0.5, execute: newTask)
-    }
-    
-    func performSearch(with query: String?) {
-        guard let query = query else {
-            return
-        }
-        
-        // Выполняем поиск на основе запроса
-        print("Searching for: \(query)")
     }
 }
 
