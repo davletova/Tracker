@@ -18,7 +18,7 @@
 		4D1A3D352A7EBAB9003026E6 /* TrackerService.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4D1A3D342A7EBAB9003026E6 /* TrackerService.swift */; };
 		4D1A3D372A7FC604003026E6 /* TrackerRecordsService.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4D1A3D362A7FC604003026E6 /* TrackerRecordsService.swift */; };
 		4D1A3D3E2A814F69003026E6 /* TypeSelectionViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4D1A3D3D2A814F69003026E6 /* TypeSelectionViewController.swift */; };
-		4D1A3D402A8167D6003026E6 /* AddingEventViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4D1A3D3F2A8167D6003026E6 /* AddingEventViewController.swift */; };
+		4D1A3D402A8167D6003026E6 /* CreateEventViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4D1A3D3F2A8167D6003026E6 /* CreateEventViewController.swift */; };
 		4D1A9BFE2A726B4C007E527A /* AppDelegate.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4D1A9BFD2A726B4C007E527A /* AppDelegate.swift */; };
 		4D1A9C002A726B4C007E527A /* SceneDelegate.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4D1A9BFF2A726B4C007E527A /* SceneDelegate.swift */; };
 		4D1A9C022A726B4C007E527A /* TrackerCollectionView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4D1A9C012A726B4C007E527A /* TrackerCollectionView.swift */; };
@@ -30,7 +30,7 @@
 		4DA5C9742A82A9CB0046C149 /* CreateCategoryViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4DA5C9732A82A9CB0046C149 /* CreateCategoryViewController.swift */; };
 		4DA5C9762A8344750046C149 /* CategoryService.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4DA5C9752A8344750046C149 /* CategoryService.swift */; };
 		4DA5C97A2A838F6B0046C149 /* EmojiCollectionViewCell.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4DA5C9792A838F6B0046C149 /* EmojiCollectionViewCell.swift */; };
-		4DA5C97C2A83D2190046C149 /* AddingEventSupplementaryView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4DA5C97B2A83D2190046C149 /* AddingEventSupplementaryView.swift */; };
+		4DA5C97C2A83D2190046C149 /* CreateEventSupplementaryView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4DA5C97B2A83D2190046C149 /* CreateEventSupplementaryView.swift */; };
 		4DA5C97E2A83EA8E0046C149 /* ColorCollectionViewCell.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4DA5C97D2A83EA8E0046C149 /* ColorCollectionViewCell.swift */; };
 		4DA5C9802A84CD650046C149 /* ScheduleViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4DA5C97F2A84CD650046C149 /* ScheduleViewController.swift */; };
 /* End PBXBuildFile section */
@@ -47,7 +47,7 @@
 		4D1A3D342A7EBAB9003026E6 /* TrackerService.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TrackerService.swift; sourceTree = "<group>"; };
 		4D1A3D362A7FC604003026E6 /* TrackerRecordsService.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TrackerRecordsService.swift; sourceTree = "<group>"; };
 		4D1A3D3D2A814F69003026E6 /* TypeSelectionViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TypeSelectionViewController.swift; sourceTree = "<group>"; };
-		4D1A3D3F2A8167D6003026E6 /* AddingEventViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AddingEventViewController.swift; sourceTree = "<group>"; };
+		4D1A3D3F2A8167D6003026E6 /* CreateEventViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CreateEventViewController.swift; sourceTree = "<group>"; };
 		4D1A9BFA2A726B4C007E527A /* Tracker.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = Tracker.app; sourceTree = BUILT_PRODUCTS_DIR; };
 		4D1A9BFD2A726B4C007E527A /* AppDelegate.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AppDelegate.swift; sourceTree = "<group>"; };
 		4D1A9BFF2A726B4C007E527A /* SceneDelegate.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SceneDelegate.swift; sourceTree = "<group>"; };
@@ -61,7 +61,7 @@
 		4DA5C9732A82A9CB0046C149 /* CreateCategoryViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CreateCategoryViewController.swift; sourceTree = "<group>"; };
 		4DA5C9752A8344750046C149 /* CategoryService.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CategoryService.swift; sourceTree = "<group>"; };
 		4DA5C9792A838F6B0046C149 /* EmojiCollectionViewCell.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = EmojiCollectionViewCell.swift; sourceTree = "<group>"; };
-		4DA5C97B2A83D2190046C149 /* AddingEventSupplementaryView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AddingEventSupplementaryView.swift; sourceTree = "<group>"; };
+		4DA5C97B2A83D2190046C149 /* CreateEventSupplementaryView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CreateEventSupplementaryView.swift; sourceTree = "<group>"; };
 		4DA5C97D2A83EA8E0046C149 /* ColorCollectionViewCell.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ColorCollectionViewCell.swift; sourceTree = "<group>"; };
 		4DA5C97F2A84CD650046C149 /* ScheduleViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ScheduleViewController.swift; sourceTree = "<group>"; };
 /* End PBXFileReference section */
@@ -107,15 +107,15 @@
 			path = Services;
 			sourceTree = "<group>";
 		};
-		4D1A3D3C2A814F04003026E6 /* AddingEventsViewControllers */ = {
+		4D1A3D3C2A814F04003026E6 /* CreateEventViewControllers */ = {
 			isa = PBXGroup;
 			children = (
-				4D1A3D3F2A8167D6003026E6 /* AddingEventViewController.swift */,
+				4D1A3D3F2A8167D6003026E6 /* CreateEventViewController.swift */,
 				4DA5C9792A838F6B0046C149 /* EmojiCollectionViewCell.swift */,
-				4DA5C97B2A83D2190046C149 /* AddingEventSupplementaryView.swift */,
+				4DA5C97B2A83D2190046C149 /* CreateEventSupplementaryView.swift */,
 				4DA5C97D2A83EA8E0046C149 /* ColorCollectionViewCell.swift */,
 			);
-			path = AddingEventsViewControllers;
+			path = CreateEventViewControllers;
 			sourceTree = "<group>";
 		};
 		4D1A9BF12A726B4C007E527A = {
@@ -141,7 +141,7 @@
 				4D6B34BA2A85463200C1902C /* EventTypeSelectionViewControllers */,
 				4D6B34B92A8545E900C1902C /* ScheduleViewControllers */,
 				4D6B34B82A8545CE00C1902C /* CategoriesViewControllers */,
-				4D1A3D3C2A814F04003026E6 /* AddingEventsViewControllers */,
+				4D1A3D3C2A814F04003026E6 /* CreateEventViewControllers */,
 				4D0817D42A797AF0003724B5 /* Services */,
 				4D0817CC2A796E8D003724B5 /* Helpers */,
 				4D0817C52A79666E003724B5 /* Models */,
@@ -269,7 +269,7 @@
 			isa = PBXSourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
-				4DA5C97C2A83D2190046C149 /* AddingEventSupplementaryView.swift in Sources */,
+				4DA5C97C2A83D2190046C149 /* CreateEventSupplementaryView.swift in Sources */,
 				4D1A9C022A726B4C007E527A /* TrackerCollectionView.swift in Sources */,
 				4D0817D02A7977BE003724B5 /* Event.swift in Sources */,
 				4DA5C9802A84CD650046C149 /* ScheduleViewController.swift in Sources */,
@@ -283,7 +283,7 @@
 				4DA5C9722A82313B0046C149 /* ListCategoriesViewController.swift in Sources */,
 				4D0817CE2A796E9D003724B5 /* Date.swift in Sources */,
 				4D1A3D3E2A814F69003026E6 /* TypeSelectionViewController.swift in Sources */,
-				4D1A3D402A8167D6003026E6 /* AddingEventViewController.swift in Sources */,
+				4D1A3D402A8167D6003026E6 /* CreateEventViewController.swift in Sources */,
 				4D1A9BFE2A726B4C007E527A /* AppDelegate.swift in Sources */,
 				4D1A9C002A726B4C007E527A /* SceneDelegate.swift in Sources */,
 				4D1A3D2F2A7B8D53003026E6 /* Array.swift in Sources */,

@@ -8,7 +8,7 @@
 import Foundation
 
 extension Array {
-    func safelyAccessElement(at index: Int) -> Element? {
+    func safetyAccessElement(at index: Int) -> Element? {
         guard (0..<count).contains(index) else {
             return nil
         }

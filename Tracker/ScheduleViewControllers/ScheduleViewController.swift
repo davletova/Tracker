@@ -14,8 +14,9 @@ struct DailySchedule {
 }
 
 final class ScheduleViewController: UIViewController {
-    @IBOutlet weak var titleLabel: UILabel!
-    @IBOutlet weak var doneButton: UIButton!
+    private var titleLabel = UILabel()
+    private var doneButton = UIButton()
+    private var daysTable = UITableView()
     
     let rowHeight: CGFloat = 75.0
     let buttonHeight: CGFloat = 60.0
@@ -29,66 +30,67 @@ final class ScheduleViewController: UIViewController {
         view.backgroundColor = UIColor(named: "WhiteDay")
         
         createTitle()
-        createTable()
-        createButton()
+        createDoneButton()
+        createTableWithDays()
     }
     
-    func createButton() {
-        let button = UIButton(type: .custom)
-
-        button.translatesAutoresizingMaskIntoConstraints = false
-        button.layer.cornerRadius = 16
-        button.backgroundColor = UIColor(named: "BlackDay")
-
-        button.setTitle("Готово", for: .normal)
-        // button.addTarget(self, action: #selector(<#T##@objc method#>), for: .)
-
-        // button.addTarget(self, action: #selector(openSchedules), for: .touchUpInside)
-        view.addSubview(button)
-        doneButton = button
+    func createDoneButton() {
+        doneButton.translatesAutoresizingMaskIntoConstraints = false
+        doneButton.layer.cornerRadius = 16
+        doneButton.backgroundColor = UIColor(named: "BlackDay")
+        doneButton.setTitle("Готово", for: .normal)
+        doneButton.addTarget(self, action: #selector(done), for: .touchUpInside)
         
-        button.bottomAnchor.constraint(equalTo: view.bottomAnchor, constant: -24).isActive = true
-        button.heightAnchor.constraint(equalToConstant: 75).isActive = true
-        button.leadingAnchor.constraint(equalTo: view.leadingAnchor, constant: 16).isActive = true
-        button.trailingAnchor.constraint(equalTo: view.trailingAnchor, constant: -16).isActive = true
+        view.addSubview(doneButton)
+        
+        NSLayoutConstraint.activate([
+            doneButton.bottomAnchor.constraint(equalTo: view.bottomAnchor, constant: -44),
+            doneButton.heightAnchor.constraint(equalToConstant: buttonHeight),
+            doneButton.leadingAnchor.constraint(equalTo: view.leadingAnchor, constant: 16),
+            doneButton.trailingAnchor.constraint(equalTo: view.trailingAnchor, constant: -16)
+        ])
     }
     
     func createTitle() {
-        let title = UILabel()
-        title.translatesAutoresizingMaskIntoConstraints = false
-        title.text = "Расписание"
-        title.textAlignment = .center
+        titleLabel.translatesAutoresizingMaskIntoConstraints = false
+        titleLabel.text = "Расписание"
+        titleLabel.textAlignment = .center
+        titleLabel.font = UIFont.systemFont(ofSize: 16, weight: .medium)
+        titleLabel.textColor = UIColor(named: "BlackDay")
         
-        title.font = UIFont.systemFont(ofSize: 16, weight: .medium)
-        title.textColor = UIColor(named: "BlackDay")
-        view.addSubview(title)
+        view.addSubview(titleLabel)
         
-        title.widthAnchor.constraint(equalToConstant: 288).isActive = true
-        title.heightAnchor.constraint(equalToConstant: 22).isActive = true
-        title.topAnchor.constraint(equalTo: view.topAnchor, constant: 24).isActive = true
-        title.centerXAnchor.constraint(equalTo: view.centerXAnchor).isActive = true
-
-        titleLabel = title
+        NSLayoutConstraint.activate([
+            titleLabel.widthAnchor.constraint(equalToConstant: 288),
+            titleLabel.heightAnchor.constraint(equalToConstant: 22),
+            titleLabel.topAnchor.constraint(equalTo: view.topAnchor, constant: 24),
+            titleLabel.centerXAnchor.constraint(equalTo: view.centerXAnchor)
+        ])
      }
 
-    func createTable() {
-        let table = UITableView()
+    func createTableWithDays() {
+        daysTable.translatesAutoresizingMaskIntoConstraints = false
+        daysTable.backgroundColor = UIColor(named: "BackgroundDay")
+        daysTable.layer.cornerRadius = 16
+        daysTable.separatorColor = .gray
+        daysTable.separatorStyle = .singleLine
         
-        view.addSubview(table)
-        table.register(UITableViewCell.self, forCellReuseIdentifier: cellIdentifier)
-        table.dataSource = self
-        table.delegate = self
+        daysTable.register(UITableViewCell.self, forCellReuseIdentifier: cellIdentifier)
+        daysTable.dataSource = self
+        daysTable.delegate = self
         
-        table.translatesAutoresizingMaskIntoConstraints = false
-        table.backgroundColor = UIColor(named: "BackgroundDay")
-        table.layer.cornerRadius = 16
-        table.separatorColor = .gray
-        table.separatorStyle = .singleLine
+        view.addSubview(daysTable)
         
-        table.topAnchor.constraint(equalTo: titleLabel.bottomAnchor, constant: 24).isActive = true
-        table.leadingAnchor.constraint(equalTo: view.leadingAnchor, constant: 10).isActive = true
-        table.trailingAnchor.constraint(equalTo: view.trailingAnchor, constant: -10).isActive = true
-        table.bottomAnchor.constraint(equalTo: view.bottomAnchor, constant: -buttonHeight-44.0).isActive = true
+        NSLayoutConstraint.activate([
+            daysTable.topAnchor.constraint(equalTo: titleLabel.bottomAnchor, constant: 24),
+            daysTable.leadingAnchor.constraint(equalTo: view.leadingAnchor, constant: 10),
+            daysTable.trailingAnchor.constraint(equalTo: view.trailingAnchor, constant: -10),
+            daysTable.bottomAnchor.constraint(equalTo: doneButton.topAnchor, constant: -39)
+        ])
+    }
+    
+    @objc func done() {
+        dismiss(animated: true, completion: nil)
     }
 }
 
@@ -99,6 +101,7 @@ extension ScheduleViewController: UITableViewDataSource {
     
     func tableView(_ tableView: UITableView, cellForRowAt indexPath: IndexPath) -> UITableViewCell {
         let weekdayIndex = (indexPath.row + 1) % 7
+        
         let dateFormatter = DateFormatter()
         dateFormatter.locale = Locale(identifier: "ru_RU")
         
@@ -131,8 +134,7 @@ extension ScheduleViewController: UITableViewDelegate {
     }
     
     func tableView(_ tableView: UITableView, didSelectRowAt indexPath: IndexPath) {
-//        tableView.deselectRow(at: indexPath, animated: true)
-        dismiss(animated: true, completion: nil)
+        
     }
 }
 

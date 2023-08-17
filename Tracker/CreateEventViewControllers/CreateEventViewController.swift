@@ -16,9 +16,9 @@ struct TableButton {
     var callback: () -> Void
 }
 
-final class AddingEventViewController: UIViewController {
+final class CreateEventViewController: UIViewController {
     private let buttonHeight = CGFloat(60)
-    private var tableButtons = [TableButton]()
+    private var categoryAndScheduleButtons = [TableButton]()
     private let emojies = [
         "🙂", "😻", "🌺", "🐶", "❤️", "😱",
         "😇", "😡", "🥶", "🤔", "🙌", "🍔",
@@ -27,15 +27,13 @@ final class AddingEventViewController: UIViewController {
     private let colors = (1...18).map{ UIColor(named: "ColorSelection\($0)") }
 
     private let titleLabel = UILabel()
-    private let nameInput = UITextField()
-    private let tableView = UITableView()
+    private let eventNameInput = UITextField()
+    private let buttonsTableView = UITableView()
     private let titleEmojiList = UILabel()
     private let titleColorsList = UILabel()
     private let cancelButton = UIButton()
-    private let createButton = UIButton()
+    private let createEventButton = UIButton()
     
-    var trackerService: TrackerServiceProtocol?
-
     private let emojiCollectionView: UICollectionView = {
         let collectionView = UICollectionView(
             frame: .zero,
@@ -43,39 +41,40 @@ final class AddingEventViewController: UIViewController {
         )
         collectionView.register(EmojiCollectionViewCell.self, forCellWithReuseIdentifier: emojiCellIdentifier)
         collectionView.register(ColorCollectionViewCell.self, forCellWithReuseIdentifier: colorCellIdentifier)
-        collectionView.register(AddingEventSupplementaryView.self,
+        collectionView.register(CreateEventSupplementaryView.self,
                                 forSupplementaryViewOfKind: UICollectionView.elementKindSectionHeader,
                                 withReuseIdentifier: "header")
         return collectionView
     }()
 
+    var trackerService: TrackerServiceProtocol?
     var isHabit: Bool?
 
     override func viewDidLoad() {
         super.viewDidLoad()
         view.backgroundColor = UIColor(named: "WhiteDay")
     
-        tableButtons.append(TableButton(name: "Категория", callback:  openCategories))
+        categoryAndScheduleButtons.append(TableButton(name: "Категория", callback: openCategories))
         if let isHabit = isHabit, isHabit {
-            tableButtons.append(TableButton(name: "Расписание", callback: openSchedule))
+            categoryAndScheduleButtons.append(TableButton(name: "Расписание", callback: openSchedule))
         }
         
         createTitle()
-        createNameInput()
+        createEventNameInput()
         createTableWithButtons()
         createEmojiList()
-        createButtons()
+        createCancelButton()
+        createEventCreateButton()
     }
     
     private func createTitle() {
-        view.addSubview(titleLabel)
-        
         titleLabel.translatesAutoresizingMaskIntoConstraints = false
         titleLabel.text = "Новое нерегулярное событие"
         titleLabel.textAlignment = .center
-        
         titleLabel.font = UIFont.systemFont(ofSize: 16, weight: .medium)
         titleLabel.textColor = UIColor(named: "BlackDay")
+        
+        view.addSubview(titleLabel)
         
         NSLayoutConstraint.activate([
             titleLabel.heightAnchor.constraint(equalToConstant: 22),
@@ -84,63 +83,64 @@ final class AddingEventViewController: UIViewController {
         ])
     }
     
-    private func createNameInput() {
-        view.addSubview(nameInput)
+    private func createEventNameInput() {
+        eventNameInput.translatesAutoresizingMaskIntoConstraints = false
+        eventNameInput.backgroundColor = UIColor(named: "BackgroundDay")
+        eventNameInput.layer.cornerRadius = 16
+        eventNameInput.leftView = UIView(frame: CGRectMake(0, 0, 16, eventNameInput.frame.height))
+        eventNameInput.leftViewMode = .always
+        eventNameInput.placeholder = "Введите название трекера"
+        eventNameInput.addTarget(self, action: #selector(textFieldDidChange(textField:)), for: .editingChanged)
         
-        nameInput.translatesAutoresizingMaskIntoConstraints = false
-        nameInput.backgroundColor = UIColor(named: "BackgroundDay")
-        nameInput.layer.cornerRadius = 16
-        nameInput.leftView = UIView(frame: CGRectMake(0, 0, 16, nameInput.frame.height))
-        nameInput.leftViewMode = .always
-        nameInput.placeholder = "Введите название трекера"
-        nameInput.addTarget(self, action: #selector(textFieldDidChange(textField:)), for: .editingChanged)
+        view.addSubview(eventNameInput)
         
         NSLayoutConstraint.activate([
-            nameInput.heightAnchor.constraint(equalToConstant: 75),
-            nameInput.topAnchor.constraint(equalTo: titleLabel.bottomAnchor, constant: 24),
-            nameInput.leadingAnchor.constraint(equalTo: view.leadingAnchor, constant: 16),
-            nameInput.trailingAnchor.constraint(equalTo: view.trailingAnchor, constant: -16)
+            eventNameInput.heightAnchor.constraint(equalToConstant: 75),
+            eventNameInput.topAnchor.constraint(equalTo: titleLabel.bottomAnchor, constant: 24),
+            eventNameInput.leadingAnchor.constraint(equalTo: view.leadingAnchor, constant: 16),
+            eventNameInput.trailingAnchor.constraint(equalTo: view.trailingAnchor, constant: -16)
         ])
     }
     
     private func createTableWithButtons() {
-        view.addSubview(tableView)
-        
-        tableView.translatesAutoresizingMaskIntoConstraints = false
-        tableView.register(UITableViewCell.self, forCellReuseIdentifier: "cell")
-        tableView.rowHeight = 75
-        tableView.backgroundColor = UIColor(named: "BackgroundDay")
-        tableView.layer.cornerRadius = 16
-        tableView.tableFooterView = UIView(frame: CGRect(x: 0, y: 0, width: tableView.frame.size.width, height: 1))
+        buttonsTableView.translatesAutoresizingMaskIntoConstraints = false
+        buttonsTableView.register(UITableViewCell.self, forCellReuseIdentifier: "cell")
+        buttonsTableView.rowHeight = 75
+        buttonsTableView.backgroundColor = UIColor(named: "BackgroundDay")
+        buttonsTableView.layer.cornerRadius = 16
+        buttonsTableView.tableFooterView = UIView(frame: CGRect(x: 0, y: 0, width: buttonsTableView.frame.size.width, height: 1))
 
-        tableView.dataSource = self
-        tableView.delegate = self
+        buttonsTableView.dataSource = self
+        buttonsTableView.delegate = self
+        
+        view.addSubview(buttonsTableView)
         
         NSLayoutConstraint.activate([
-            tableView.topAnchor.constraint(equalTo: nameInput.bottomAnchor, constant: 24),
-            tableView.leadingAnchor.constraint(equalTo: view.leadingAnchor, constant: 16),
-            tableView.trailingAnchor.constraint(equalTo: view.trailingAnchor, constant: -16),
-            tableView.heightAnchor.constraint(equalToConstant: 75 * CGFloat(tableButtons.count))
+            buttonsTableView.topAnchor.constraint(equalTo: eventNameInput.bottomAnchor, constant: 24),
+            buttonsTableView.leadingAnchor.constraint(equalTo: view.leadingAnchor, constant: 16),
+            buttonsTableView.trailingAnchor.constraint(equalTo: view.trailingAnchor, constant: -16),
+            buttonsTableView.heightAnchor.constraint(equalToConstant: 75 * CGFloat(categoryAndScheduleButtons.count))
         ])
     }
     
     private func createEmojiList() {
-        view.addSubview(emojiCollectionView)
         emojiCollectionView.translatesAutoresizingMaskIntoConstraints = false
+        
+        emojiCollectionView.dataSource = self
+        emojiCollectionView.delegate = self
+        
+        view.addSubview(emojiCollectionView)
+        
         NSLayoutConstraint.activate([
             emojiCollectionView.heightAnchor.constraint(equalToConstant: 450),
-            emojiCollectionView.topAnchor.constraint(equalTo: tableView.bottomAnchor, constant: 16),
+            emojiCollectionView.topAnchor.constraint(equalTo: buttonsTableView.bottomAnchor, constant: 16),
             emojiCollectionView.leadingAnchor.constraint(equalTo: view.leadingAnchor, constant: 16),
             emojiCollectionView.trailingAnchor.constraint(equalTo: view.trailingAnchor, constant: -16),
             emojiCollectionView.bottomAnchor.constraint(lessThanOrEqualTo: view.bottomAnchor, constant: -buttonHeight - CGFloat(44))
         ])
-        
-        emojiCollectionView.dataSource = self
-        emojiCollectionView.delegate = self
     }
     
-    private func createButtons() {
-        view.addSubview(cancelButton)
+    private func createCancelButton() {
         cancelButton.translatesAutoresizingMaskIntoConstraints = false
         cancelButton.backgroundColor = UIColor(named: "WhiteDay")
         cancelButton.layer.cornerRadius = 16
@@ -151,42 +151,49 @@ final class AddingEventViewController: UIViewController {
         cancelButton.layer.borderWidth = 1
         cancelButton.addTarget(self, action: #selector(cancelCreateEvent), for: .touchUpInside)
         
-        view.addSubview(createButton)
-        createButton.backgroundColor = UIColor(named: "BlackDay")
-        createButton.translatesAutoresizingMaskIntoConstraints = false
-        createButton.layer.cornerRadius = 16
-        createButton.setTitle("Создать", for: .normal)
-        createButton.titleLabel?.font = UIFont.systemFont(ofSize: 16, weight: .medium)
-        createButton.setTitleColor(UIColor(named: "WhiteDay"), for: .normal)
-        createButton.titleLabel?.textAlignment = .center
-        createButton.addTarget(self, action: #selector(createEvent), for: .touchUpInside)
-        
-        if let inputText = nameInput.text,
-           inputText.isEmpty {
-            createButton.isEnabled = false
-            createButton.backgroundColor = UIColor(named: "Gray")
-        }
+        view.addSubview(cancelButton)
         
         NSLayoutConstraint.activate([
             cancelButton.bottomAnchor.constraint(equalTo: view.bottomAnchor, constant: -34),
             cancelButton.heightAnchor.constraint(equalToConstant: buttonHeight),
             cancelButton.trailingAnchor.constraint(equalTo: view.trailingAnchor, constant: -(view.frame.width / 2 + 3)),
-            cancelButton.leadingAnchor.constraint(equalTo: view.leadingAnchor, constant: 16),
-            
-            createButton.leadingAnchor.constraint(equalTo: cancelButton.trailingAnchor, constant: 6),
-            createButton.trailingAnchor.constraint(equalTo: view.trailingAnchor, constant: -16),
-            createButton.heightAnchor.constraint(equalToConstant: buttonHeight),
-            createButton.bottomAnchor.constraint(equalTo: view.bottomAnchor, constant: -34)
+            cancelButton.leadingAnchor.constraint(equalTo: view.leadingAnchor, constant: 16)
         ])
     }
     
-    func openCategories() {
+    private func createEventCreateButton() {
+        createEventButton.backgroundColor = UIColor(named: "BlackDay")
+        createEventButton.translatesAutoresizingMaskIntoConstraints = false
+        createEventButton.layer.cornerRadius = 16
+        createEventButton.setTitle("Создать", for: .normal)
+        createEventButton.titleLabel?.font = UIFont.systemFont(ofSize: 16, weight: .medium)
+        createEventButton.setTitleColor(UIColor(named: "WhiteDay"), for: .normal)
+        createEventButton.titleLabel?.textAlignment = .center
+        createEventButton.addTarget(self, action: #selector(goToCreateEventController), for: .touchUpInside)
+        
+        if let inputText = eventNameInput.text,
+           inputText.isEmpty {
+            createEventButton.isEnabled = false
+            createEventButton.backgroundColor = UIColor(named: "Gray")
+        }
+       
+        view.addSubview(createEventButton)
+        
+        NSLayoutConstraint.activate([
+            createEventButton.leadingAnchor.constraint(equalTo: cancelButton.trailingAnchor, constant: 6),
+            createEventButton.trailingAnchor.constraint(equalTo: view.trailingAnchor, constant: -16),
+            createEventButton.heightAnchor.constraint(equalToConstant: buttonHeight),
+            createEventButton.bottomAnchor.constraint(equalTo: view.bottomAnchor, constant: -34)
+        ])
+    }
+    
+    private func openCategories() {
         let categoriesViewController = ListCategoriesViewController()
         categoriesViewController.modalPresentationStyle = .popover
         self.present(categoriesViewController, animated: true)
     }
     
-    func openSchedule() {
+    private func openSchedule() {
         let scheduleViewController = ScheduleViewController()
         scheduleViewController.modalPresentationStyle = .popover
         self.present(scheduleViewController, animated: true)
@@ -196,19 +203,19 @@ final class AddingEventViewController: UIViewController {
         self.view.window?.rootViewController?.dismiss(animated: true, completion: nil)
     }
     
-    @objc func createEvent() {
-        guard let value = nameInput.text else {
-            print("createEvent: nameInput.text is empty")
+    @objc func goToCreateEventController() {
+        guard let value = eventNameInput.text else {
+            print("goToCreateEventController: nameInput.text is empty")
             return
         }
         
         guard let trackerService = trackerService else {
-            print("createEvent: trackerService is empty")
+            print("goToCreateEventController: trackerService is empty")
             return
         }
         
         guard let isHabit = isHabit else {
-            print("createEvent: isHabit is empty")
+            print("goToCreateEventController: isHabit is empty")
             return
         }
         
@@ -244,25 +251,26 @@ final class AddingEventViewController: UIViewController {
     }
     
     @objc func textFieldDidChange(textField: UITextField) {
-        if let nameInputText = nameInput.text,
+        if let nameInputText = eventNameInput.text,
            !nameInputText.isEmpty {
-            createButton.isEnabled = true
-            createButton.backgroundColor = UIColor(named: "BlackDay")
+            createEventButton.isEnabled = true
+            createEventButton.backgroundColor = UIColor(named: "BlackDay")
             return
         }
         
-        createButton.isEnabled = false
-        createButton.backgroundColor = UIColor(named: "Gray")
+        createEventButton.isEnabled = false
+        createEventButton.backgroundColor = UIColor(named: "Gray")
     }
 }
-extension AddingEventViewController: UITableViewDataSource {
+
+extension CreateEventViewController: UITableViewDataSource {
     func tableView(_ tableView: UITableView, numberOfRowsInSection section: Int) -> Int {
-        return tableButtons.count
+        return categoryAndScheduleButtons.count
     }
     
     func tableView(_ tableView: UITableView, cellForRowAt indexPath: IndexPath) -> UITableViewCell {
         let cell = tableView.dequeueReusableCell(withIdentifier: cellIdentifier, for: indexPath)
-        cell.textLabel?.text = tableButtons[indexPath.row].name
+        cell.textLabel?.text = categoryAndScheduleButtons[indexPath.row].name
         cell.backgroundColor = UIColor(named: "BackgroundDay")
         
         let chevronImageView = UIImageView(image: UIImage(named: "chevron"))
@@ -281,13 +289,13 @@ extension AddingEventViewController: UITableViewDataSource {
     }
 }
 
-extension AddingEventViewController: UITableViewDelegate {
+extension CreateEventViewController: UITableViewDelegate {
     func tableView(_ tableView: UITableView, didSelectRowAt indexPath: IndexPath) {
-        tableButtons[indexPath.row].callback()
+        categoryAndScheduleButtons[indexPath.row].callback()
     }
 }
 
-extension AddingEventViewController: UICollectionViewDataSource {
+extension CreateEventViewController: UICollectionViewDataSource {
     func numberOfSections(in collectionView: UICollectionView) -> Int {
         2
     }
@@ -326,7 +334,7 @@ extension AddingEventViewController: UICollectionViewDataSource {
             id = ""
         }
 
-        guard let view = collectionView.dequeueReusableSupplementaryView(ofKind: kind, withReuseIdentifier: id, for: indexPath) as? AddingEventSupplementaryView else {
+        guard let view = collectionView.dequeueReusableSupplementaryView(ofKind: kind, withReuseIdentifier: id, for: indexPath) as? CreateEventSupplementaryView else {
             print("fialed to convert SupplementaryView")
             return UICollectionReusableView()
         }
@@ -341,7 +349,7 @@ extension AddingEventViewController: UICollectionViewDataSource {
     }
 }
 
-extension AddingEventViewController: UICollectionViewDelegateFlowLayout {
+extension CreateEventViewController: UICollectionViewDelegateFlowLayout {
     func collectionView(_ collectionView: UICollectionView, layout collectionViewLayout: UICollectionViewLayout, sizeForItemAt indexPath: IndexPath) -> CGSize {
         return CGSize(width: collectionView.bounds.width / 6, height: collectionView.bounds.width / 6)
     }

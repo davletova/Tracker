@@ -48,7 +48,4 @@ final class CategoryService: CategoryServiceProtocol {
     func getCategories() -> [Category] {
         return categories
     }
-    
-    
-    
 }

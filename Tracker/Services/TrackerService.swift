@@ -34,16 +34,16 @@ struct Section {
     var events: [Event]
 }
 
-final class TrackerService: TrackerServiceProtocol {
+final class TrackerService {
     static let CreateEventNotification = Notification.Name(rawValue: "creatEvent")
-
+    
     var events = [UUID: Event]()
     
     var trackerRecordService: TrackerRecordServiceProtocol
     
     init(trackerRecordService: TrackerRecordServiceProtocol) {
         self.trackerRecordService = trackerRecordService
-    
+        
         events = createMockEvents()
         
         NotificationCenter.default.addObserver(
@@ -64,7 +64,9 @@ final class TrackerService: TrackerServiceProtocol {
             self.createEvent(event: event)
         }
     }
+}
 
+extension TrackerService: TrackerServiceProtocol {
     func getEvents(by date: Date) -> [Section] {
         var eventsByDate = [UUID: Event]()
         
@@ -120,7 +122,6 @@ final class TrackerService: TrackerServiceProtocol {
         return completedEvents
     }
     
-    
     func createEvent(event: Event) {
         events.updateValue(event, forKey: event.id)
         
@@ -164,7 +165,7 @@ final class TrackerService: TrackerServiceProtocol {
         events[eventId] = event
     }
     
-    func putEventsToSections(cellEvents: [UUID: Event]) -> [Section] {
+    private func putEventsToSections(cellEvents: [UUID: Event]) -> [Section] {
         var sectionsDictionary = [String: [Event]]()
         var sections = [Section]()
     
@@ -186,18 +187,3 @@ final class TrackerService: TrackerServiceProtocol {
     }
 }
 
-//func dateFromString(date: String) -> Date {
-//    let dateFormatter = DateFormatter()
-//    dateFormatter.locale = Locale(identifier: "en_US_POSIX")
-//    dateFormatter.dateFormat = "yyyy-MM-dd'T'HH:mm:ss"
-//    return dateFormatter.date(from: date)!
-//
-//}
-//let d1 = dateFromString(date: "2023-08-07T02:44:00")
-//let d2 = dateFromString(date: "2023-08-06T21:44:00")
-//let d3 = Date()
-//let newDate = Calendar.current.date(byAdding: .day, value: 1, to: d3)
-//let date = Calendar.current.date(bySettingHour: 0, minute: 0, second: 0, of: newDate!)!
-//
-//print(date.formatted(date: .abbreviated, time: .standard))
-//print(date > Date())

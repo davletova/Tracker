@@ -8,7 +8,7 @@
 import Foundation
 import UIKit
 
-class AddingEventSupplementaryView: UICollectionReusableView {
+class CreateEventSupplementaryView: UICollectionReusableView {
     let titleLabel = UILabel()
     
     override init(frame: CGRect) {

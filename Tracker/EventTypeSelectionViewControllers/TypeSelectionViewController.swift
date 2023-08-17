@@ -10,8 +10,8 @@ import Foundation
 import UIKit
 
 final class TypeSelectionViewController: UIViewController {
-    let habitButton = UIButton()
-    let eventButton = UIButton()
+    private let habitButton = UIButton()
+    private let eventButton = UIButton()
     
     var trackerService: TrackerServiceProtocol?
     
@@ -19,11 +19,12 @@ final class TypeSelectionViewController: UIViewController {
         super.viewDidLoad()
         
         view.backgroundColor = UIColor(named: "WhiteDay")
-        createButtons()
+        
+        createHabitButton()
+        createEventButton()
     }
     
-    func createButtons() {
-        view.addSubview(habitButton)
+    func createHabitButton() {
         habitButton.backgroundColor = UIColor(named: "BlackDay")
         habitButton.translatesAutoresizingMaskIntoConstraints = false
         habitButton.layer.cornerRadius = 16
@@ -33,7 +34,18 @@ final class TypeSelectionViewController: UIViewController {
         habitButton.titleLabel?.textAlignment = .center
         habitButton.addTarget(self, action: #selector(goToCreateHabit), for: .touchUpInside)
         
-        view.addSubview(eventButton)
+        view.addSubview(habitButton)
+        
+        NSLayoutConstraint.activate([
+            habitButton.centerYAnchor.constraint(equalTo: view.centerYAnchor),
+            habitButton.leadingAnchor.constraint(equalTo: view.leadingAnchor, constant: 16),
+            habitButton.trailingAnchor.constraint(equalTo: view.trailingAnchor, constant: -16),
+            habitButton.heightAnchor.constraint(equalToConstant: 60),
+            habitButton.centerXAnchor.constraint(equalTo: view.centerXAnchor),
+        ])
+    }
+    
+    private func createEventButton() {
         eventButton.backgroundColor = UIColor(named: "BlackDay")
         eventButton.translatesAutoresizingMaskIntoConstraints = false
         eventButton.layer.cornerRadius = 16
@@ -42,29 +54,28 @@ final class TypeSelectionViewController: UIViewController {
         eventButton.titleLabel?.textColor = UIColor(named: "WhiteDay")
         eventButton.titleLabel?.textAlignment = .center
         eventButton.addTarget(self, action: #selector(goToCreateEvent), for: .touchUpInside)
+       
+        view.addSubview(eventButton)
         
-        habitButton.centerYAnchor.constraint(equalTo: view.centerYAnchor).isActive = true
-        habitButton.leadingAnchor.constraint(equalTo: view.leadingAnchor, constant: 16).isActive = true
-        habitButton.trailingAnchor.constraint(equalTo: view.trailingAnchor, constant: -16).isActive = true
-        habitButton.heightAnchor.constraint(equalToConstant: 60).isActive = true
-        habitButton.centerXAnchor.constraint(equalTo: view.centerXAnchor).isActive = true
-        
-        eventButton.leadingAnchor.constraint(equalTo: view.leadingAnchor, constant: 16).isActive = true
-        eventButton.trailingAnchor.constraint(equalTo: view.trailingAnchor, constant: -16).isActive = true
-        eventButton.heightAnchor.constraint(equalToConstant: 60).isActive = true
-        eventButton.centerXAnchor.constraint(equalTo: view.centerXAnchor).isActive = true
-        eventButton.topAnchor.constraint(equalTo: habitButton.bottomAnchor, constant: 10).isActive = true
+        NSLayoutConstraint.activate([
+            eventButton.leadingAnchor.constraint(equalTo: view.leadingAnchor, constant: 16),
+            eventButton.trailingAnchor.constraint(equalTo: view.trailingAnchor, constant: -16),
+            eventButton.heightAnchor.constraint(equalToConstant: 60),
+            eventButton.centerXAnchor.constraint(equalTo: view.centerXAnchor),
+            eventButton.topAnchor.constraint(equalTo: habitButton.bottomAnchor, constant: 10),
+
+        ])
     }
     
     @objc func goToCreateEvent() {
-        let addingEventViewController = AddingEventViewController()
+        let addingEventViewController = CreateEventViewController()
         addingEventViewController.trackerService = trackerService
         addingEventViewController.isHabit = false
         self.present(addingEventViewController, animated: true)
     }
     
     @objc func goToCreateHabit() {
-        let addingEventViewController = AddingEventViewController()
+        let addingEventViewController = CreateEventViewController()
         addingEventViewController.trackerService = trackerService
         addingEventViewController.isHabit = true
         self.present(addingEventViewController, animated: true)

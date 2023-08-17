@@ -14,7 +14,6 @@ struct GeometricParams {
     let leftInset: CGFloat
     let rightInset: CGFloat
     let cellSpacing: CGFloat
-    // Параметр вычисляется уже при создании, что экономит время на вычислениях при отрисовке коллекции.
     let paddingWidth: CGFloat
     
     init(cellCount: Int, leftInset: CGFloat, rightInset: CGFloat, cellSpacing: CGFloat) {
@@ -29,9 +28,9 @@ struct GeometricParams {
 final class TrackerCollectionView: UIViewController {
     static let EventSavedNotification = Notification.Name(rawValue: "CreateEvent")
     
-    var collectionView = UICollectionView(frame: .zero, collectionViewLayout: UICollectionViewFlowLayout())
-    
     private var trackerService: TrackerServiceProtocol?
+    
+    private var collectionView = UICollectionView(frame: .zero, collectionViewLayout: UICollectionViewFlowLayout())
     private var visibleEventsByCategory = [Section]()
     private var completedEvents = Set<UUID>()
     private var datePicker: UIDatePicker = {
@@ -41,6 +40,9 @@ final class TrackerCollectionView: UIViewController {
         datePicker.calendar = datePickerCalendar
         return datePicker
     }()
+    private let searchController = UISearchController(searchResultsController: nil)
+    private var currentTask: DispatchWorkItem?
+    
     private let params = GeometricParams(cellCount: 2, leftInset: 10, rightInset: 10, cellSpacing: 10)
     
     lazy var emptyCollectionView: UIView = {
@@ -66,10 +68,6 @@ final class TrackerCollectionView: UIViewController {
         
         return view
     }()
-    
-    private let searchController = UISearchController(searchResultsController: nil)
-    private var currentTask: DispatchWorkItem?
-    
     
     override func viewDidLoad() {
         super.viewDidLoad()
@@ -101,20 +99,9 @@ final class TrackerCollectionView: UIViewController {
         searchController.searchResultsUpdater = self
         
         view.backgroundColor = UIColor(named: "WhiteDay")
+
         createNavigationBar()
-        
-        collectionView.translatesAutoresizingMaskIntoConstraints = false
-        view.addSubview(collectionView)
-        
-        setConstraint()
-        
-        collectionView.register(TrackerCollectionViewCell.self, forCellWithReuseIdentifier: cellIdentifier)
-        collectionView.register(SupplementaryView.self,
-                                forSupplementaryViewOfKind: UICollectionView.elementKindSectionHeader,
-                                withReuseIdentifier: "header")
-        
-        collectionView.dataSource = self
-        collectionView.delegate = self
+        showCollectionView()
     }
 
     func showEmptyCollection() {
@@ -130,25 +117,16 @@ final class TrackerCollectionView: UIViewController {
         emptyCollectionView.removeFromSuperview()
     }
     
-    func setConstraint() {
-        NSLayoutConstraint.activate([
-            collectionView.topAnchor.constraint(equalTo: view.safeAreaLayoutGuide.topAnchor, constant: 10),
-            collectionView.bottomAnchor.constraint(equalTo: view.safeAreaLayoutGuide.bottomAnchor),
-            collectionView.leadingAnchor.constraint(equalTo: view.leadingAnchor),
-            collectionView.trailingAnchor.constraint(equalTo: view.trailingAnchor)
-        ])
-    }
-    
     func createNavigationBar() {
         if let navigationBar = navigationController?.navigationBar {
             navigationBar.backgroundColor = UIColor(named: "WhiteDay")
             navigationBar.tintColor = .black
             
-            navigationItem.leftBarButtonItem = UIBarButtonItem(image: UIImage(named: "add"), style: .plain, target: self, action: #selector(createEvent))
+            navigationItem.leftBarButtonItem = UIBarButtonItem(image: UIImage(named: "add"), style: .plain, target: self, action: #selector(clickButtonCreateEvent))
             
             datePicker.preferredDatePickerStyle = .compact
             datePicker.datePickerMode = UIDatePicker.Mode.date
-            datePicker.addTarget(self, action: #selector(changeDate(_:)), for: .valueChanged)
+            datePicker.addTarget(self, action: #selector(changeDateOnDatePicker(_:)), for: .valueChanged)
            
             navigationItem.rightBarButtonItem = UIBarButtonItem(customView: datePicker)
             
@@ -168,16 +146,35 @@ final class TrackerCollectionView: UIViewController {
         }
     }
     
-    @objc func createEvent() {
+    func showCollectionView() {
+        collectionView.translatesAutoresizingMaskIntoConstraints = false
+        view.addSubview(collectionView)
+        
+        collectionView.register(TrackerCollectionViewCell.self, forCellWithReuseIdentifier: cellIdentifier)
+        collectionView.register(SupplementaryView.self,
+                                forSupplementaryViewOfKind: UICollectionView.elementKindSectionHeader,
+                                withReuseIdentifier: "header")
+        collectionView.dataSource = self
+        collectionView.delegate = self
+        
+        NSLayoutConstraint.activate([
+            collectionView.topAnchor.constraint(equalTo: view.safeAreaLayoutGuide.topAnchor, constant: 10),
+            collectionView.bottomAnchor.constraint(equalTo: view.safeAreaLayoutGuide.bottomAnchor),
+            collectionView.leadingAnchor.constraint(equalTo: view.leadingAnchor),
+            collectionView.trailingAnchor.constraint(equalTo: view.trailingAnchor)
+        ])
+    }
+    
+    @objc func clickButtonCreateEvent() {
         let typeSelectionViewController = TypeSelectionViewController()
         typeSelectionViewController.trackerService = trackerService
         typeSelectionViewController.modalPresentationStyle = .popover
         self.present(typeSelectionViewController, animated: true)
     }
     
-    @objc func changeDate(_ datePicker: UIDatePicker) {
+    @objc func changeDateOnDatePicker(_ datePicker: UIDatePicker) {
         guard let trackerService = trackerService else {
-            print("changeDate: trackerService is empty")
+            print("changeDateOnDatePicker: trackerService is empty")
             return
         }
         visibleEventsByCategory = trackerService.getEvents(by: datePicker.date)
@@ -222,19 +219,14 @@ extension TrackerCollectionView: TrackEventProtocol {
 
 extension TrackerCollectionView: UISearchResultsUpdating {
     func updateSearchResults(for searchController: UISearchController) {
-        // Отменяем предыдущую задачу
         currentTask?.cancel()
         
-        // Создаем новую задачу для выполнения поискового запроса
         let newTask = DispatchWorkItem { [weak self] in
-            // Выполняем поисковый запрос
             self?.performSearch(with: searchController.searchBar.text)
         }
         
-        // Сохраняем новую задачу для последующей отмены
         currentTask = newTask
         
-        // Запускаем новую задачу с небольшой задержкой
         DispatchQueue.main.asyncAfter(deadline: .now() + 1, execute: newTask)
     }
     
@@ -277,7 +269,7 @@ extension TrackerCollectionView: UICollectionViewDataSource {
     }
     
     func collectionView(_ collectionView: UICollectionView, numberOfItemsInSection section: Int) -> Int {
-        guard let section = visibleEventsByCategory.safelyAccessElement(at: section) else {
+        guard let section = visibleEventsByCategory.safetyAccessElement(at: section) else {
             print("failed to get section from collection by index \(section)")
             return 0
         }
@@ -291,12 +283,12 @@ extension TrackerCollectionView: UICollectionViewDataSource {
             return UICollectionViewCell()
         }
         
-        guard let section = visibleEventsByCategory.safelyAccessElement(at: indexPath.section) else {
+        guard let section = visibleEventsByCategory.safetyAccessElement(at: indexPath.section) else {
             print("failed to get section from collection by index \(indexPath.section)")
             return UICollectionViewCell()
         }
         
-        guard let event = section.events.safelyAccessElement(at: indexPath.row) else {
+        guard let event = section.events.safetyAccessElement(at: indexPath.row) else {
             print("failed to get element from section: \(section.categoryName) by index \(indexPath.row)")
             return UICollectionViewCell()
         }

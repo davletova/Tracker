@@ -35,7 +35,7 @@ final class TrackerCollectionViewCell: UICollectionViewCell {
     
     var cellEvent: CellEvent? {
         didSet {
-            guard var cellEvent = cellEvent else {
+            guard let cellEvent = cellEvent else {
                 print("event didSet: event is empty")
                 return
             }
@@ -64,6 +64,15 @@ final class TrackerCollectionViewCell: UICollectionViewCell {
     override init(frame: CGRect) {
         super.init(frame: frame)
         
+        createEventView()
+        createTrackView()
+    }
+    
+    required init?(coder: NSCoder) {
+        fatalError("init(coder:) has not been implemented")
+    }
+    
+    func createEventView() {
         eventNameView.translatesAutoresizingMaskIntoConstraints = false
         eventNameView.layer.cornerRadius = 16
         
@@ -73,15 +82,31 @@ final class TrackerCollectionViewCell: UICollectionViewCell {
         emogiLabel.layer.cornerRadius = emogiLabel.frame.height / 2
         emogiLabel.textAlignment = .center
         emogiLabel.font = UIFont.systemFont(ofSize: 16)
-        eventNameView.addSubview(emogiLabel)
         
+        nameLabel.translatesAutoresizingMaskIntoConstraints = false
         nameLabel.frame = CGRect(x: 12, y: 44, width: frame.width - 24, height: 34)
         nameLabel.font = UIFont(name: "SF Pro", size: 12)
         
-        nameLabel.translatesAutoresizingMaskIntoConstraints = false
+        eventNameView.addSubview(emogiLabel)
         eventNameView.addSubview(nameLabel)
         contentView.addSubview(eventNameView)
         
+        NSLayoutConstraint.activate([
+            eventNameView.topAnchor.constraint(equalTo: contentView.topAnchor),
+            eventNameView.leadingAnchor.constraint(equalTo: contentView.leadingAnchor),
+            eventNameView.widthAnchor.constraint(equalToConstant: frame.width),
+            eventNameView.heightAnchor.constraint(equalToConstant: 90),
+            nameLabel.widthAnchor.constraint(equalTo: eventNameView.widthAnchor),
+            emogiLabel.leadingAnchor.constraint(equalTo: contentView.leadingAnchor, constant: 10),
+            emogiLabel.topAnchor.constraint(equalTo: eventNameView.topAnchor, constant: 10),
+            emogiLabel.widthAnchor.constraint(equalToConstant: 30),
+            emogiLabel.heightAnchor.constraint(equalToConstant: 30),
+            nameLabel.bottomAnchor.constraint(equalTo: eventNameView.bottomAnchor, constant: -10),
+            nameLabel.leadingAnchor.constraint(equalTo: contentView.leadingAnchor, constant: 12),
+        ])
+    }
+    
+    func createTrackView() {
         trackView.translatesAutoresizingMaskIntoConstraints = false
                 
         trackButton.frame = CGRect(x: 0, y: 0, width: 40, height: 40)
@@ -97,25 +122,13 @@ final class TrackerCollectionViewCell: UICollectionViewCell {
 
         trackView.addSubview(trackedDaysLabel)
         trackView.addSubview(trackButton)
-        
         contentView.addSubview(trackView)
         
         NSLayoutConstraint.activate([
-            eventNameView.topAnchor.constraint(equalTo: contentView.topAnchor),
-            eventNameView.leadingAnchor.constraint(equalTo: contentView.leadingAnchor),
-            eventNameView.widthAnchor.constraint(equalToConstant: frame.width),
-            eventNameView.heightAnchor.constraint(equalToConstant: 90),
-            nameLabel.widthAnchor.constraint(equalTo: eventNameView.widthAnchor),
             trackView.topAnchor.constraint(equalTo: eventNameView.bottomAnchor),
             trackView.leadingAnchor.constraint(equalTo: contentView.leadingAnchor),
             trackView.widthAnchor.constraint(equalToConstant: frame.width),
             trackView.heightAnchor.constraint(equalToConstant: 58),
-            emogiLabel.leadingAnchor.constraint(equalTo: contentView.leadingAnchor, constant: 10),
-            emogiLabel.topAnchor.constraint(equalTo: eventNameView.topAnchor, constant: 10),
-            emogiLabel.widthAnchor.constraint(equalToConstant: 30),
-            emogiLabel.heightAnchor.constraint(equalToConstant: 30),
-            nameLabel.bottomAnchor.constraint(equalTo: eventNameView.bottomAnchor, constant: -10),
-            nameLabel.leadingAnchor.constraint(equalTo: contentView.leadingAnchor, constant: 12),
             trackedDaysLabel.centerYAnchor.constraint(equalTo: trackView.centerYAnchor),
             trackedDaysLabel.leadingAnchor.constraint(equalTo: contentView.leadingAnchor, constant: 10),
             trackButton.centerYAnchor.constraint(equalTo: trackView.centerYAnchor),
@@ -123,10 +136,6 @@ final class TrackerCollectionViewCell: UICollectionViewCell {
             trackButton.widthAnchor.constraint(equalToConstant: 40),
             trackButton.heightAnchor.constraint(equalToConstant: 40)
         ])
-    }
-    
-    required init?(coder: NSCoder) {
-        fatalError("init(coder:) has not been implemented")
     }
     
     @objc private func trackEvent() {
