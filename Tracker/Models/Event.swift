@@ -10,13 +10,19 @@ import UIKit
 
 class Event {
     let id: UUID
-    var name: String
-    var category: Category
+    let name: String
+    let category: Category
     var trackedDaysCount: Int
-    var emoji: String
-    var color: UIColor
+    let emoji: String
+    let color: UIColor
     
-    init(id: UUID, name: String, category: Category, emoji: String, color: UIColor) {
+    init(
+        id: UUID,
+        name: String,
+        category: Category,
+        emoji: String,
+        color: UIColor
+    ) {
         self.id = id
         self.name = name
         self.category = category

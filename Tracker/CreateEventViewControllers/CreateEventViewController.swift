@@ -25,7 +25,7 @@ final class CreateEventViewController: UIViewController {
         "🥦", "🏓", "🥇", "🎸", "🏝", "😪",
     ]
     private let colors = (1...18).map{ UIColor(named: "ColorSelection\($0)") }
-
+    
     private let titleLabel = UILabel()
     private let eventNameInput = UITextField()
     private let buttonsTableView = UITableView()
@@ -46,14 +46,14 @@ final class CreateEventViewController: UIViewController {
                                 withReuseIdentifier: "header")
         return collectionView
     }()
-
+    
     var trackerService: TrackerServiceProtocol?
     var isHabit: Bool?
-
+    
     override func viewDidLoad() {
         super.viewDidLoad()
         view.backgroundColor = UIColor(named: "WhiteDay")
-    
+        
         categoryAndScheduleButtons.append(TableButton(name: "Категория", callback: openCategories))
         if let isHabit = isHabit, isHabit {
             categoryAndScheduleButtons.append(TableButton(name: "Расписание", callback: openSchedule))
@@ -109,7 +109,7 @@ final class CreateEventViewController: UIViewController {
         buttonsTableView.backgroundColor = UIColor(named: "BackgroundDay")
         buttonsTableView.layer.cornerRadius = 16
         buttonsTableView.tableFooterView = UIView(frame: CGRect(x: 0, y: 0, width: buttonsTableView.frame.size.width, height: 1))
-
+        
         buttonsTableView.dataSource = self
         buttonsTableView.delegate = self
         
@@ -176,7 +176,7 @@ final class CreateEventViewController: UIViewController {
             createEventButton.isEnabled = false
             createEventButton.backgroundColor = UIColor(named: "Gray")
         }
-       
+        
         view.addSubview(createEventButton)
         
         NSLayoutConstraint.activate([
@@ -246,7 +246,7 @@ final class CreateEventViewController: UIViewController {
             object: self,
             userInfo: ["event": newEvent]
         )
-    
+        
         self.view.window?.rootViewController?.dismiss(animated: true, completion: nil)
     }
     
@@ -283,7 +283,7 @@ extension CreateEventViewController: UITableViewDataSource {
             chevronImageView.widthAnchor.constraint(equalToConstant: 24),
             chevronImageView.heightAnchor.constraint(equalToConstant: 24)
         ])
-
+        
         cell.selectionStyle = .none
         return cell
     }
@@ -307,7 +307,7 @@ extension CreateEventViewController: UICollectionViewDataSource {
             return colors.count
         }
     }
-        
+    
     func collectionView(_ collectionView: UICollectionView, cellForItemAt indexPath: IndexPath) -> UICollectionViewCell {
         if indexPath.section == 0 {
             let cell = collectionView.dequeueReusableCell(withReuseIdentifier: emojiCellIdentifier, for: indexPath) as! EmojiCollectionViewCell
@@ -333,7 +333,7 @@ extension CreateEventViewController: UICollectionViewDataSource {
         default:
             id = ""
         }
-
+        
         guard let view = collectionView.dequeueReusableSupplementaryView(ofKind: kind, withReuseIdentifier: id, for: indexPath) as? CreateEventSupplementaryView else {
             print("fialed to convert SupplementaryView")
             return UICollectionReusableView()
@@ -360,9 +360,9 @@ extension CreateEventViewController: UICollectionViewDelegateFlowLayout {
     
     func collectionView(_ collectionView: UICollectionView, layout collectionViewLayout: UICollectionViewLayout, referenceSizeForHeaderInSection section: Int) -> CGSize {
         let indexPath = IndexPath(row: 0, section: section)
-
+        
         let headerView = self.collectionView(collectionView, viewForSupplementaryElementOfKind: UICollectionView.elementKindSectionHeader, at: indexPath)
-
+        
         return headerView.systemLayoutSizeFitting(
             CGSize(width: collectionView.frame.width, height: UIView.layoutFittingExpandedSize.height),
             withHorizontalFittingPriority: .required,

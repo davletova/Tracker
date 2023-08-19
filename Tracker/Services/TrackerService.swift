@@ -9,19 +9,12 @@ import Foundation
 
 protocol TrackerServiceProtocol {
     func getEvents(by date: Date) -> [Section]
-    
     func filterEvents(by name: String, date: Date) -> [Section]
-    
     func getCompletedEvents(by date: Date) -> Set<UUID>
-    
     func createEvent(event: Event)
-    
     func updateEvent(event: Event) -> Event?
-    
     func deleteEvent(eventID: UUID)
-    
     func trackEvent(eventId: UUID)
-    
     func untrackEvent(eventId: UUID)
 }
 

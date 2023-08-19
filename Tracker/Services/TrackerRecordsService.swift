@@ -7,12 +7,6 @@
 
 import Foundation
 
-struct TrackerRecord {
-    let eventID: UUID
-    
-    let date: Date
-}
-
 final class TrackerRecordService: TrackerRecordServiceProtocol {
     static let AddTrackerRecordNotification = Notification.Name(rawValue: "AddRecordTracker")
     static let DeleteTrackerRecordNotification = Notification.Name(rawValue: "DeleteEvent")

@@ -15,7 +15,13 @@ protocol Timetable {
 final class Habit: Event {
     var schedule: Schedule
 
-    init(id: UUID, name: String, category: Category, emoji: String, color: UIColor, schedule: Schedule) {
+    init(id: UUID,
+         name: String,
+         category: Category,
+         emoji: String,
+         color: UIColor,
+         schedule: Schedule
+    ) {
         self.schedule = schedule
         super.init(id: id, name: name, category: category, emoji: emoji, color: color)
     }

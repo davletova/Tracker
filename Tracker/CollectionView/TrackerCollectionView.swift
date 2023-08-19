@@ -8,6 +8,7 @@
 import UIKit
 
 let cellIdentifier = "cell"
+let headerIdentifier = "header"
 
 struct GeometricParams {
     let cellCount: Int
@@ -153,7 +154,7 @@ final class TrackerCollectionView: UIViewController {
         collectionView.register(TrackerCollectionViewCell.self, forCellWithReuseIdentifier: cellIdentifier)
         collectionView.register(SupplementaryView.self,
                                 forSupplementaryViewOfKind: UICollectionView.elementKindSectionHeader,
-                                withReuseIdentifier: "header")
+                                withReuseIdentifier: headerIdentifier)
         collectionView.dataSource = self
         collectionView.delegate = self
         
@@ -312,7 +313,7 @@ extension TrackerCollectionView: UICollectionViewDataSource {
         var id: String
         switch kind {
         case UICollectionView.elementKindSectionHeader:
-            id = "header"
+            id = headerIdentifier
         case UICollectionView.elementKindSectionFooter:
             id = "footer"
         default:

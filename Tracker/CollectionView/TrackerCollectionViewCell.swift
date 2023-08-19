@@ -165,12 +165,9 @@ final class TrackerCollectionViewCell: UICollectionViewCell {
         trackedDaysLabel.text = formatTrackedDays(days: cellEvent.event.trackedDaysCount)
     }
     
-    func disableTrackButton() {
-        trackButton.isEnabled = false
-    }
-    func enableTrackButton() {
-        trackButton.isEnabled = true
-    }
+    func disableTrackButton() { trackButton.isEnabled = false }
+    
+    func enableTrackButton() { trackButton.isEnabled = true }
     
     private func formatTrackedDays(days: Int) -> String {
         if days >= 11 && days <= 14 {

@@ -76,7 +76,7 @@ final class CreateCategoryViewController: UIViewController {
         button.titleLabel?.textColor = UIColor(named: "WhiteDay")
         button.titleLabel?.textAlignment = .center
         button.addTarget(self, action: #selector(createCategory), for: .touchUpInside)
-
+        
         view.addSubview(button)
         
         button.leadingAnchor.constraint(equalTo: view.leadingAnchor, constant: 16).isActive = true
@@ -87,8 +87,6 @@ final class CreateCategoryViewController: UIViewController {
         
         if let nameInputText = nameInput.text,
            nameInputText.isEmpty {
-            print("--------- want disable button ------------")
-            
             button.isEnabled = false
             button.backgroundColor = UIColor(named: "Gray")
         }
@@ -97,7 +95,6 @@ final class CreateCategoryViewController: UIViewController {
     }
     
     @objc func textFieldDidChange(textField: UITextField) {
-        print("=========== text changed ===========")
         if let nameInputText = nameInput.text,
            !nameInputText.isEmpty {
             doneButton.isEnabled = true
@@ -109,7 +106,5 @@ final class CreateCategoryViewController: UIViewController {
         doneButton.backgroundColor = UIColor(named: "Gray")
     }
     
-    @objc func createCategory() {
-        print("------------- create category ----------------")
-    }
+    @objc func createCategory() {}
 }

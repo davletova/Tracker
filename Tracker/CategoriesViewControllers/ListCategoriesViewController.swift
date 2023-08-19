@@ -63,11 +63,13 @@ final class ListCategoriesViewController: UIViewController {
         table.layer.cornerRadius = 16
         table.tableFooterView = UIView(frame: CGRect(x: 0, y: 0, width: table.frame.size.width, height: 1))
         
-        table.topAnchor.constraint(equalTo: titleLabel.bottomAnchor, constant: 24).isActive = true
-        table.leadingAnchor.constraint(equalTo: view.leadingAnchor, constant: 10).isActive = true
-        table.trailingAnchor.constraint(equalTo: view.trailingAnchor, constant: -10).isActive = true
-        table.heightAnchor.constraint(equalToConstant: rowHeight * CGFloat(categories.count)).isActive = true
-        table.bottomAnchor.constraint(lessThanOrEqualTo: view.bottomAnchor, constant: -buttonHeight - CGFloat(44)).isActive = true
+        NSLayoutConstraint.activate([
+            table.topAnchor.constraint(equalTo: titleLabel.bottomAnchor, constant: 24),
+            table.leadingAnchor.constraint(equalTo: view.leadingAnchor, constant: 10),
+            table.trailingAnchor.constraint(equalTo: view.trailingAnchor, constant: -10),
+            table.heightAnchor.constraint(equalToConstant: rowHeight * CGFloat(categories.count)),
+            table.bottomAnchor.constraint(lessThanOrEqualTo: view.bottomAnchor, constant: -buttonHeight - CGFloat(44))
+        ])
     }
     
     func createButton() {
@@ -85,10 +87,12 @@ final class ListCategoriesViewController: UIViewController {
         
         addCategory = button
         
-        button.widthAnchor.constraint(equalToConstant: 288).isActive = true
-        button.heightAnchor.constraint(equalToConstant: buttonHeight).isActive = true
-        button.centerXAnchor.constraint(equalTo: view.centerXAnchor).isActive = true
-        button.bottomAnchor.constraint(equalTo: view.bottomAnchor, constant: -24).isActive = true
+        NSLayoutConstraint.activate([
+            button.widthAnchor.constraint(equalToConstant: 288),
+            button.heightAnchor.constraint(equalToConstant: buttonHeight),
+            button.centerXAnchor.constraint(equalTo: view.centerXAnchor),
+            button.bottomAnchor.constraint(equalTo: view.bottomAnchor, constant: -24)
+        ])
     }
     
     func showEmptyCollection() {
@@ -105,7 +109,6 @@ final class ListCategoriesViewController: UIViewController {
         let createCategoryVC = CreateCategoryViewController()
         
         createCategoryVC.modalPresentationStyle = .popover
-//        popup.popoverPresentationController?.passthroughViews = nil
         self.present(createCategoryVC, animated: true)
     }
 }
@@ -124,9 +127,5 @@ extension ListCategoriesViewController: UITableViewDataSource {
 }
 
 extension ListCategoriesViewController: UITableViewDelegate {
-    func tableView(_ tableView: UITableView, didSelectRowAt indexPath: IndexPath) {
-        
-//        tableView.deselectRow(at: indexPath, animated: true)
-//        dismiss(animated: true, completion: nil)
-    }
+    func tableView(_ tableView: UITableView, didSelectRowAt indexPath: IndexPath) {}
 }
