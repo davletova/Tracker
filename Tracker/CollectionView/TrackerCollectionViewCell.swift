@@ -24,6 +24,10 @@ protocol TrackEventProtocol {
 }
 
 final class TrackerCollectionViewCell: UICollectionViewCell {
+    var date: Date?
+    
+    var delegate: TrackEventProtocol?
+    
     private var emogiLabel: UILabel = {
         var emogiLabel = UILabel()
         emogiLabel.frame = CGRect(x: 0, y: 0, width: 30, height: 30)
@@ -39,7 +43,8 @@ final class TrackerCollectionViewCell: UICollectionViewCell {
     private var nameLabel: UILabel = {
         var nameLabel = UILabel()
         nameLabel.translatesAutoresizingMaskIntoConstraints = false
-        nameLabel.font = UIFont(name: "SF Pro", size: 12)
+        nameLabel.font = UIFont.systemFont(ofSize: 12, weight: .medium)
+        nameLabel.textColor = .white
         
         return nameLabel
     }()
@@ -79,8 +84,6 @@ final class TrackerCollectionViewCell: UICollectionViewCell {
         return trackView
     }()
     
-    var delegate: TrackEventProtocol?
-    
     var cellEvent: CellEvent? {
         didSet {
             guard let cellEvent = cellEvent else {
@@ -106,8 +109,6 @@ final class TrackerCollectionViewCell: UICollectionViewCell {
             }
         }
     }
-    
-    var date: Date? 
     
     override init(frame: CGRect) {
         super.init(frame: frame)
