@@ -9,14 +9,17 @@ import Foundation
 import UIKit
 
 final class EmojiCollectionViewCell: UICollectionViewCell {
-    var titleLabel = UILabel()
+    var titleLabel: UILabel = {
+        var titleLabel = UILabel()
+        titleLabel.font = UIFont.systemFont(ofSize: 32, weight: .bold)
+        titleLabel.translatesAutoresizingMaskIntoConstraints = false
+        
+        return titleLabel
+    }()
     
     override init(frame: CGRect) {
         super.init(frame: frame)
-
-        titleLabel.font = UIFont.systemFont(ofSize: 32, weight: .bold)
-        titleLabel.translatesAutoresizingMaskIntoConstraints = false
-            
+        
         contentView.addSubview(titleLabel)
         
         NSLayoutConstraint.activate([

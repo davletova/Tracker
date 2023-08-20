@@ -14,44 +14,8 @@ struct DailySchedule {
 }
 
 final class ScheduleViewController: UIViewController {
-    private var titleLabel = UILabel()
-    private var doneButton = UIButton()
-    private var daysTable = UITableView()
-    
-    let rowHeight: CGFloat = 75.0
-    let buttonHeight: CGFloat = 60.0
-    
-    var scheduleDays = Weekday.allCases.map { weekday in
-        DailySchedule(dayOfWeek: weekday, isScheduled: true)
-    }
-    
-    override func viewDidLoad() {
-        super.viewDidLoad()
-        view.backgroundColor = UIColor(named: "WhiteDay")
-        
-        createTitle()
-        createDoneButton()
-        createTableWithDays()
-    }
-    
-    func createDoneButton() {
-        doneButton.translatesAutoresizingMaskIntoConstraints = false
-        doneButton.layer.cornerRadius = 16
-        doneButton.backgroundColor = UIColor(named: "BlackDay")
-        doneButton.setTitle("Готово", for: .normal)
-        doneButton.addTarget(self, action: #selector(done), for: .touchUpInside)
-        
-        view.addSubview(doneButton)
-        
-        NSLayoutConstraint.activate([
-            doneButton.bottomAnchor.constraint(equalTo: view.bottomAnchor, constant: -44),
-            doneButton.heightAnchor.constraint(equalToConstant: buttonHeight),
-            doneButton.leadingAnchor.constraint(equalTo: view.leadingAnchor, constant: 16),
-            doneButton.trailingAnchor.constraint(equalTo: view.trailingAnchor, constant: -16)
-        ])
-    }
-    
-    func createTitle() {
+    private lazy var titleLabel: UILabel = {
+        let titleLabel = UILabel()
         titleLabel.translatesAutoresizingMaskIntoConstraints = false
         titleLabel.text = "Расписание"
         titleLabel.textAlignment = .center
@@ -60,15 +24,24 @@ final class ScheduleViewController: UIViewController {
         
         view.addSubview(titleLabel)
         
-        NSLayoutConstraint.activate([
-            titleLabel.widthAnchor.constraint(equalToConstant: 288),
-            titleLabel.heightAnchor.constraint(equalToConstant: 22),
-            titleLabel.topAnchor.constraint(equalTo: view.topAnchor, constant: 24),
-            titleLabel.centerXAnchor.constraint(equalTo: view.centerXAnchor)
-        ])
-     }
-
-    func createTableWithDays() {
+        return titleLabel
+    }()
+    
+    private lazy var doneButton: UIButton = {
+        let doneButton = UIButton()
+        doneButton.translatesAutoresizingMaskIntoConstraints = false
+        doneButton.layer.cornerRadius = 16
+        doneButton.backgroundColor = UIColor(named: "BlackDay")
+        doneButton.setTitle("Готово", for: .normal)
+        doneButton.addTarget(self, action: #selector(done), for: .touchUpInside)
+        
+        view.addSubview(doneButton)
+        
+        return doneButton
+    }()
+    
+    private lazy var daysTable: UITableView = {
+        let daysTable = UITableView()
         daysTable.translatesAutoresizingMaskIntoConstraints = false
         daysTable.backgroundColor = UIColor(named: "BackgroundDay")
         daysTable.layer.cornerRadius = 16
@@ -81,7 +54,35 @@ final class ScheduleViewController: UIViewController {
         
         view.addSubview(daysTable)
         
+        return daysTable
+    }()
+    
+    let rowHeight: CGFloat = 75.0
+    let buttonHeight: CGFloat = 60.0
+    
+    var scheduleDays = Weekday.allCases.map { weekday in
+        DailySchedule(dayOfWeek: weekday, isScheduled: true)
+    }
+    
+    override func viewDidLoad() {
+        super.viewDidLoad()
+        view.backgroundColor = UIColor(named: "WhiteDay")
+        
+        setConstraint()
+    }
+    
+    func setConstraint() {
         NSLayoutConstraint.activate([
+            doneButton.bottomAnchor.constraint(equalTo: view.bottomAnchor, constant: -44),
+            doneButton.heightAnchor.constraint(equalToConstant: buttonHeight),
+            doneButton.leadingAnchor.constraint(equalTo: view.leadingAnchor, constant: 16),
+            doneButton.trailingAnchor.constraint(equalTo: view.trailingAnchor, constant: -16),
+            
+            titleLabel.widthAnchor.constraint(equalToConstant: 288),
+            titleLabel.heightAnchor.constraint(equalToConstant: 22),
+            titleLabel.topAnchor.constraint(equalTo: view.topAnchor, constant: 24),
+            titleLabel.centerXAnchor.constraint(equalTo: view.centerXAnchor),
+            
             daysTable.topAnchor.constraint(equalTo: titleLabel.bottomAnchor, constant: 24),
             daysTable.leadingAnchor.constraint(equalTo: view.leadingAnchor, constant: 10),
             daysTable.trailingAnchor.constraint(equalTo: view.trailingAnchor, constant: -10),
@@ -133,8 +134,6 @@ extension ScheduleViewController: UITableViewDelegate {
         return cellHeight
     }
     
-    func tableView(_ tableView: UITableView, didSelectRowAt indexPath: IndexPath) {
-        
-    }
+    func tableView(_ tableView: UITableView, didSelectRowAt indexPath: IndexPath) {}
 }
 

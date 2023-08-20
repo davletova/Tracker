@@ -9,14 +9,17 @@ import Foundation
 import UIKit
 
 class SupplementaryView: UICollectionReusableView {
-    let titleLabel = UILabel()
+    let titleLabel: UILabel = {
+        let titleLabel = UILabel()
+        titleLabel.translatesAutoresizingMaskIntoConstraints = false
+        titleLabel.font = UIFont.systemFont(ofSize: 19, weight: UIFont.Weight.bold)
+        return titleLabel
+    }()
     
     override init(frame: CGRect) {
         super.init(frame: frame)
         
         addSubview(titleLabel)
-        titleLabel.translatesAutoresizingMaskIntoConstraints = false
-        titleLabel.font = UIFont.systemFont(ofSize: 19, weight: UIFont.Weight.bold)
         
         NSLayoutConstraint.activate([
             titleLabel.leadingAnchor.constraint(equalTo: leadingAnchor, constant: 20),

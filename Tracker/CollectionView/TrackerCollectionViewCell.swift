@@ -24,12 +24,60 @@ protocol TrackEventProtocol {
 }
 
 final class TrackerCollectionViewCell: UICollectionViewCell {
-    var eventNameView = UIView()
-    var trackView = UIView()
-    var emogiLabel = UILabel()
-    var nameLabel = UILabel()
-    var trackedDaysLabel = UILabel()
-    var trackButton = UIButton()
+    private var emogiLabel: UILabel = {
+        var emogiLabel = UILabel()
+        emogiLabel.frame = CGRect(x: 0, y: 0, width: 30, height: 30)
+        emogiLabel.translatesAutoresizingMaskIntoConstraints = false
+        emogiLabel.layer.masksToBounds = true
+        emogiLabel.layer.cornerRadius = emogiLabel.frame.height / 2
+        emogiLabel.textAlignment = .center
+        emogiLabel.font = UIFont.systemFont(ofSize: 16)
+        
+        return emogiLabel
+    }()
+    
+    private var nameLabel: UILabel = {
+        var nameLabel = UILabel()
+        nameLabel.translatesAutoresizingMaskIntoConstraints = false
+        nameLabel.font = UIFont(name: "SF Pro", size: 12)
+        
+        return nameLabel
+    }()
+    
+    private var eventNameView: UIView = {
+        let eventNameView = UIView()
+        eventNameView.translatesAutoresizingMaskIntoConstraints = false
+        eventNameView.layer.cornerRadius = 16
+        
+        return eventNameView
+    }()
+    
+    private var trackedDaysLabel: UILabel = {
+        let trackedDaysLabel = UILabel()
+        trackedDaysLabel.textColor = .black
+        trackedDaysLabel.translatesAutoresizingMaskIntoConstraints = false
+        trackedDaysLabel.textAlignment = .center
+
+        return trackedDaysLabel
+    }()
+    
+    private var trackButton: UIButton = {
+        var trackButton = UIButton()
+        trackButton.frame = CGRect(x: 0, y: 0, width: 40, height: 40)
+        trackButton.layer.masksToBounds = true
+        trackButton.translatesAutoresizingMaskIntoConstraints = false
+        trackButton.layer.cornerRadius = trackButton.frame.height / 2
+        trackButton.tintColor = .white
+        
+        return trackButton
+    }()
+    
+    private var trackView: UIView = {
+        var trackView = UIView()
+        trackView.translatesAutoresizingMaskIntoConstraints = false
+        
+        return trackView
+    }()
     
     var delegate: TrackEventProtocol?
     
@@ -64,33 +112,26 @@ final class TrackerCollectionViewCell: UICollectionViewCell {
     override init(frame: CGRect) {
         super.init(frame: frame)
         
-        createEventView()
-        createTrackView()
+        nameLabel.frame = CGRect(x: 12, y: 44, width: frame.width - 24, height: 34)
+        
+        eventNameView.addSubview(emogiLabel)
+        eventNameView.addSubview(nameLabel)
+        contentView.addSubview(eventNameView)
+        
+        trackButton.addTarget(self, action: #selector(trackEvent), for: .touchUpInside)
+        
+        trackView.addSubview(trackedDaysLabel)
+        trackView.addSubview(trackButton)
+        contentView.addSubview(trackView)
+        
+        setConstraint()
     }
     
     required init?(coder: NSCoder) {
         fatalError("init(coder:) has not been implemented")
     }
     
-    func createEventView() {
-        eventNameView.translatesAutoresizingMaskIntoConstraints = false
-        eventNameView.layer.cornerRadius = 16
-        
-        emogiLabel.frame = CGRect(x: 0, y: 0, width: 30, height: 30)
-        emogiLabel.translatesAutoresizingMaskIntoConstraints = false
-        emogiLabel.layer.masksToBounds = true
-        emogiLabel.layer.cornerRadius = emogiLabel.frame.height / 2
-        emogiLabel.textAlignment = .center
-        emogiLabel.font = UIFont.systemFont(ofSize: 16)
-        
-        nameLabel.translatesAutoresizingMaskIntoConstraints = false
-        nameLabel.frame = CGRect(x: 12, y: 44, width: frame.width - 24, height: 34)
-        nameLabel.font = UIFont(name: "SF Pro", size: 12)
-        
-        eventNameView.addSubview(emogiLabel)
-        eventNameView.addSubview(nameLabel)
-        contentView.addSubview(eventNameView)
-        
+    private func setConstraint() {
         NSLayoutConstraint.activate([
             eventNameView.topAnchor.constraint(equalTo: contentView.topAnchor),
             eventNameView.leadingAnchor.constraint(equalTo: contentView.leadingAnchor),
@@ -103,28 +144,7 @@ final class TrackerCollectionViewCell: UICollectionViewCell {
             emogiLabel.heightAnchor.constraint(equalToConstant: 30),
             nameLabel.bottomAnchor.constraint(equalTo: eventNameView.bottomAnchor, constant: -10),
             nameLabel.leadingAnchor.constraint(equalTo: contentView.leadingAnchor, constant: 12),
-        ])
-    }
-    
-    func createTrackView() {
-        trackView.translatesAutoresizingMaskIntoConstraints = false
-                
-        trackButton.frame = CGRect(x: 0, y: 0, width: 40, height: 40)
-        trackButton.layer.masksToBounds = true
-        trackButton.translatesAutoresizingMaskIntoConstraints = false
-        trackButton.layer.cornerRadius = trackButton.frame.height / 2
-        trackButton.tintColor = .white
-        trackButton.addTarget(self, action: #selector(trackEvent), for: .touchUpInside)
-
-        trackedDaysLabel.textColor = .black
-        trackedDaysLabel.translatesAutoresizingMaskIntoConstraints = false
-        trackedDaysLabel.textAlignment = .center
-
-        trackView.addSubview(trackedDaysLabel)
-        trackView.addSubview(trackButton)
-        contentView.addSubview(trackView)
-        
-        NSLayoutConstraint.activate([
+            
             trackView.topAnchor.constraint(equalTo: eventNameView.bottomAnchor),
             trackView.leadingAnchor.constraint(equalTo: contentView.leadingAnchor),
             trackView.widthAnchor.constraint(equalToConstant: frame.width),

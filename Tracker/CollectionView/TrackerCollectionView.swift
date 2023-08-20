@@ -31,9 +31,9 @@ final class TrackerCollectionView: UIViewController {
     
     private var trackerService: TrackerServiceProtocol?
     
-    private var collectionView = UICollectionView(frame: .zero, collectionViewLayout: UICollectionViewFlowLayout())
     private var visibleEventsByCategory = [Section]()
     private var completedEvents = Set<UUID>()
+    
     private var datePicker: UIDatePicker = {
         var datePicker = UIDatePicker()
         var datePickerCalendar = Calendar(identifier: .gregorian)
@@ -41,12 +41,49 @@ final class TrackerCollectionView: UIViewController {
         datePicker.calendar = datePickerCalendar
         return datePicker
     }()
-    private let searchController = UISearchController(searchResultsController: nil)
-    private var currentTask: DispatchWorkItem?
     
     private let params = GeometricParams(cellCount: 2, leftInset: 10, rightInset: 10, cellSpacing: 10)
     
-    lazy var emptyCollectionView: UIView = {
+    private lazy var searchTextField: UISearchTextField = {
+        let textField = UISearchTextField()
+        textField.backgroundColor = UIColor(named: "BackgroundDay")
+        textField.textColor = UIColor(named: "BlackDay")
+        textField.font = UIFont.systemFont(ofSize: 17, weight: .regular)
+        textField.translatesAutoresizingMaskIntoConstraints = false
+        textField.layer.cornerRadius = 16
+        textField.heightAnchor.constraint(equalToConstant: 36).isActive = true
+        
+        let attributes = [
+            NSAttributedString.Key.foregroundColor: UIColor(named: "Gray")
+        ]
+        let attributedPlaceholder = NSAttributedString(
+            string: "Поиск",
+            attributes: attributes
+        )
+        textField.attributedPlaceholder = attributedPlaceholder
+        textField.delegate = self
+        
+        view.addSubview(textField)
+        
+        return textField
+    }()
+    
+    private lazy var collectionView: UICollectionView = {
+        let collectionView = UICollectionView(frame: .zero, collectionViewLayout: UICollectionViewFlowLayout())
+        
+        collectionView.translatesAutoresizingMaskIntoConstraints = false
+        view.addSubview(collectionView)
+        
+        collectionView.register(TrackerCollectionViewCell.self, forCellWithReuseIdentifier: cellIdentifier)
+        collectionView.register(SupplementaryView.self,
+                                forSupplementaryViewOfKind: UICollectionView.elementKindSectionHeader,
+                                withReuseIdentifier: headerIdentifier)
+        collectionView.dataSource = self
+        collectionView.delegate = self
+        return collectionView
+    }()
+    
+    private lazy var emptyCollectionView: UIView = {
         let view = UIView()
         let imageView = UIImageView(image: UIImage(named: "star"))
         let label = UILabel()
@@ -97,12 +134,11 @@ final class TrackerCollectionView: UIViewController {
         visibleEventsByCategory = trackerService!.getEvents(by: datePicker.date)
         completedEvents = trackerService!.getCompletedEvents(by: datePicker.date)
         
-        searchController.searchResultsUpdater = self
+        setConstraint()
         
         view.backgroundColor = UIColor(named: "WhiteDay")
 
         createNavigationBar()
-        showCollectionView()
     }
 
     func showEmptyCollection() {
@@ -142,24 +178,16 @@ final class TrackerCollectionView: UIViewController {
             navigationItem.title = "Трекеры"
 
             navigationBar.prefersLargeTitles = true
-            
-            navigationItem.searchController = searchController
         }
     }
     
-    func showCollectionView() {
-        collectionView.translatesAutoresizingMaskIntoConstraints = false
-        view.addSubview(collectionView)
-        
-        collectionView.register(TrackerCollectionViewCell.self, forCellWithReuseIdentifier: cellIdentifier)
-        collectionView.register(SupplementaryView.self,
-                                forSupplementaryViewOfKind: UICollectionView.elementKindSectionHeader,
-                                withReuseIdentifier: headerIdentifier)
-        collectionView.dataSource = self
-        collectionView.delegate = self
-        
+    func setConstraint() {
         NSLayoutConstraint.activate([
-            collectionView.topAnchor.constraint(equalTo: view.safeAreaLayoutGuide.topAnchor, constant: 10),
+            searchTextField.topAnchor.constraint(equalTo: view.safeAreaLayoutGuide.topAnchor, constant: 10),
+            searchTextField.leadingAnchor.constraint(equalTo: view.leadingAnchor, constant: 16),
+            searchTextField.trailingAnchor.constraint(equalTo: view.trailingAnchor, constant: -16),
+            
+            collectionView.topAnchor.constraint(equalTo: searchTextField.bottomAnchor, constant: 24),
             collectionView.bottomAnchor.constraint(equalTo: view.safeAreaLayoutGuide.bottomAnchor),
             collectionView.leadingAnchor.constraint(equalTo: view.leadingAnchor),
             collectionView.trailingAnchor.constraint(equalTo: view.trailingAnchor)
@@ -218,43 +246,29 @@ extension TrackerCollectionView: TrackEventProtocol {
     }
 }
 
-extension TrackerCollectionView: UISearchResultsUpdating {
-    func updateSearchResults(for searchController: UISearchController) {
-        currentTask?.cancel()
+extension TrackerCollectionView: UISearchTextFieldDelegate {
+    func textFieldShouldReturn(_ textField: UITextField) -> Bool {
+        textField.resignFirstResponder()
         
-        let newTask = DispatchWorkItem { [weak self] in
-            self?.performSearch(with: searchController.searchBar.text)
-        }
-        
-        currentTask = newTask
-        
-        DispatchQueue.main.asyncAfter(deadline: .now() + 1, execute: newTask)
-    }
-    
-    func performSearch(with query: String?) {
-        guard let query = query else {
-            return
+        guard let searchText = searchTextField.text else {
+            return false
         }
         
         guard let trackerService = trackerService else {
             print("performSearch: trackerService is empty")
-            return
+            return false
         }
         
-        var filteredEvents = [Section]()
-        
-        if query.isEmpty {
-            filteredEvents = trackerService.getEvents(by: datePicker.date)
-            if filteredEvents.count == visibleEventsByCategory.count {
-                return
-            }
+
+        if searchText.isEmpty {
+            visibleEventsByCategory = trackerService.getEvents(by: datePicker.date)
         } else {
-            filteredEvents = trackerService.filterEvents(by: query, date: datePicker.date)
+            visibleEventsByCategory = trackerService.filterEvents(by: searchText, date: datePicker.date)
         }
-        
-        visibleEventsByCategory = filteredEvents
         
         collectionView.reloadData()
+        
+        return true
     }
 }
 

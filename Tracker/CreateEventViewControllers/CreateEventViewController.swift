@@ -26,48 +26,8 @@ final class CreateEventViewController: UIViewController {
     ]
     private let colors = (1...18).map{ UIColor(named: "ColorSelection\($0)") }
     
-    private let titleLabel = UILabel()
-    private let eventNameInput = UITextField()
-    private let buttonsTableView = UITableView()
-    private let titleEmojiList = UILabel()
-    private let titleColorsList = UILabel()
-    private let cancelButton = UIButton()
-    private let createEventButton = UIButton()
-    
-    private let emojiCollectionView: UICollectionView = {
-        let collectionView = UICollectionView(
-            frame: .zero,
-            collectionViewLayout: UICollectionViewFlowLayout()
-        )
-        collectionView.register(EmojiCollectionViewCell.self, forCellWithReuseIdentifier: emojiCellIdentifier)
-        collectionView.register(ColorCollectionViewCell.self, forCellWithReuseIdentifier: colorCellIdentifier)
-        collectionView.register(CreateEventSupplementaryView.self,
-                                forSupplementaryViewOfKind: UICollectionView.elementKindSectionHeader,
-                                withReuseIdentifier: "header")
-        return collectionView
-    }()
-    
-    var trackerService: TrackerServiceProtocol?
-    var isHabit: Bool?
-    
-    override func viewDidLoad() {
-        super.viewDidLoad()
-        view.backgroundColor = UIColor(named: "WhiteDay")
-        
-        categoryAndScheduleButtons.append(TableButton(name: "Категория", callback: openCategories))
-        if let isHabit = isHabit, isHabit {
-            categoryAndScheduleButtons.append(TableButton(name: "Расписание", callback: openSchedule))
-        }
-        
-        createTitle()
-        createEventNameInput()
-        createTableWithButtons()
-        createEmojiList()
-        createCancelButton()
-        createEventCreateButton()
-    }
-    
-    private func createTitle() {
+    private lazy var titleLabel: UILabel = {
+        let titleLabel = UILabel()
         titleLabel.translatesAutoresizingMaskIntoConstraints = false
         titleLabel.text = "Новое нерегулярное событие"
         titleLabel.textAlignment = .center
@@ -76,14 +36,11 @@ final class CreateEventViewController: UIViewController {
         
         view.addSubview(titleLabel)
         
-        NSLayoutConstraint.activate([
-            titleLabel.heightAnchor.constraint(equalToConstant: 22),
-            titleLabel.topAnchor.constraint(equalTo: view.topAnchor, constant: 24),
-            titleLabel.centerXAnchor.constraint(equalTo: view.centerXAnchor),
-        ])
-    }
+        return titleLabel
+    }()
     
-    private func createEventNameInput() {
+    private lazy var eventNameInput: UITextField = {
+        let eventNameInput = UITextField()
         eventNameInput.translatesAutoresizingMaskIntoConstraints = false
         eventNameInput.backgroundColor = UIColor(named: "BackgroundDay")
         eventNameInput.layer.cornerRadius = 16
@@ -94,15 +51,11 @@ final class CreateEventViewController: UIViewController {
         
         view.addSubview(eventNameInput)
         
-        NSLayoutConstraint.activate([
-            eventNameInput.heightAnchor.constraint(equalToConstant: 75),
-            eventNameInput.topAnchor.constraint(equalTo: titleLabel.bottomAnchor, constant: 24),
-            eventNameInput.leadingAnchor.constraint(equalTo: view.leadingAnchor, constant: 16),
-            eventNameInput.trailingAnchor.constraint(equalTo: view.trailingAnchor, constant: -16)
-        ])
-    }
+        return eventNameInput
+    }()
     
-    private func createTableWithButtons() {
+    private lazy var buttonsTableView: UITableView = {
+        let buttonsTableView = UITableView()
         buttonsTableView.translatesAutoresizingMaskIntoConstraints = false
         buttonsTableView.register(UITableViewCell.self, forCellReuseIdentifier: "cell")
         buttonsTableView.rowHeight = 75
@@ -115,32 +68,32 @@ final class CreateEventViewController: UIViewController {
         
         view.addSubview(buttonsTableView)
         
-        NSLayoutConstraint.activate([
-            buttonsTableView.topAnchor.constraint(equalTo: eventNameInput.bottomAnchor, constant: 24),
-            buttonsTableView.leadingAnchor.constraint(equalTo: view.leadingAnchor, constant: 16),
-            buttonsTableView.trailingAnchor.constraint(equalTo: view.trailingAnchor, constant: -16),
-            buttonsTableView.heightAnchor.constraint(equalToConstant: 75 * CGFloat(categoryAndScheduleButtons.count))
-        ])
-    }
+        return buttonsTableView
+    }()
+        
+    private lazy var emojiCollectionView: UICollectionView = {
+        let collectionView = UICollectionView(
+            frame: .zero,
+            collectionViewLayout: UICollectionViewFlowLayout()
+        )
+        
+        collectionView.translatesAutoresizingMaskIntoConstraints = false
+        
+        collectionView.dataSource = self
+        collectionView.delegate = self
+        collectionView.register(EmojiCollectionViewCell.self, forCellWithReuseIdentifier: emojiCellIdentifier)
+        collectionView.register(ColorCollectionViewCell.self, forCellWithReuseIdentifier: colorCellIdentifier)
+        collectionView.register(CreateEventSupplementaryView.self,
+                                forSupplementaryViewOfKind: UICollectionView.elementKindSectionHeader,
+                                withReuseIdentifier: "header")
+        
+        view.addSubview(collectionView)
+        
+        return collectionView
+    }()
     
-    private func createEmojiList() {
-        emojiCollectionView.translatesAutoresizingMaskIntoConstraints = false
-        
-        emojiCollectionView.dataSource = self
-        emojiCollectionView.delegate = self
-        
-        view.addSubview(emojiCollectionView)
-        
-        NSLayoutConstraint.activate([
-            emojiCollectionView.heightAnchor.constraint(equalToConstant: 450),
-            emojiCollectionView.topAnchor.constraint(equalTo: buttonsTableView.bottomAnchor, constant: 16),
-            emojiCollectionView.leadingAnchor.constraint(equalTo: view.leadingAnchor, constant: 16),
-            emojiCollectionView.trailingAnchor.constraint(equalTo: view.trailingAnchor, constant: -16),
-            emojiCollectionView.bottomAnchor.constraint(lessThanOrEqualTo: view.bottomAnchor, constant: -buttonHeight - CGFloat(44))
-        ])
-    }
-    
-    private func createCancelButton() {
+    private lazy var cancelButton: UIButton = {
+        let cancelButton = UIButton()
         cancelButton.translatesAutoresizingMaskIntoConstraints = false
         cancelButton.backgroundColor = UIColor(named: "WhiteDay")
         cancelButton.layer.cornerRadius = 16
@@ -153,15 +106,11 @@ final class CreateEventViewController: UIViewController {
         
         view.addSubview(cancelButton)
         
-        NSLayoutConstraint.activate([
-            cancelButton.bottomAnchor.constraint(equalTo: view.bottomAnchor, constant: -34),
-            cancelButton.heightAnchor.constraint(equalToConstant: buttonHeight),
-            cancelButton.trailingAnchor.constraint(equalTo: view.trailingAnchor, constant: -(view.frame.width / 2 + 3)),
-            cancelButton.leadingAnchor.constraint(equalTo: view.leadingAnchor, constant: 16)
-        ])
-    }
+        return cancelButton
+    }()
     
-    private func createEventCreateButton() {
+    private lazy var createEventButton: UIButton = {
+        let createEventButton = UIButton()
         createEventButton.backgroundColor = UIColor(named: "BlackDay")
         createEventButton.translatesAutoresizingMaskIntoConstraints = false
         createEventButton.layer.cornerRadius = 16
@@ -179,7 +128,51 @@ final class CreateEventViewController: UIViewController {
         
         view.addSubview(createEventButton)
         
+        return createEventButton
+    }()
+    
+    var trackerService: TrackerServiceProtocol?
+    var isHabit: Bool?
+    
+    override func viewDidLoad() {
+        super.viewDidLoad()
+        view.backgroundColor = UIColor(named: "WhiteDay")
+        
+        categoryAndScheduleButtons.append(TableButton(name: "Категория", callback: openCategories))
+        if let isHabit = isHabit, isHabit {
+            categoryAndScheduleButtons.append(TableButton(name: "Расписание", callback: openSchedule))
+        }
+        
+        setConstraint()
+    }
+    
+    private func setConstraint() {
         NSLayoutConstraint.activate([
+            titleLabel.heightAnchor.constraint(equalToConstant: 22),
+            titleLabel.topAnchor.constraint(equalTo: view.topAnchor, constant: 24),
+            titleLabel.centerXAnchor.constraint(equalTo: view.centerXAnchor),
+            
+            eventNameInput.heightAnchor.constraint(equalToConstant: 75),
+            eventNameInput.topAnchor.constraint(equalTo: titleLabel.bottomAnchor, constant: 24),
+            eventNameInput.leadingAnchor.constraint(equalTo: view.leadingAnchor, constant: 16),
+            eventNameInput.trailingAnchor.constraint(equalTo: view.trailingAnchor, constant: -16),
+            
+            buttonsTableView.topAnchor.constraint(equalTo: eventNameInput.bottomAnchor, constant: 24),
+            buttonsTableView.leadingAnchor.constraint(equalTo: view.leadingAnchor, constant: 16),
+            buttonsTableView.trailingAnchor.constraint(equalTo: view.trailingAnchor, constant: -16),
+            buttonsTableView.heightAnchor.constraint(equalToConstant: 75 * CGFloat(categoryAndScheduleButtons.count)),
+            
+            emojiCollectionView.heightAnchor.constraint(equalToConstant: 450),
+            emojiCollectionView.topAnchor.constraint(equalTo: buttonsTableView.bottomAnchor, constant: 16),
+            emojiCollectionView.leadingAnchor.constraint(equalTo: view.leadingAnchor, constant: 16),
+            emojiCollectionView.trailingAnchor.constraint(equalTo: view.trailingAnchor, constant: -16),
+            emojiCollectionView.bottomAnchor.constraint(lessThanOrEqualTo: view.bottomAnchor, constant: -buttonHeight - CGFloat(44)),
+            
+            cancelButton.bottomAnchor.constraint(equalTo: view.bottomAnchor, constant: -34),
+            cancelButton.heightAnchor.constraint(equalToConstant: buttonHeight),
+            cancelButton.trailingAnchor.constraint(equalTo: view.trailingAnchor, constant: -(view.frame.width / 2 + 3)),
+            cancelButton.leadingAnchor.constraint(equalTo: view.leadingAnchor, constant: 16),
+            
             createEventButton.leadingAnchor.constraint(equalTo: cancelButton.trailingAnchor, constant: 6),
             createEventButton.trailingAnchor.constraint(equalTo: view.trailingAnchor, constant: -16),
             createEventButton.heightAnchor.constraint(equalToConstant: buttonHeight),

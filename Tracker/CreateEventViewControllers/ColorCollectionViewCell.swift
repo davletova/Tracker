@@ -10,12 +10,15 @@ import Foundation
 import UIKit
 
 final class ColorCollectionViewCell: UICollectionViewCell {
-    let view = UIView()
+    let view: UIView = {
+        let view = UIView()
+        view.translatesAutoresizingMaskIntoConstraints = false
+        return view
+    }()
     
     override init(frame: CGRect) {
         super.init(frame: frame)
 
-        view.translatesAutoresizingMaskIntoConstraints = false
         contentView.addSubview(view)
         
         NSLayoutConstraint.activate([
