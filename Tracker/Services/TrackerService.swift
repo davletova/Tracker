@@ -61,7 +61,7 @@ final class TrackerService {
 
 extension TrackerService: TrackerServiceProtocol {
     func getEvents(by date: Date) -> [Section] {
-        var eventsByDate = [UUID: Event]()
+        var eventsByCategory = [String: [Event]]()
         
         guard let dayOfWeek = date.dayNumberOfWeek() else {
             print("failed to get day of week")
@@ -74,21 +74,16 @@ extension TrackerService: TrackerServiceProtocol {
                     continue
                 }
             }
-            eventsByDate[event.id] = event
-        }
-                
-        let completedEvents = getCompletedEvents(by: date)
-        
-        for eventId in completedEvents {
-            guard let event = events[eventId] else {
-                print("event with id \(eventId) not found")
-                continue
-            }
             
-            eventsByDate.updateValue(event, forKey: eventId)
+            if var categoryEvents = eventsByCategory[event.category.name] {
+                categoryEvents.append(event)
+                eventsByCategory[event.category.name] = categoryEvents
+            } else {
+                eventsByCategory[event.category.name] = [event]
+            }
         }
         
-        return putEventsToSections(cellEvents: eventsByDate)
+        return putEventsToSections(eventsByCategory: eventsByCategory)
     }
     
     func filterEvents(by name: String, date: Date) -> [Section] {
@@ -158,21 +153,9 @@ extension TrackerService: TrackerServiceProtocol {
         events[eventId] = event
     }
     
-    private func putEventsToSections(cellEvents: [UUID: Event]) -> [Section] {
-        var sectionsDictionary = [String: [Event]]()
+    private func putEventsToSections(eventsByCategory: [String: [Event]]) -> [Section] {
         var sections = [Section]()
-    
-        for (_, event) in cellEvents  {
-            guard var sectionEvents = sectionsDictionary[event.category.name] else {
-                sectionsDictionary[event.category.name] = [event]
-                continue
-            }
-            
-            sectionEvents.append(event)
-            sectionsDictionary[event.category.name] = sectionEvents
-        }
-        
-        for (categoryName, sectionEvents) in sectionsDictionary {
+        for (categoryName, sectionEvents) in eventsByCategory {
             sections.append(Section(categoryName: categoryName, events: sectionEvents))
         }
     
