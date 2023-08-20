@@ -10,6 +10,11 @@ import UIKit
 let cellIdentifier = "cell"
 let headerIdentifier = "header"
 
+struct TrackerCategory {
+    var categoryName: String
+    var events: [Event]
+}
+
 struct GeometricParams {
     let cellCount: Int
     let leftInset: CGFloat
@@ -31,8 +36,8 @@ final class TrackerCollectionView: UIViewController {
     
     private var trackerService: TrackerServiceProtocol?
     
-    private var visibleEventsByCategory = [Section]()
-    private var completedEvents = Set<UUID>()
+    private var visibleCategories = [TrackerCategory]()
+    private var completedTrackers = Set<UUID>()
     
     private var datePicker: UIDatePicker = {
         var datePicker = UIDatePicker()
@@ -125,14 +130,14 @@ final class TrackerCollectionView: UIViewController {
                 return
             }
             
-            self.visibleEventsByCategory = trackerService.getEvents(by: datePicker.date)
+            self.visibleCategories = trackerService.getEvents(by: datePicker.date)
             
             self.collectionView.reloadData()
         }
         
         trackerService = TrackerService(trackerRecordService: TrackerRecordService())
-        visibleEventsByCategory = trackerService!.getEvents(by: datePicker.date)
-        completedEvents = trackerService!.getCompletedEvents(by: datePicker.date)
+        visibleCategories = trackerService!.getEvents(by: datePicker.date)
+        completedTrackers = trackerService!.getCompletedEvents(by: datePicker.date)
         
         setConstraint()
         
@@ -206,9 +211,9 @@ final class TrackerCollectionView: UIViewController {
             print("changeDateOnDatePicker: trackerService is empty")
             return
         }
-        visibleEventsByCategory = trackerService.getEvents(by: datePicker.date)
-        completedEvents = trackerService.getCompletedEvents(by: datePicker.date)
-        print(completedEvents)
+        visibleCategories = trackerService.getEvents(by: datePicker.date)
+        completedTrackers = trackerService.getCompletedEvents(by: datePicker.date)
+        print(completedTrackers)
         collectionView.reloadData()
         presentedViewController?.dismiss(animated: true)
     }
@@ -261,9 +266,9 @@ extension TrackerCollectionView: UISearchTextFieldDelegate {
         
 
         if searchText.isEmpty {
-            visibleEventsByCategory = trackerService.getEvents(by: datePicker.date)
+            visibleCategories = trackerService.getEvents(by: datePicker.date)
         } else {
-            visibleEventsByCategory = trackerService.filterEvents(by: searchText, date: datePicker.date)
+            visibleCategories = trackerService.filterEvents(by: searchText, date: datePicker.date)
         }
         
         collectionView.reloadData()
@@ -274,17 +279,17 @@ extension TrackerCollectionView: UISearchTextFieldDelegate {
 
 extension TrackerCollectionView: UICollectionViewDataSource {
     func numberOfSections(in collectionView: UICollectionView) -> Int {
-        if visibleEventsByCategory.count == 0 {
+        if visibleCategories.count == 0 {
             showEmptyCollection()
         } else {
             hideEmptyView()
         }
         
-        return visibleEventsByCategory.count
+        return visibleCategories.count
     }
     
     func collectionView(_ collectionView: UICollectionView, numberOfItemsInSection section: Int) -> Int {
-        guard let section = visibleEventsByCategory.safetyAccessElement(at: section) else {
+        guard let section = visibleCategories.safetyAccessElement(at: section) else {
             print("failed to get section from collection by index \(section)")
             return 0
         }
@@ -298,7 +303,7 @@ extension TrackerCollectionView: UICollectionViewDataSource {
             return UICollectionViewCell()
         }
         
-        guard let section = visibleEventsByCategory.safetyAccessElement(at: indexPath.section) else {
+        guard let section = visibleCategories.safetyAccessElement(at: indexPath.section) else {
             print("failed to get section from collection by index \(indexPath.section)")
             return UICollectionViewCell()
         }
@@ -308,7 +313,7 @@ extension TrackerCollectionView: UICollectionViewDataSource {
             return UICollectionViewCell()
         }
         
-        let cellEvent = CellEvent(event: event, tracked: completedEvents.contains(event.id))
+        let cellEvent = CellEvent(event: event, tracked: completedTrackers.contains(event.id))
         
         cell.cellEvent = cellEvent
         cell.delegate = self
@@ -339,7 +344,7 @@ extension TrackerCollectionView: UICollectionViewDataSource {
             return UICollectionReusableView()
         }
         
-        view.titleLabel.text = visibleEventsByCategory[indexPath.section].categoryName
+        view.titleLabel.text = visibleCategories[indexPath.section].categoryName
         
         return view
     }

@@ -8,8 +8,8 @@
 import Foundation
 
 protocol TrackerServiceProtocol {
-    func getEvents(by date: Date) -> [Section]
-    func filterEvents(by name: String, date: Date) -> [Section]
+    func getEvents(by date: Date) -> [TrackerCategory]
+    func filterEvents(by name: String, date: Date) -> [TrackerCategory]
     func getCompletedEvents(by date: Date) -> Set<UUID>
     func createEvent(event: Event)
     func updateEvent(event: Event) -> Event?
@@ -20,11 +20,6 @@ protocol TrackerServiceProtocol {
 
 protocol TrackerRecordServiceProtocol {
     func getRecords(by date: Date) -> [TrackerRecord]
-}
-
-struct Section {
-    var categoryName: String
-    var events: [Event]
 }
 
 final class TrackerService {
@@ -60,12 +55,12 @@ final class TrackerService {
 }
 
 extension TrackerService: TrackerServiceProtocol {
-    func getEvents(by date: Date) -> [Section] {
+    func getEvents(by date: Date) -> [TrackerCategory] {
         var eventsByCategory = [String: [Event]]()
         
         guard let dayOfWeek = date.dayNumberOfWeek() else {
             print("failed to get day of week")
-            return [Section]()
+            return [TrackerCategory]()
         }
         
         for (_, event) in events {
@@ -86,7 +81,7 @@ extension TrackerService: TrackerServiceProtocol {
         return putEventsToSections(eventsByCategory: eventsByCategory)
     }
     
-    func filterEvents(by name: String, date: Date) -> [Section] {
+    func filterEvents(by name: String, date: Date) -> [TrackerCategory] {
         var eventsByDate = getEvents(by: date)
         
         for i in (0..<eventsByDate.count).reversed() {
@@ -153,10 +148,10 @@ extension TrackerService: TrackerServiceProtocol {
         events[eventId] = event
     }
     
-    private func putEventsToSections(eventsByCategory: [String: [Event]]) -> [Section] {
-        var sections = [Section]()
+    private func putEventsToSections(eventsByCategory: [String: [Event]]) -> [TrackerCategory] {
+        var sections = [TrackerCategory]()
         for (categoryName, sectionEvents) in eventsByCategory {
-            sections.append(Section(categoryName: categoryName, events: sectionEvents))
+            sections.append(TrackerCategory(categoryName: categoryName, events: sectionEvents))
         }
     
         return sections
