@@ -12,7 +12,7 @@ protocol Timetable {
     func getSchedule() -> Schedule
 }
 
-final class Habit: Event {
+final class Habit: Tracker {
     var schedule: Schedule
 
     init(id: UUID,

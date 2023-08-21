@@ -212,7 +212,7 @@ final class CreateEventViewController: UIViewController {
             return
         }
         
-        let newEvent: Event
+        let newEvent: Tracker
         if isHabit {
             newEvent = Habit(
                 id: UUID(),
@@ -223,7 +223,7 @@ final class CreateEventViewController: UIViewController {
                 schedule: Schedule(startDate: Calendar.current.startOfDay(for: Date()), repetition: [Weekday.friday])
             )
         } else {
-            newEvent = Event(
+            newEvent = Tracker(
                 id: UUID(),
                 name: value,
                 category: category2,
@@ -232,10 +232,10 @@ final class CreateEventViewController: UIViewController {
             )
         }
         
-        trackerService.createEvent(event: newEvent)
+        trackerService.createTracker(tracker: newEvent)
         
         NotificationCenter.default.post(
-            name: TrackerService.CreateEventNotification,
+            name: TrackerService.CreateTrackerNotification,
             object: self,
             userInfo: ["event": newEvent]
         )

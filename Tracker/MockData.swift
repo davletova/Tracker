@@ -35,18 +35,13 @@ let mockCategories = [category1, category2, category3]
 let habit1 = Habit(id: UUID.init(), name: "habit 1", category: category1, emoji: "❤️", color: color1, schedule: schedule)
 
 let habit2 = Habit(id: UUID.init(), name: "habit 2", category: category2, emoji: "😡", color: color2, schedule: schedule)
-let event1 = Event(id: UUID.init(), name: "event 1", category: category2, emoji: "🍋", color: color3)
-let event2 = Event(id: UUID.init(), name: "event 2", category: category3, emoji: "🍊", color: color4)
-let event3 = Event(id: UUID.init(), name: "здесь очень длинное название", category: category1, emoji: "🍈", color: color5)
+let event1 = Tracker(id: UUID.init(), name: "event 1", category: category2, emoji: "🍋", color: color3)
+let event2 = Tracker(id: UUID.init(), name: "event 2", category: category3, emoji: "🍊", color: color4)
+let event3 = Tracker(id: UUID.init(), name: "здесь очень длинное название", category: category1, emoji: "🍈", color: color5)
 let habit3 = Habit(id: UUID.init(), name: "habit 3", category: category2, emoji: "😡", color: color6, schedule: schedule)
 
-func createMockEvents() -> [UUID: Event] {
-    var mockEvents = [UUID: Event]()
-    habit1.trackedDaysCount = 2
-    habit2.trackedDaysCount = 1
-    event1.trackedDaysCount = 1
-    event2.trackedDaysCount = 1
-    event3.trackedDaysCount = 1
+func createMockEvents() -> [UUID: Tracker] {
+    var mockEvents = [UUID: Tracker]()
     mockEvents[habit1.id] = habit1
     mockEvents[habit2.id] = habit2
     mockEvents[event1.id] = event1

@@ -12,7 +12,7 @@ let headerIdentifier = "header"
 
 struct TrackerCategory {
     var categoryName: String
-    var events: [Event]
+    var trackers: [Tracker]
 }
 
 struct GeometricParams {
@@ -32,9 +32,10 @@ struct GeometricParams {
 }
 
 final class TrackerCollectionView: UIViewController {
-    static let EventSavedNotification = Notification.Name(rawValue: "CreateEvent")
+    static let TrackerSavedNotification = Notification.Name(rawValue: "CreateEvent")
     
     private var trackerService: TrackerServiceProtocol?
+    private var trackerRecordService: TrackerRecordServiceProtocol?
     
     private var visibleCategories = [TrackerCategory]()
     private var completedTrackers = Set<UUID>()
@@ -116,7 +117,7 @@ final class TrackerCollectionView: UIViewController {
         super.viewDidLoad()
         
         NotificationCenter.default.addObserver(
-            forName: TrackerCollectionView.EventSavedNotification,
+            forName: TrackerCollectionView.TrackerSavedNotification,
             object: nil,
             queue: OperationQueue.main
         ) { [weak self] _ in
@@ -130,14 +131,16 @@ final class TrackerCollectionView: UIViewController {
                 return
             }
             
-            self.visibleCategories = trackerService.getEvents(by: datePicker.date)
+            self.visibleCategories = trackerService.getTrackers(by: datePicker.date)
             
             self.collectionView.reloadData()
         }
         
-        trackerService = TrackerService(trackerRecordService: TrackerRecordService())
-        visibleCategories = trackerService!.getEvents(by: datePicker.date)
-        completedTrackers = trackerService!.getCompletedEvents(by: datePicker.date)
+        trackerService = TrackerService()
+        trackerRecordService = TrackerRecordService()
+        
+        visibleCategories = trackerService!.getTrackers(by: datePicker.date)
+        completedTrackers = trackerRecordService!.getSetOfCOmpletedEvents(by: datePicker.date)
         
         setConstraint()
         
@@ -211,43 +214,15 @@ final class TrackerCollectionView: UIViewController {
             print("changeDateOnDatePicker: trackerService is empty")
             return
         }
-        visibleCategories = trackerService.getEvents(by: datePicker.date)
-        completedTrackers = trackerService.getCompletedEvents(by: datePicker.date)
+        guard let trackerRecordService = trackerRecordService else {
+            print("changeDateOnDatePicker: trackerRecordService is empty")
+            return
+        }
+        visibleCategories = trackerService.getTrackers(by: datePicker.date)
+        completedTrackers = trackerRecordService.getSetOfCOmpletedEvents(by: datePicker.date)
         print(completedTrackers)
         collectionView.reloadData()
         presentedViewController?.dismiss(animated: true)
-    }
-}
-
-extension TrackerCollectionView: TrackEventProtocol {
-    func untrackedEvent(event: Event) {
-        NotificationCenter.default.post(
-            name: TrackerRecordService.DeleteTrackerRecordNotification,
-            object: self,
-            userInfo: ["record": TrackerRecord(eventID: event.id, date: Calendar.current.startOfDay(for: datePicker.date))]
-        )
-        
-        guard let trackerService = trackerService else {
-            print("changeDate: trackerService is empty")
-            return
-        }
-        
-        trackerService.untrackEvent(eventId: event.id)
-    }
-    
-    func trackEvent(event: Event) {
-        NotificationCenter.default.post(
-            name: TrackerRecordService.AddTrackerRecordNotification,
-            object: self,
-            userInfo: ["record": TrackerRecord(eventID: event.id, date: Calendar.current.startOfDay(for: datePicker.date))]
-        )
-        
-        guard let trackerService = trackerService else {
-            print("changeDate: trackerService is empty")
-            return
-        }
-        
-        trackerService.trackEvent(eventId: event.id)
     }
 }
 
@@ -266,14 +241,38 @@ extension TrackerCollectionView: UISearchTextFieldDelegate {
         
 
         if searchText.isEmpty {
-            visibleCategories = trackerService.getEvents(by: datePicker.date)
+            visibleCategories = trackerService.getTrackers(by: datePicker.date)
         } else {
-            visibleCategories = trackerService.filterEvents(by: searchText, date: datePicker.date)
+            visibleCategories = trackerService.filterTrackers(by: searchText, date: datePicker.date)
         }
         
         collectionView.reloadData()
         
         return true
+    }
+}
+
+extension TrackerCollectionView: TrackEventProtocol {
+    func trackEvent(eventId: UUID, indexPath: IndexPath) {
+        guard let trackerRecordService = trackerRecordService else {
+            print("changeDate: trackerRecordService is empty")
+            return
+        }
+        
+        trackerRecordService.addRecords(record: TrackerRecord(eventID: eventId, date: Calendar.current.startOfDay(for: datePicker.date)))
+        completedTrackers = trackerRecordService.getSetOfCOmpletedEvents(by: datePicker.date)
+        collectionView.reloadItems(at: [indexPath])
+    }
+    
+    func untrackEvent(eventId: UUID, indexPath: IndexPath) {
+        guard let trackerRecordService = trackerRecordService else {
+            print("changeDate: trackerRecordService is empty")
+            return
+        }
+        
+        trackerRecordService.deleteTrackerRecord(record: TrackerRecord(eventID: eventId, date: Calendar.current.startOfDay(for: datePicker.date)))
+        completedTrackers = trackerRecordService.getSetOfCOmpletedEvents(by: datePicker.date)
+        collectionView.reloadItems(at: [indexPath])
     }
 }
 
@@ -294,7 +293,7 @@ extension TrackerCollectionView: UICollectionViewDataSource {
             return 0
         }
         
-        return section.events.count
+        return section.trackers.count
     }
     
     func collectionView(_ collectionView: UICollectionView, cellForItemAt indexPath: IndexPath) -> UICollectionViewCell {
@@ -308,14 +307,24 @@ extension TrackerCollectionView: UICollectionViewDataSource {
             return UICollectionViewCell()
         }
         
-        guard let event = section.events.safetyAccessElement(at: indexPath.row) else {
+        guard let event = section.trackers.safetyAccessElement(at: indexPath.row) else {
             print("failed to get element from section: \(section.categoryName) by index \(indexPath.row)")
             return UICollectionViewCell()
         }
         
-        let cellEvent = CellEvent(event: event, tracked: completedTrackers.contains(event.id))
+        guard let trackerRecordService = trackerRecordService else {
+            print("collectionView cellForItemAt: trackerRecordService is empty")
+            return UICollectionViewCell()
+        }
         
+        let trackedDaysCount = trackerRecordService.getTrackerDaysCount(of: event.id)
+        let cellEvent = TrackerCell(
+            event: event,
+            trackedDaysCount: trackedDaysCount,
+            tracked: completedTrackers.contains(event.id)
+        )
         cell.cellEvent = cellEvent
+        cell.indexPath = indexPath
         cell.delegate = self
         cell.contentView.layer.cornerRadius = 16
         

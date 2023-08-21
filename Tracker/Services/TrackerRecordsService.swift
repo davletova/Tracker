@@ -7,39 +7,17 @@
 
 import Foundation
 
+protocol TrackerRecordServiceProtocol {
+    func getRecords(by date: Date) -> [TrackerRecord]
+    func getSetOfCOmpletedEvents(by date: Date) -> Set<UUID>
+    func getTrackerDaysCount(of eventId: UUID) -> Int
+    
+    func addRecords(record: TrackerRecord)
+    func deleteTrackerRecord(record: TrackerRecord)
+}
+
 final class TrackerRecordService: TrackerRecordServiceProtocol {
-    static let AddTrackerRecordNotification = Notification.Name(rawValue: "AddRecordTracker")
-    static let DeleteTrackerRecordNotification = Notification.Name(rawValue: "DeleteEvent")
-    
     var trackerRecords: [TrackerRecord] = mockTrackerRecords
-    
-    init() {
-        NotificationCenter.default.addObserver(
-            forName: TrackerRecordService.AddTrackerRecordNotification,
-            object: nil,
-            queue: OperationQueue.main
-        ) { record in
-            guard let record = record.userInfo?["record"] as? TrackerRecord else {
-                print("failed to convert notification: \(record) to TrackerRecord")
-                return
-            }
-            
-            self.addRecords(record: record)
-        }
-        
-        NotificationCenter.default.addObserver(
-            forName: TrackerRecordService.DeleteTrackerRecordNotification,
-            object: nil,
-            queue: OperationQueue.main
-        ) { record in
-            guard let record = record.userInfo?["record"] as? TrackerRecord else {
-                print("failed to convert notification: \(record) to TrackerRecord")
-                return
-            }
-            
-            self.deleteTrackerRecord(record: record)
-        }
-    }
     
     func getRecords(by date: Date) -> [TrackerRecord] {
         var result = [TrackerRecord]()
@@ -54,11 +32,34 @@ final class TrackerRecordService: TrackerRecordServiceProtocol {
         return result
     }
     
-    private func addRecords(record: TrackerRecord) {
+    func getTrackerDaysCount(of eventId: UUID) -> Int {
+        var trackerDaysCount = 0
+        
+        for record in trackerRecords {
+            if record.eventID == eventId {
+                trackerDaysCount += 1
+            }
+        }
+        
+        return trackerDaysCount
+    }
+    
+    func getSetOfCOmpletedEvents(by date: Date) -> Set<UUID> {
+        var completedEvents = Set<UUID>()
+        var recordsByDate = getRecords(by: date)
+        
+        for record in recordsByDate {
+            completedEvents.insert(record.eventID)
+        }
+        
+        return completedEvents
+    }
+    
+    func addRecords(record: TrackerRecord) {
         trackerRecords.append(record)
     }
     
-    private func deleteTrackerRecord(record: TrackerRecord) {
+    func deleteTrackerRecord(record: TrackerRecord) {
         for i in (0..<trackerRecords.count).reversed() {
             if trackerRecords[i].eventID != record.eventID {
                 continue

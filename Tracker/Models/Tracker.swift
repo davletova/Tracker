@@ -8,11 +8,10 @@
 import Foundation
 import UIKit
 
-class Event {
+class Tracker {
     let id: UUID
     let name: String
     let category: Category
-    var trackedDaysCount: Int
     let emoji: String
     let color: UIColor
     
@@ -26,7 +25,6 @@ class Event {
         self.id = id
         self.name = name
         self.category = category
-        self.trackedDaysCount = 0
         self.emoji = emoji
         self.color = color
     }
