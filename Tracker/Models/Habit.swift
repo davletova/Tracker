@@ -14,7 +14,7 @@ protocol Timetable {
 
 final class Habit: Tracker {
     var schedule: Schedule
-
+    
     init(id: UUID,
          name: String,
          category: String,

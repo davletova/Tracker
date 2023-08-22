@@ -70,7 +70,7 @@ final class CreateEventViewController: UIViewController {
         
         return buttonsTableView
     }()
-        
+    
     private lazy var emojiCollectionView: UICollectionView = {
         let collectionView = UICollectionView(
             frame: .zero,

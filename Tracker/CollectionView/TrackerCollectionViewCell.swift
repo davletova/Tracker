@@ -70,7 +70,7 @@ final class TrackerCollectionViewCell: UICollectionViewCell {
         trackedDaysLabel.textColor = .black
         trackedDaysLabel.translatesAutoresizingMaskIntoConstraints = false
         trackedDaysLabel.textAlignment = .center
-
+        
         return trackedDaysLabel
     }()
     
@@ -189,13 +189,8 @@ final class TrackerCollectionViewCell: UICollectionViewCell {
         
         if cellEvent.tracked {
             delegate.untrackEvent(eventId: cellEvent.id, indexPath: indexPath)
-//            trackButton.setImage(UIImage(systemName: "checkmark"), for: .normal)
-//            trackButton.backgroundColor = trackButton.backgroundColor?.withAlphaComponent(0.3)
         } else {
             delegate.trackEvent(eventId: cellEvent.id, indexPath: indexPath)
-//            trackButton.setImage(UIImage(systemName: "plus"), for: .normal)
-//            trackButton.backgroundColor = trackButton.backgroundColor?.withAlphaComponent(1)
-//            trackButton.tintColor = .white
         }
         self.cellEvent = cellEvent
         trackedDaysLabel.text = formatTrackedDays(days: cellEvent.trackedDaysCount)

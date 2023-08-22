@@ -18,7 +18,7 @@ final class ColorCollectionViewCell: UICollectionViewCell {
     
     override init(frame: CGRect) {
         super.init(frame: frame)
-
+        
         contentView.addSubview(view)
         
         NSLayoutConstraint.activate([

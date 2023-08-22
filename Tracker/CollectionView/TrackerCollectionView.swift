@@ -142,10 +142,10 @@ final class TrackerCollectionView: UIViewController {
         setConstraint()
         
         view.backgroundColor = UIColor(named: "WhiteDay")
-
+        
         createNavigationBar()
     }
-
+    
     func showEmptyCollection() {
         collectionView.addSubview(emptyCollectionView)
         
@@ -169,7 +169,7 @@ final class TrackerCollectionView: UIViewController {
             datePicker.preferredDatePickerStyle = .compact
             datePicker.datePickerMode = UIDatePicker.Mode.date
             datePicker.addTarget(self, action: #selector(changeDateOnDatePicker(_:)), for: .valueChanged)
-           
+            
             navigationItem.rightBarButtonItem = UIBarButtonItem(customView: datePicker)
             
             let paragraphStyle = NSMutableParagraphStyle()
@@ -181,7 +181,7 @@ final class TrackerCollectionView: UIViewController {
                 NSAttributedString.Key.paragraphStyle: paragraphStyle
             ] as [NSAttributedString.Key : Any]
             navigationItem.title = "Трекеры"
-
+            
             navigationBar.prefersLargeTitles = true
         }
     }
@@ -236,7 +236,7 @@ extension TrackerCollectionView: UISearchTextFieldDelegate {
             return false
         }
         
-
+        
         if searchText.isEmpty {
             visibleCategories = trackerService.getTrackers(by: datePicker.date)
         } else {
@@ -344,7 +344,7 @@ extension TrackerCollectionView: UICollectionViewDataSource {
         default:
             id = ""
         }
-
+        
         guard let view = collectionView.dequeueReusableSupplementaryView(ofKind: kind, withReuseIdentifier: id, for: indexPath) as? SupplementaryView else {
             print("fialed to convert SupplementaryView")
             return UICollectionReusableView()
@@ -376,9 +376,9 @@ extension TrackerCollectionView: UICollectionViewDelegateFlowLayout {
     
     func collectionView(_ collectionView: UICollectionView, layout collectionViewLayout: UICollectionViewLayout, referenceSizeForHeaderInSection section: Int) -> CGSize {
         let indexPath = IndexPath(row: 0, section: section)
-
+        
         let headerView = self.collectionView(collectionView, viewForSupplementaryElementOfKind: UICollectionView.elementKindSectionHeader, at: indexPath)
-
+        
         return headerView.systemLayoutSizeFitting(
             CGSize(width: collectionView.frame.width, height: UIView.layoutFittingExpandedSize.height),
             withHorizontalFittingPriority: .required,

@@ -82,24 +82,5 @@ extension TrackerService: TrackerServiceProtocol {
             userInfo: ["event": tracker]
         )
     }
-    
-//    func updateTracker(tracker updateEvent: Tracker) -> Tracker? {
-//        events.updateValue(updateEvent, forKey: updateEvent.id)
-//
-//        return events[updateEvent.id]
-//    }
-    
-//    func deleteTracker(trackerID: UUID) {
-//        events.removeValue(forKey: trackerID)
-//    }
-//
-//    private func putTrackersToSections(eventsByCategory: [String: [Tracker]]) -> [TrackerCategory] {
-//        var sections = [TrackerCategory]()
-//        for (categoryName, sectionEvents) in eventsByCategory {
-//            sections.append(TrackerCategory(categoryName: categoryName, trackers: sectionEvents))
-//        }
-//
-//        return sections
-//    }
 }
 
