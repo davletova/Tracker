@@ -8,6 +8,10 @@
 import Foundation
 import UIKit
 
+protocol ScheduleViewControllerDelegate {
+    func saveSchedule(schedule: Schedule)
+}
+
 struct DailySchedule {
     let dayOfWeek: Weekday
     var isScheduled: Bool
@@ -33,7 +37,7 @@ final class ScheduleViewController: UIViewController {
         doneButton.layer.cornerRadius = 16
         doneButton.backgroundColor = UIColor(named: "BlackDay")
         doneButton.setTitle("Готово", for: .normal)
-        doneButton.addTarget(self, action: #selector(done), for: .touchUpInside)
+        doneButton.addTarget(self, action: #selector(saveSchedule), for: .touchUpInside)
         
         view.addSubview(doneButton)
         
@@ -57,12 +61,14 @@ final class ScheduleViewController: UIViewController {
         return daysTable
     }()
     
-    let rowHeight: CGFloat = 75.0
-    let buttonHeight: CGFloat = 60.0
+    private let rowHeight: CGFloat = 75.0
+    private let buttonHeight: CGFloat = 60.0
     
-    var scheduleDays = Weekday.allCases.map { weekday in
-        DailySchedule(dayOfWeek: weekday, isScheduled: true)
+    private var scheduleDays = Weekday.allCases.map { weekday in
+        DailySchedule(dayOfWeek: weekday, isScheduled: false)
     }
+    
+    var delegate: ScheduleViewControllerDelegate?
     
     override func viewDidLoad() {
         super.viewDidLoad()
@@ -90,8 +96,28 @@ final class ScheduleViewController: UIViewController {
         ])
     }
     
-    @objc func done() {
+    @objc func saveSchedule() {
+        guard let delegate = delegate else {
+            print("save schedule: delegate is empty")
+            return
+        }
+        
+        print(convertScheduleDaysToSchedule(scheduleDays: scheduleDays))
+        delegate.saveSchedule(schedule: convertScheduleDaysToSchedule(scheduleDays: scheduleDays))
+        
         dismiss(animated: true, completion: nil)
+    }
+    
+    func convertScheduleDaysToSchedule(scheduleDays: [DailySchedule]) -> Schedule {
+        var repetition = Set<Weekday>()
+        
+        scheduleDays.forEach({
+            if $0.isScheduled {
+                repetition.insert($0.dayOfWeek)
+            }
+        })
+        
+        return Schedule(startDate: Calendar.current.startOfDay(for: Date()), repetition: repetition)
     }
 }
 
@@ -108,13 +134,14 @@ extension ScheduleViewController: UITableViewDataSource {
         
         let switcher = UISwitch(frame: CGRect(x: 0, y: 0, width: 51, height: 31))
         switcher.setOn(scheduleDays[weekdayIndex].isScheduled, animated: true)
-        switcher.tag = weekdayIndex
+        switcher.tag = indexPath.row
         switcher.addTarget(self, action: #selector(weekDaySwitcherValueChanged), for: .valueChanged)
         
         let cell = tableView.dequeueReusableCell(withIdentifier: cellIdentifier, for: indexPath)
         cell.textLabel?.text = dateFormatter.standaloneWeekdaySymbols?[weekdayIndex].localizedCapitalized
         cell.backgroundColor = UIColor(named: "BackgroundDay")
         cell.accessoryView = switcher
+        cell.selectionStyle = .none
         
         return cell
     }
@@ -133,7 +160,5 @@ extension ScheduleViewController: UITableViewDelegate {
         
         return cellHeight
     }
-    
-    func tableView(_ tableView: UITableView, didSelectRowAt indexPath: IndexPath) {}
 }
 

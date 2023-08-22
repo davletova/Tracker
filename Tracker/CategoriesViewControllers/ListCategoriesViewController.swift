@@ -12,10 +12,15 @@ final class ListCategoriesViewController: UIViewController {
     @IBOutlet weak var titleLabel: UILabel!
     @IBOutlet weak var addCategory: UIButton!
     
-    let categories = mockCategories
-    let cellIdentifier = "cell"
-    let rowHeight: CGFloat = 75
-    let buttonHeight: CGFloat = 60
+    private let listOfCategories = [
+        Category(id: UUID(), name: "category1"),
+        Category(id: UUID(), name: "category2"),
+        Category(id: UUID(), name: "category3"),
+        Category(id: UUID(), name: "category4")
+    ]
+    private let cellIdentifier = "cell"
+    private let rowHeight: CGFloat = 75
+    private let buttonHeight: CGFloat = 60
     
     override func viewDidLoad() {
         super.viewDidLoad()
@@ -25,7 +30,7 @@ final class ListCategoriesViewController: UIViewController {
         createTable()
         createButton()
         
-        if categories.count == 0 {
+        if listOfCategories.count == 0 {
             showEmptyCollection()
         }
     }
@@ -67,7 +72,7 @@ final class ListCategoriesViewController: UIViewController {
             table.topAnchor.constraint(equalTo: titleLabel.bottomAnchor, constant: 24),
             table.leadingAnchor.constraint(equalTo: view.leadingAnchor, constant: 10),
             table.trailingAnchor.constraint(equalTo: view.trailingAnchor, constant: -10),
-            table.heightAnchor.constraint(equalToConstant: rowHeight * CGFloat(categories.count)),
+            table.heightAnchor.constraint(equalToConstant: rowHeight * CGFloat(listOfCategories.count)),
             table.bottomAnchor.constraint(lessThanOrEqualTo: view.bottomAnchor, constant: -buttonHeight - CGFloat(44))
         ])
     }
@@ -115,12 +120,12 @@ final class ListCategoriesViewController: UIViewController {
 
 extension ListCategoriesViewController: UITableViewDataSource {
     func tableView(_ tableView: UITableView, numberOfRowsInSection section: Int) -> Int {
-        return categories.count
+        return listOfCategories.count
     }
     
     func tableView(_ tableView: UITableView, cellForRowAt indexPath: IndexPath) -> UITableViewCell {
         let cell = tableView.dequeueReusableCell(withIdentifier: cellIdentifier, for: indexPath)
-        cell.textLabel?.text = categories[indexPath.row].name
+        cell.textLabel?.text = listOfCategories[indexPath.row].name
         cell.backgroundColor = UIColor(named: "BackgroundDay")
         return cell
     }

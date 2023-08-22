@@ -15,20 +15,25 @@ protocol CategoryServiceProtocol {
 }
 
 final class CategoryService: CategoryServiceProtocol {
-    private var categories: [Category]
+    private var listOfCategories: [Category]
     
     init() {
-        categories = mockCategories
+        listOfCategories = [
+            Category(id: UUID(), name: "category1"),
+            Category(id: UUID(), name: "category2"),
+            Category(id: UUID(), name: "category3"),
+            Category(id: UUID(), name: "category4")
+        ]
     }
     
     func addCategory(category: Category) {
-        categories.append(category)
+        listOfCategories.append(category)
     }
     
     func updateCategory(category: Category) {
-        for i in 0..<categories.count {
-            if category.id == categories[i].id {
-                categories[i] = category
+        for i in 0..<listOfCategories.count {
+            if category.id == listOfCategories[i].id {
+                listOfCategories[i] = category
                 return
             }
         }
@@ -36,9 +41,9 @@ final class CategoryService: CategoryServiceProtocol {
     }
     
     func deleteCategory(category: Category) {
-        for i in (0..<categories.count).reversed() {
-            if category.id == categories[i].id {
-                categories.remove(at: i)
+        for i in (0..<listOfCategories.count).reversed() {
+            if category.id == listOfCategories[i].id {
+                listOfCategories.remove(at: i)
                 return
             }
         }
@@ -46,6 +51,6 @@ final class CategoryService: CategoryServiceProtocol {
     }
     
     func getCategories() -> [Category] {
-        return categories
+        return listOfCategories
     }
 }

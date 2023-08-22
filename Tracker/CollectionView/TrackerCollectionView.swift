@@ -10,10 +10,7 @@ import UIKit
 let cellIdentifier = "cell"
 let headerIdentifier = "header"
 
-struct TrackerCategory {
-    var categoryName: String
-    var trackers: [Tracker]
-}
+
 
 struct GeometricParams {
     let cellCount: Int

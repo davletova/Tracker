@@ -134,6 +134,8 @@ final class CreateEventViewController: UIViewController {
     var trackerService: TrackerServiceProtocol?
     var isHabit: Bool?
     
+    private var schedule: Schedule?
+    
     override func viewDidLoad() {
         super.viewDidLoad()
         view.backgroundColor = UIColor(named: "WhiteDay")
@@ -188,6 +190,7 @@ final class CreateEventViewController: UIViewController {
     
     private func openSchedule() {
         let scheduleViewController = ScheduleViewController()
+        scheduleViewController.delegate = self
         scheduleViewController.modalPresentationStyle = .popover
         self.present(scheduleViewController, animated: true)
     }
@@ -214,31 +217,30 @@ final class CreateEventViewController: UIViewController {
         
         let newEvent: Tracker
         if isHabit {
+            guard let schedule = schedule else {
+                print("create habit: schedule is empty")
+                return
+            }
+            
             newEvent = Habit(
                 id: UUID(),
                 name: value,
-                category: category2,
+                category: "category1",
                 emoji: "🏓",
                 color: UIColor(named: "ColorSelection3")!,
-                schedule: Schedule(startDate: Calendar.current.startOfDay(for: Date()), repetition: [Weekday.friday])
+                schedule: schedule
             )
         } else {
             newEvent = Tracker(
                 id: UUID(),
                 name: value,
-                category: category2,
+                category: "category1",
                 emoji: "🏓",
                 color: UIColor(named: "ColorSelection3")!
             )
         }
         
         trackerService.createTracker(tracker: newEvent)
-        
-        NotificationCenter.default.post(
-            name: TrackerService.CreateTrackerNotification,
-            object: self,
-            userInfo: ["event": newEvent]
-        )
         
         self.view.window?.rootViewController?.dismiss(animated: true, completion: nil)
     }
@@ -253,6 +255,12 @@ final class CreateEventViewController: UIViewController {
         
         createEventButton.isEnabled = false
         createEventButton.backgroundColor = UIColor(named: "Gray")
+    }
+}
+
+extension CreateEventViewController: ScheduleViewControllerDelegate {
+    func saveSchedule(schedule: Schedule) {
+        self.schedule = schedule
     }
 }
 

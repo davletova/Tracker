@@ -17,7 +17,7 @@ final class Habit: Tracker {
 
     init(id: UUID,
          name: String,
-         category: Category,
+         category: String,
          emoji: String,
          color: UIColor,
          schedule: Schedule

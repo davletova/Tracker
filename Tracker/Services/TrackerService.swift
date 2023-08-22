@@ -11,63 +11,45 @@ protocol TrackerServiceProtocol {
     func getTrackers(by date: Date) -> [TrackerCategory]
     func filterTrackers(by name: String, date: Date) -> [TrackerCategory]
     func createTracker(tracker: Tracker)
-    func updateTracker(tracker: Tracker) -> Tracker?
-    func deleteTracker(trackerID: UUID)
+}
+
+struct TrackerCategory {
+    var categoryName: String
+    var trackers: [Tracker]
 }
 
 final class TrackerService {
-    static let CreateTrackerNotification = Notification.Name(rawValue: "creatEvent")
-    
-    var events = [UUID: Tracker]()
+    var categories = [TrackerCategory]()
     
     init() {
-        events = createMockEvents()
-        
-        NotificationCenter.default.addObserver(
-            forName: TrackerService.CreateTrackerNotification,
-            object: nil,
-            queue: OperationQueue.main
-        ) { [weak self] notification in
-            guard let self = self else {
-                print("TrackerService, CreateEventNotification: self is empty")
-                return
-            }
-            
-            guard let event = notification.userInfo?["event"] as? Tracker else {
-                print("failed to convert event: \(String(describing: notification.userInfo?["event"]))")
-                return
-            }
-            
-            self.createTracker(tracker: event)
-        }
+        categories = mockEvents
     }
 }
 
 extension TrackerService: TrackerServiceProtocol {
     func getTrackers(by date: Date) -> [TrackerCategory] {
-        var eventsByCategory = [String: [Tracker]]()
+        var eventsByDate = categories
         
         guard let dayOfWeek = date.dayNumberOfWeek() else {
             print("failed to get day of week")
             return [TrackerCategory]()
         }
         
-        for (_, event) in events {
-            if let habit = event as? Timetable {
-                if !habit.getSchedule().repetition.contains(dayOfWeek) {
-                    continue
+        for i in (0..<eventsByDate.count).reversed() {
+            for j in (0..<eventsByDate[i].trackers.count).reversed() {
+                if let habit = eventsByDate[i].trackers[j] as? Timetable {
+                    if !habit.getSchedule().repetition.contains(dayOfWeek) {
+                        eventsByDate[i].trackers.remove(at: j)
+                    }
                 }
             }
             
-            if var categoryEvents = eventsByCategory[event.category.name] {
-                categoryEvents.append(event)
-                eventsByCategory[event.category.name] = categoryEvents
-            } else {
-                eventsByCategory[event.category.name] = [event]
+            if eventsByDate[i].trackers.isEmpty {
+                eventsByDate.remove(at: i)
             }
         }
         
-        return putTrackersToSections(eventsByCategory: eventsByCategory)
+        return eventsByDate
     }
     
     func filterTrackers(by name: String, date: Date) -> [TrackerCategory] {
@@ -85,7 +67,14 @@ extension TrackerService: TrackerServiceProtocol {
     }
     
     func createTracker(tracker: Tracker) {
-        events.updateValue(tracker, forKey: tracker.id)
+        for i in (0..<categories.count) {
+            if categories[i].categoryName == tracker.name {
+                categories[i].trackers.append(tracker)
+                return
+            }
+        }
+        
+        categories.append(TrackerCategory(categoryName: tracker.name, trackers: [tracker]))
         
         NotificationCenter.default.post(
             name: TrackerCollectionView.TrackerSavedNotification,
@@ -94,23 +83,23 @@ extension TrackerService: TrackerServiceProtocol {
         )
     }
     
-    func updateTracker(tracker updateEvent: Tracker) -> Tracker? {
-        events.updateValue(updateEvent, forKey: updateEvent.id)
+//    func updateTracker(tracker updateEvent: Tracker) -> Tracker? {
+//        events.updateValue(updateEvent, forKey: updateEvent.id)
+//
+//        return events[updateEvent.id]
+//    }
     
-        return events[updateEvent.id]
-    }
-    
-    func deleteTracker(trackerID: UUID) {
-        events.removeValue(forKey: trackerID)
-    }
-    
-    private func putTrackersToSections(eventsByCategory: [String: [Tracker]]) -> [TrackerCategory] {
-        var sections = [TrackerCategory]()
-        for (categoryName, sectionEvents) in eventsByCategory {
-            sections.append(TrackerCategory(categoryName: categoryName, trackers: sectionEvents))
-        }
-    
-        return sections
-    }
+//    func deleteTracker(trackerID: UUID) {
+//        events.removeValue(forKey: trackerID)
+//    }
+//
+//    private func putTrackersToSections(eventsByCategory: [String: [Tracker]]) -> [TrackerCategory] {
+//        var sections = [TrackerCategory]()
+//        for (categoryName, sectionEvents) in eventsByCategory {
+//            sections.append(TrackerCategory(categoryName: categoryName, trackers: sectionEvents))
+//        }
+//
+//        return sections
+//    }
 }
 
