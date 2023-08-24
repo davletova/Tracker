@@ -301,7 +301,7 @@ extension CreateEventViewController: UITableViewDataSource {
         let cell = tableView.dequeueReusableCell(withIdentifier: cellIdentifier, for: indexPath)
         cell.textLabel?.text = categoryAndScheduleButtons[indexPath.row].name
         cell.backgroundColor = UIColor(named: "BackgroundDay")
-
+        
         let chevronImageView = UIImageView(image: UIImage(named: "chevron"))
         cell.addSubview(chevronImageView)
         chevronImageView.translatesAutoresizingMaskIntoConstraints = false

@@ -38,7 +38,6 @@ final class ListCategoriesViewController: UIViewController {
         table.translatesAutoresizingMaskIntoConstraints = false
         table.backgroundColor = UIColor(named: "BackgroundDay")
         table.layer.cornerRadius = 16
-        // table.tableFooterView = UIView(frame: CGRect(x: 0, y: 0, width: table.frame.size.width, height: 1))
         table.separatorStyle = .singleLine
         
         table.register(UITableViewCell.self, forCellReuseIdentifier: cellIdentifier)
@@ -91,7 +90,7 @@ final class ListCategoriesViewController: UIViewController {
             table.trailingAnchor.constraint(equalTo: view.trailingAnchor, constant: -10),
             table.heightAnchor.constraint(equalToConstant: rowHeight * CGFloat(listOfCategories.count)),
             table.bottomAnchor.constraint(lessThanOrEqualTo: view.bottomAnchor, constant: -buttonHeight - CGFloat(44)),
-                        
+            
             createButton.heightAnchor.constraint(equalToConstant: buttonHeight),
             createButton.centerXAnchor.constraint(equalTo: view.centerXAnchor),
             createButton.bottomAnchor.constraint(equalTo: view.bottomAnchor, constant: -39),

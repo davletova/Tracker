@@ -128,7 +128,7 @@ extension ScheduleViewController: UITableViewDataSource {
         switcher.addTarget(self, action: #selector(weekDaySwitcherValueChanged), for: .valueChanged)
         
         let cell = tableView.dequeueReusableCell(withIdentifier: cellIdentifier, for: indexPath)
-
+        
         cell.textLabel?.text = dateFormatter.standaloneWeekdaySymbols?[weekdayIndex].localizedCapitalized
         cell.backgroundColor = UIColor(named: "BackgroundDay")
         cell.accessoryView = switcher

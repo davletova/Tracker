@@ -357,9 +357,7 @@ extension TrackerCollectionView: UICollectionViewDataSource {
 
 extension TrackerCollectionView: UICollectionViewDelegateFlowLayout {
     func collectionView(_ collectionView: UICollectionView, layout collectionViewLayout: UICollectionViewLayout, sizeForItemAt indexPath: IndexPath) -> CGSize {
-        // Доступная ширина после вычета отступов
         let availableWidth = collectionView.frame.width - self.params.paddingWidth
-        // Ширина ячейки
         let cellWidth =  availableWidth / CGFloat(self.params.cellCount)
         
         return CGSize(width: cellWidth, height: 148)
