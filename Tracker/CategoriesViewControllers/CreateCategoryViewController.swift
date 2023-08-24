@@ -9,24 +9,9 @@ import Foundation
 import UIKit
 
 final class CreateCategoryViewController: UIViewController {
-    @IBOutlet weak var titleLabel: UILabel!
-    @IBOutlet weak var nameInput: UITextField!
-    @IBOutlet weak var doneButton: UIButton!
-    
     var categoryService: CategoryServiceProtocol?
     
-    override func viewDidLoad() {
-        super.viewDidLoad()
-        
-        categoryService = CategoryService()
-        
-        view.backgroundColor = UIColor(named: "WhiteDay")
-        createTitle()
-        createNameInput()
-        createButton()
-    }
-    
-    func createTitle() {
+    private lazy var titleLabel: UILabel = {
         let title = UILabel()
         title.translatesAutoresizingMaskIntoConstraints = false
         title.text = "Новая категория"
@@ -42,10 +27,10 @@ final class CreateCategoryViewController: UIViewController {
         title.topAnchor.constraint(equalTo: view.topAnchor, constant: 24).isActive = true
         title.centerXAnchor.constraint(equalTo: view.centerXAnchor).isActive = true
         
-        titleLabel = title
-    }
+        return title
+    }()
     
-    func createNameInput() {
+    private lazy var nameInput: UITextField = {
         let input = UITextField(frame: CGRect(x: 0, y: 0, width: 288, height: 75))
         input.translatesAutoresizingMaskIntoConstraints = false
         input.backgroundColor = UIColor(named: "BackgroundDay")
@@ -55,55 +40,73 @@ final class CreateCategoryViewController: UIViewController {
         input.leftViewMode = .always
         view.addSubview(input)
         
-        input.leadingAnchor.constraint(equalTo: view.leadingAnchor, constant: 16).isActive = true
-        input.trailingAnchor.constraint(equalTo: view.trailingAnchor, constant: -16).isActive = true
-        input.heightAnchor.constraint(equalToConstant: 75).isActive = true
-        input.topAnchor.constraint(equalTo: titleLabel.bottomAnchor, constant: 10).isActive = true
-        input.centerXAnchor.constraint(equalTo: view.centerXAnchor).isActive = true
-        
-        input.addTarget(self, action: #selector(textFieldDidChange(textField:)), for: .editingChanged)
-        
-        nameInput = input
-    }
+        return input
+    }()
     
-    func createButton() {
+    private lazy var createButton: UIButton = {
         let button = UIButton()
         button.backgroundColor = UIColor(named: "BlackDay")
         button.translatesAutoresizingMaskIntoConstraints = false
         button.layer.cornerRadius = 16
         button.setTitle("Добавить категорию", for: .normal)
-        button.titleLabel?.font = UIFont.systemFont(ofSize: 16)
+        button.titleLabel?.font = UIFont.systemFont(ofSize: 16, weight: .medium)
         button.titleLabel?.textColor = UIColor(named: "WhiteDay")
         button.titleLabel?.textAlignment = .center
         button.addTarget(self, action: #selector(createCategory), for: .touchUpInside)
-        
         view.addSubview(button)
         
-        button.leadingAnchor.constraint(equalTo: view.leadingAnchor, constant: 16).isActive = true
-        button.trailingAnchor.constraint(equalTo: view.trailingAnchor, constant: -16).isActive = true
-        button.heightAnchor.constraint(equalToConstant: 60).isActive = true
-        button.centerXAnchor.constraint(equalTo: view.centerXAnchor).isActive = true
-        button.bottomAnchor.constraint(equalTo: view.bottomAnchor, constant: -24).isActive = true
+        return button
+       
+    }()
+    
+    override func viewDidLoad() {
+        super.viewDidLoad()
+        
+        categoryService = CategoryService()
+
+        view.backgroundColor = UIColor(named: "WhiteDay")
+
+        setConstraint()
+
+        nameInput.addTarget(self, action: #selector(textFieldDidChange(textField:)), for: .editingChanged)
         
         if let nameInputText = nameInput.text,
            nameInputText.isEmpty {
-            button.isEnabled = false
-            button.backgroundColor = UIColor(named: "Gray")
+            createButton.isEnabled = false
+            createButton.backgroundColor = UIColor(named: "Gray")
         }
+    }
+    
+    func setConstraint() {
+        titleLabel.leadingAnchor.constraint(equalTo: view.leadingAnchor, constant: 16).isActive = true
+        titleLabel.trailingAnchor.constraint(equalTo: view.trailingAnchor, constant: -16).isActive = true
+        titleLabel.heightAnchor.constraint(equalToConstant: 22).isActive = true
+        titleLabel.topAnchor.constraint(equalTo: view.topAnchor, constant: 24).isActive = true
+        titleLabel.centerXAnchor.constraint(equalTo: view.centerXAnchor).isActive = true
         
-        doneButton = button
+        nameInput.leadingAnchor.constraint(equalTo: view.leadingAnchor, constant: 16).isActive = true
+        nameInput.trailingAnchor.constraint(equalTo: view.trailingAnchor, constant: -16).isActive = true
+        nameInput.heightAnchor.constraint(equalToConstant: 75).isActive = true
+        nameInput.topAnchor.constraint(equalTo: titleLabel.bottomAnchor, constant: 10).isActive = true
+        nameInput.centerXAnchor.constraint(equalTo: view.centerXAnchor).isActive = true
+        
+        createButton.leadingAnchor.constraint(equalTo: view.leadingAnchor, constant: 20).isActive = true
+        createButton.trailingAnchor.constraint(equalTo: view.trailingAnchor, constant: -20).isActive = true
+        createButton.heightAnchor.constraint(equalToConstant: 60).isActive = true
+        createButton.bottomAnchor.constraint(equalTo: view.bottomAnchor, constant: -39).isActive = true
+        
     }
     
     @objc func textFieldDidChange(textField: UITextField) {
         if let nameInputText = nameInput.text,
            !nameInputText.isEmpty {
-            doneButton.isEnabled = true
-            doneButton.backgroundColor = UIColor(named: "BlackDay")
+            createButton.isEnabled = true
+            createButton.backgroundColor = UIColor(named: "BlackDay")
             return
         }
         
-        doneButton.isEnabled = false
-        doneButton.backgroundColor = UIColor(named: "Gray")
+        createButton.isEnabled = false
+        createButton.backgroundColor = UIColor(named: "Gray")
     }
     
     @objc func createCategory() {}

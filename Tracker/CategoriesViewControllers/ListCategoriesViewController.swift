@@ -9,9 +9,6 @@ import Foundation
 import UIKit
 
 final class ListCategoriesViewController: UIViewController {
-    @IBOutlet weak var titleLabel: UILabel!
-    @IBOutlet weak var addCategory: UIButton!
-    
     private let listOfCategories = [
         Category(id: UUID(), name: "category1"),
         Category(id: UUID(), name: "category2"),
@@ -22,20 +19,7 @@ final class ListCategoriesViewController: UIViewController {
     private let rowHeight: CGFloat = 75
     private let buttonHeight: CGFloat = 60
     
-    override func viewDidLoad() {
-        super.viewDidLoad()
-        view.backgroundColor = UIColor(named: "WhiteDay")
-        
-        createTitle()
-        createTable()
-        createButton()
-        
-        if listOfCategories.count == 0 {
-            showEmptyCollection()
-        }
-    }
-    
-    func createTitle() {
+    private lazy var titleLabel: UILabel = {
         let title = UILabel()
         title.translatesAutoresizingMaskIntoConstraints = false
         title.text = "Категория"
@@ -45,39 +29,28 @@ final class ListCategoriesViewController: UIViewController {
         title.textColor = UIColor(named: "BlackDay")
         view.addSubview(title)
         
-        title.widthAnchor.constraint(equalToConstant: 288).isActive = true
-        title.heightAnchor.constraint(equalToConstant: 22).isActive = true
-        title.topAnchor.constraint(equalTo: view.topAnchor, constant: 24).isActive = true
-        title.centerXAnchor.constraint(equalTo: view.centerXAnchor).isActive = true
-        
-        titleLabel = title
-    }
+        return title
+    }()
     
-    func createTable() {
+    private lazy var table: UITableView = {
         let table = UITableView()
+        table.rowHeight = rowHeight
+        table.translatesAutoresizingMaskIntoConstraints = false
+        table.backgroundColor = UIColor(named: "BackgroundDay")
+        table.layer.cornerRadius = 16
+        // table.tableFooterView = UIView(frame: CGRect(x: 0, y: 0, width: table.frame.size.width, height: 1))
+        table.separatorStyle = .singleLine
         
-        view.addSubview(table)
         table.register(UITableViewCell.self, forCellReuseIdentifier: cellIdentifier)
         table.dataSource = self
         table.delegate = self
         
-        table.rowHeight = rowHeight
+        view.addSubview(table)
         
-        table.translatesAutoresizingMaskIntoConstraints = false
-        table.backgroundColor = UIColor(named: "BackgroundDay")
-        table.layer.cornerRadius = 16
-        table.tableFooterView = UIView(frame: CGRect(x: 0, y: 0, width: table.frame.size.width, height: 1))
-        
-        NSLayoutConstraint.activate([
-            table.topAnchor.constraint(equalTo: titleLabel.bottomAnchor, constant: 24),
-            table.leadingAnchor.constraint(equalTo: view.leadingAnchor, constant: 10),
-            table.trailingAnchor.constraint(equalTo: view.trailingAnchor, constant: -10),
-            table.heightAnchor.constraint(equalToConstant: rowHeight * CGFloat(listOfCategories.count)),
-            table.bottomAnchor.constraint(lessThanOrEqualTo: view.bottomAnchor, constant: -buttonHeight - CGFloat(44))
-        ])
-    }
+        return table
+    }()
     
-    func createButton() {
+    private lazy var createButton: UIButton = {
         let button = UIButton()
         button.backgroundColor = UIColor(named: "BlackDay")
         button.translatesAutoresizingMaskIntoConstraints = false
@@ -86,24 +59,51 @@ final class ListCategoriesViewController: UIViewController {
         button.titleLabel?.font = UIFont.systemFont(ofSize: 16)
         button.titleLabel?.textColor = UIColor(named: "WhiteDay")
         button.titleLabel?.textAlignment = .center
-        button.addTarget(self, action: #selector(createCategory), for: .touchUpInside)
-
         view.addSubview(button)
         
-        addCategory = button
+        return button
+    }()
+    
+    var delegate: ListCategoriesDelegateProtocol?
+    
+    override func viewDidLoad() {
+        super.viewDidLoad()
+        view.backgroundColor = UIColor(named: "WhiteDay")
         
+        setConstraint()
+        
+        createButton.addTarget(self, action: #selector(createCategory), for: .touchUpInside)
+        
+        if listOfCategories.count == 0 {
+            showEmptyCollection()
+        }
+    }
+    
+    func setConstraint() {
         NSLayoutConstraint.activate([
-            button.widthAnchor.constraint(equalToConstant: 288),
-            button.heightAnchor.constraint(equalToConstant: buttonHeight),
-            button.centerXAnchor.constraint(equalTo: view.centerXAnchor),
-            button.bottomAnchor.constraint(equalTo: view.bottomAnchor, constant: -24)
+            titleLabel.heightAnchor.constraint(equalToConstant: 22),
+            titleLabel.topAnchor.constraint(equalTo: view.topAnchor, constant: 24),
+            titleLabel.leadingAnchor.constraint(equalTo: view.leadingAnchor, constant: 20),
+            titleLabel.trailingAnchor.constraint(equalTo: view.trailingAnchor, constant: -10),
+            
+            table.topAnchor.constraint(equalTo: titleLabel.bottomAnchor, constant: 24),
+            table.leadingAnchor.constraint(equalTo: view.leadingAnchor, constant: 10),
+            table.trailingAnchor.constraint(equalTo: view.trailingAnchor, constant: -10),
+            table.heightAnchor.constraint(equalToConstant: rowHeight * CGFloat(listOfCategories.count)),
+            table.bottomAnchor.constraint(lessThanOrEqualTo: view.bottomAnchor, constant: -buttonHeight - CGFloat(44)),
+                        
+            createButton.heightAnchor.constraint(equalToConstant: buttonHeight),
+            createButton.centerXAnchor.constraint(equalTo: view.centerXAnchor),
+            createButton.bottomAnchor.constraint(equalTo: view.bottomAnchor, constant: -39),
+            createButton.trailingAnchor.constraint(equalTo: view.trailingAnchor, constant: -20),
+            createButton.leadingAnchor.constraint(equalTo: view.leadingAnchor, constant: 20)
         ])
     }
     
     func showEmptyCollection() {
         let imageView = UIImageView(image: UIImage(named: "star"))
         imageView.translatesAutoresizingMaskIntoConstraints = false
-
+        
         view.addSubview(imageView)
         
         imageView.centerXAnchor.constraint(equalTo: view.centerXAnchor).isActive = true
@@ -127,10 +127,35 @@ extension ListCategoriesViewController: UITableViewDataSource {
         let cell = tableView.dequeueReusableCell(withIdentifier: cellIdentifier, for: indexPath)
         cell.textLabel?.text = listOfCategories[indexPath.row].name
         cell.backgroundColor = UIColor(named: "BackgroundDay")
+        
+        if indexPath.row == tableView.numberOfRows(inSection: indexPath.section) - 1 {
+            cell.separatorInset = UIEdgeInsets(top: 0, left: 0, bottom: 0, right: .greatestFiniteMagnitude)
+        }
+        
         return cell
     }
 }
 
 extension ListCategoriesViewController: UITableViewDelegate {
-    func tableView(_ tableView: UITableView, didSelectRowAt indexPath: IndexPath) {}
+    func tableView(_ tableView: UITableView, didSelectRowAt indexPath: IndexPath) {
+        guard let delegate = delegate else {
+            print("save category: delegate is empty")
+            return
+        }
+        guard let category = listOfCategories.safetyAccessElement(at: indexPath.row) else  {
+            print("failed to get categoty from listOfCategories")
+            return
+        }
+        
+        delegate.saveCategory(category: category.name)
+        dismiss(animated: true, completion: nil)
+    }
+    
+    func tableView(_ tableView: UITableView, willDisplay cell: UITableViewCell, forRowAt indexPath: IndexPath) {
+        if indexPath.row == tableView.numberOfRows(inSection: indexPath.section) - 1 {
+            cell.separatorInset = UIEdgeInsets(top: 0, left: 0, bottom: 0, right: .greatestFiniteMagnitude)
+        } else {
+            cell.separatorInset = UIEdgeInsets(top: 0, left: 16, bottom: 0, right: 16)
+        }
+    }
 }

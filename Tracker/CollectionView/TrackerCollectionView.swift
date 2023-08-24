@@ -217,7 +217,6 @@ final class TrackerCollectionView: UIViewController {
         }
         visibleCategories = trackerService.getTrackers(by: datePicker.date)
         completedTrackers = trackerRecordService.getSetOfCOmpletedEvents(by: datePicker.date)
-        print(completedTrackers)
         collectionView.reloadData()
         presentedViewController?.dismiss(animated: true)
     }

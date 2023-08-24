@@ -8,15 +8,6 @@
 import Foundation
 import UIKit
 
-protocol ScheduleViewControllerDelegate {
-    func saveSchedule(schedule: Schedule)
-}
-
-struct DailySchedule {
-    let dayOfWeek: Weekday
-    var isScheduled: Bool
-}
-
 final class ScheduleViewController: UIViewController {
     private lazy var titleLabel: UILabel = {
         let titleLabel = UILabel()
@@ -68,7 +59,7 @@ final class ScheduleViewController: UIViewController {
         DailySchedule(dayOfWeek: weekday, isScheduled: false)
     }
     
-    var delegate: ScheduleViewControllerDelegate?
+    var delegate: ScheduleViewControllerDelegateProtocol?
     
     override func viewDidLoad() {
         super.viewDidLoad()
@@ -102,7 +93,6 @@ final class ScheduleViewController: UIViewController {
             return
         }
         
-        print(convertScheduleDaysToSchedule(scheduleDays: scheduleDays))
         delegate.saveSchedule(schedule: convertScheduleDaysToSchedule(scheduleDays: scheduleDays))
         
         dismiss(animated: true, completion: nil)
@@ -138,6 +128,7 @@ extension ScheduleViewController: UITableViewDataSource {
         switcher.addTarget(self, action: #selector(weekDaySwitcherValueChanged), for: .valueChanged)
         
         let cell = tableView.dequeueReusableCell(withIdentifier: cellIdentifier, for: indexPath)
+
         cell.textLabel?.text = dateFormatter.standaloneWeekdaySymbols?[weekdayIndex].localizedCapitalized
         cell.backgroundColor = UIColor(named: "BackgroundDay")
         cell.accessoryView = switcher
@@ -159,6 +150,14 @@ extension ScheduleViewController: UITableViewDelegate {
         let cellHeight = totalTableHeight / CGFloat(numberOfRows)
         
         return cellHeight
+    }
+    
+    func tableView(_ tableView: UITableView, willDisplay cell: UITableViewCell, forRowAt indexPath: IndexPath) {
+        if indexPath.row == tableView.numberOfRows(inSection: indexPath.section) - 1 {
+            cell.separatorInset = UIEdgeInsets(top: 0, left: 0, bottom: 0, right: .greatestFiniteMagnitude)
+        } else {
+            cell.separatorInset = UIEdgeInsets(top: 0, left: 16, bottom: 0, right: 16)
+        }
     }
 }
 

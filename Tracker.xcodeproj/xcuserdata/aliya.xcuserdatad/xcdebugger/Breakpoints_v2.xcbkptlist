@@ -71,32 +71,16 @@
       <BreakpointProxy
          BreakpointExtensionID = "Xcode.Breakpoint.FileBreakpoint">
          <BreakpointContent
-            uuid = "67793992-5FC1-4715-9461-9F0D54C6CC04"
+            uuid = "A35797C3-DECE-46A2-BBDC-528E3B0FFA6F"
             shouldBeEnabled = "No"
             ignoreCount = "0"
             continueAfterRunningActions = "No"
-            filePath = "Tracker/CollectionView/TrackerCollectionViewCell.swift"
+            filePath = "Tracker/Services/TrackerService.swift"
             startingColumnNumber = "9223372036854775807"
             endingColumnNumber = "9223372036854775807"
-            startingLineNumber = "161"
-            endingLineNumber = "161"
-            landmarkName = "TrackerCollectionViewCell"
-            landmarkType = "3">
-         </BreakpointContent>
-      </BreakpointProxy>
-      <BreakpointProxy
-         BreakpointExtensionID = "Xcode.Breakpoint.FileBreakpoint">
-         <BreakpointContent
-            uuid = "E516C5BF-5434-4975-B813-4D366C5029C7"
-            shouldBeEnabled = "No"
-            ignoreCount = "0"
-            continueAfterRunningActions = "No"
-            filePath = "Tracker/CollectionView/TrackerCollectionViewCell.swift"
-            startingColumnNumber = "9223372036854775807"
-            endingColumnNumber = "9223372036854775807"
-            startingLineNumber = "162"
-            endingLineNumber = "162"
-            landmarkName = "trackEvent()"
+            startingLineNumber = "64"
+            endingLineNumber = "64"
+            landmarkName = "createTracker(tracker:)"
             landmarkType = "7">
          </BreakpointContent>
       </BreakpointProxy>

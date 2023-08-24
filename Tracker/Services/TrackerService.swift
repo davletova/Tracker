@@ -13,11 +13,6 @@ protocol TrackerServiceProtocol {
     func createTracker(tracker: Tracker)
 }
 
-struct TrackerCategory {
-    var categoryName: String
-    var trackers: [Tracker]
-}
-
 final class TrackerService {
     var categories = [TrackerCategory]()
     
@@ -68,13 +63,20 @@ extension TrackerService: TrackerServiceProtocol {
     
     func createTracker(tracker: Tracker) {
         for i in (0..<categories.count) {
-            if categories[i].categoryName == tracker.name {
+            if categories[i].categoryName == tracker.category {
                 categories[i].trackers.append(tracker)
+                
+                NotificationCenter.default.post(
+                    name: TrackerCollectionView.TrackerSavedNotification,
+                    object: self,
+                    userInfo: ["event": tracker]
+                )
+                
                 return
             }
         }
         
-        categories.append(TrackerCategory(categoryName: tracker.name, trackers: [tracker]))
+        categories.append(TrackerCategory(categoryName: tracker.category, trackers: [tracker]))
         
         NotificationCenter.default.post(
             name: TrackerCollectionView.TrackerSavedNotification,

@@ -29,12 +29,22 @@ final class CreateEventViewController: UIViewController {
     private lazy var titleLabel: UILabel = {
         let titleLabel = UILabel()
         titleLabel.translatesAutoresizingMaskIntoConstraints = false
-        titleLabel.text = "Создание события"
         titleLabel.textAlignment = .center
         titleLabel.font = UIFont.systemFont(ofSize: 16, weight: .medium)
         titleLabel.textColor = UIColor(named: "BlackDay")
         
         view.addSubview(titleLabel)
+        
+        guard let isHabit = isHabit else {
+            print("create titleLabel: isHabit is empty")
+            return titleLabel
+        }
+        
+        if isHabit {
+            titleLabel.text = "Новая привычка"
+        } else {
+            titleLabel.text = "Новое нерегулярное событие"
+        }
         
         return titleLabel
     }()
@@ -61,7 +71,6 @@ final class CreateEventViewController: UIViewController {
         buttonsTableView.rowHeight = 75
         buttonsTableView.backgroundColor = UIColor(named: "BackgroundDay")
         buttonsTableView.layer.cornerRadius = 16
-        buttonsTableView.tableFooterView = UIView(frame: CGRect(x: 0, y: 0, width: buttonsTableView.frame.size.width, height: 1))
         
         buttonsTableView.dataSource = self
         buttonsTableView.delegate = self
@@ -86,6 +95,11 @@ final class CreateEventViewController: UIViewController {
         collectionView.register(CreateEventSupplementaryView.self,
                                 forSupplementaryViewOfKind: UICollectionView.elementKindSectionHeader,
                                 withReuseIdentifier: "header")
+        
+        let layout: UICollectionViewFlowLayout = UICollectionViewFlowLayout()
+        layout.minimumInteritemSpacing = 3
+        layout.minimumLineSpacing = 0
+        collectionView.collectionViewLayout = layout
         
         view.addSubview(collectionView)
         
@@ -135,6 +149,7 @@ final class CreateEventViewController: UIViewController {
     var isHabit: Bool?
     
     private var schedule: Schedule?
+    private var category: String?
     
     override func viewDidLoad() {
         super.viewDidLoad()
@@ -184,6 +199,7 @@ final class CreateEventViewController: UIViewController {
     
     private func openCategories() {
         let categoriesViewController = ListCategoriesViewController()
+        categoriesViewController.delegate = self
         categoriesViewController.modalPresentationStyle = .popover
         self.present(categoriesViewController, animated: true)
     }
@@ -216,6 +232,12 @@ final class CreateEventViewController: UIViewController {
         }
         
         let newEvent: Tracker
+        
+        guard let selectCategory = self.category else {
+            print("create tracker: category is empty")
+            return
+        }
+        
         if isHabit {
             guard let schedule = schedule else {
                 print("create habit: schedule is empty")
@@ -225,7 +247,7 @@ final class CreateEventViewController: UIViewController {
             newEvent = Habit(
                 id: UUID(),
                 name: value,
-                category: "category1",
+                category: selectCategory,
                 emoji: "🏓",
                 color: UIColor(named: "ColorSelection3")!,
                 schedule: schedule
@@ -234,7 +256,7 @@ final class CreateEventViewController: UIViewController {
             newEvent = Tracker(
                 id: UUID(),
                 name: value,
-                category: "category1",
+                category: selectCategory,
                 emoji: "🏓",
                 color: UIColor(named: "ColorSelection3")!
             )
@@ -258,9 +280,15 @@ final class CreateEventViewController: UIViewController {
     }
 }
 
-extension CreateEventViewController: ScheduleViewControllerDelegate {
+extension CreateEventViewController: ScheduleViewControllerDelegateProtocol {
     func saveSchedule(schedule: Schedule) {
         self.schedule = schedule
+    }
+}
+
+extension CreateEventViewController: ListCategoriesDelegateProtocol {
+    func saveCategory(category: String) {
+        self.category = category
     }
 }
 
@@ -273,7 +301,7 @@ extension CreateEventViewController: UITableViewDataSource {
         let cell = tableView.dequeueReusableCell(withIdentifier: cellIdentifier, for: indexPath)
         cell.textLabel?.text = categoryAndScheduleButtons[indexPath.row].name
         cell.backgroundColor = UIColor(named: "BackgroundDay")
-        
+
         let chevronImageView = UIImageView(image: UIImage(named: "chevron"))
         cell.addSubview(chevronImageView)
         chevronImageView.translatesAutoresizingMaskIntoConstraints = false
@@ -293,6 +321,13 @@ extension CreateEventViewController: UITableViewDataSource {
 extension CreateEventViewController: UITableViewDelegate {
     func tableView(_ tableView: UITableView, didSelectRowAt indexPath: IndexPath) {
         categoryAndScheduleButtons[indexPath.row].callback()
+    }
+    func tableView(_ tableView: UITableView, willDisplay cell: UITableViewCell, forRowAt indexPath: IndexPath) {
+        if indexPath.row == tableView.numberOfRows(inSection: indexPath.section) - 1 {
+            cell.separatorInset = UIEdgeInsets(top: 0, left: 0, bottom: 0, right: .greatestFiniteMagnitude)
+        } else {
+            cell.separatorInset = UIEdgeInsets(top: 0, left: 16, bottom: 0, right: 16)
+        }
     }
 }
 
@@ -352,7 +387,7 @@ extension CreateEventViewController: UICollectionViewDataSource {
 
 extension CreateEventViewController: UICollectionViewDelegateFlowLayout {
     func collectionView(_ collectionView: UICollectionView, layout collectionViewLayout: UICollectionViewLayout, sizeForItemAt indexPath: IndexPath) -> CGSize {
-        return CGSize(width: collectionView.bounds.width / 6, height: collectionView.bounds.width / 6)
+        return CGSize(width: 52, height: 52)
     }
     
     func collectionView(_ collectionView: UICollectionView, layout collectionViewLayout: UICollectionViewLayout, minimumInteritemSpacingForSectionAt section: Int) -> CGFloat {

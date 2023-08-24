@@ -10,6 +10,19 @@ import Foundation
 import UIKit
 
 final class TypeSelectionViewController: UIViewController {
+    private lazy var titleLabel: UILabel = {
+        let titleLabel = UILabel()
+        titleLabel.translatesAutoresizingMaskIntoConstraints = false
+        titleLabel.text = "Создание трекера"
+        titleLabel.textAlignment = .center
+        titleLabel.font = UIFont.systemFont(ofSize: 16, weight: .medium)
+        titleLabel.textColor = UIColor(named: "BlackDay")
+        
+        view.addSubview(titleLabel)
+        
+        return titleLabel
+    }()
+    
     private let habitButton: UIButton = {
         let habitButton = UIButton()
         habitButton.backgroundColor = UIColor(named: "BlackDay")
@@ -54,6 +67,9 @@ final class TypeSelectionViewController: UIViewController {
     
     func setConstraint() {
         NSLayoutConstraint.activate([
+            titleLabel.topAnchor.constraint(equalTo: view.topAnchor, constant: 24),
+            titleLabel.centerXAnchor.constraint(equalTo: view.centerXAnchor),
+            
             habitButton.centerYAnchor.constraint(equalTo: view.centerYAnchor),
             habitButton.leadingAnchor.constraint(equalTo: view.leadingAnchor, constant: 16),
             habitButton.trailingAnchor.constraint(equalTo: view.trailingAnchor, constant: -16),

@@ -34,6 +34,10 @@
 		4DA5C97C2A83D2190046C149 /* CreateEventSupplementaryView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4DA5C97B2A83D2190046C149 /* CreateEventSupplementaryView.swift */; };
 		4DA5C97E2A83EA8E0046C149 /* ColorCollectionViewCell.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4DA5C97D2A83EA8E0046C149 /* ColorCollectionViewCell.swift */; };
 		4DA5C9802A84CD650046C149 /* ScheduleViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4DA5C97F2A84CD650046C149 /* ScheduleViewController.swift */; };
+		4DDC8E0D2A96026900F85E5D /* TrackerCategory.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4DDC8E0C2A96026900F85E5D /* TrackerCategory.swift */; };
+		4DDC8E0F2A96039900F85E5D /* ListCategoriesDelegateProtocol.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4DDC8E0E2A96039900F85E5D /* ListCategoriesDelegateProtocol.swift */; };
+		4DDC8E112A960A4B00F85E5D /* ScheduleViewControllerDelegateProtocol.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4DDC8E102A960A4B00F85E5D /* ScheduleViewControllerDelegateProtocol.swift */; };
+		4DDC8E132A960F2E00F85E5D /* DailySchedule.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4DDC8E122A960F2E00F85E5D /* DailySchedule.swift */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXFileReference section */
@@ -66,6 +70,10 @@
 		4DA5C97B2A83D2190046C149 /* CreateEventSupplementaryView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CreateEventSupplementaryView.swift; sourceTree = "<group>"; };
 		4DA5C97D2A83EA8E0046C149 /* ColorCollectionViewCell.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ColorCollectionViewCell.swift; sourceTree = "<group>"; };
 		4DA5C97F2A84CD650046C149 /* ScheduleViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ScheduleViewController.swift; sourceTree = "<group>"; };
+		4DDC8E0C2A96026900F85E5D /* TrackerCategory.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TrackerCategory.swift; sourceTree = "<group>"; };
+		4DDC8E0E2A96039900F85E5D /* ListCategoriesDelegateProtocol.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ListCategoriesDelegateProtocol.swift; sourceTree = "<group>"; };
+		4DDC8E102A960A4B00F85E5D /* ScheduleViewControllerDelegateProtocol.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ScheduleViewControllerDelegateProtocol.swift; sourceTree = "<group>"; };
+		4DDC8E122A960F2E00F85E5D /* DailySchedule.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DailySchedule.swift; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -87,6 +95,8 @@
 				4D0817CA2A796D56003724B5 /* Schedule.swift */,
 				4D0817CF2A7977BE003724B5 /* Tracker.swift */,
 				4DA3CC442A90A23700DB13C7 /* TrackerRecord.swift */,
+				4DDC8E0C2A96026900F85E5D /* TrackerCategory.swift */,
+				4DDC8E122A960F2E00F85E5D /* DailySchedule.swift */,
 			);
 			path = Models;
 			sourceTree = "<group>";
@@ -106,6 +116,8 @@
 				4D1A3D342A7EBAB9003026E6 /* TrackerService.swift */,
 				4D1A3D362A7FC604003026E6 /* TrackerRecordsService.swift */,
 				4DA5C9752A8344750046C149 /* CategoryService.swift */,
+				4DDC8E0E2A96039900F85E5D /* ListCategoriesDelegateProtocol.swift */,
+				4DDC8E102A960A4B00F85E5D /* ScheduleViewControllerDelegateProtocol.swift */,
 			);
 			path = Services;
 			sourceTree = "<group>";
@@ -279,6 +291,7 @@
 				4D0817C72A796681003724B5 /* Habit.swift in Sources */,
 				4D1A3D312A7E9050003026E6 /* MockData.swift in Sources */,
 				4D1A3D372A7FC604003026E6 /* TrackerRecordsService.swift in Sources */,
+				4DDC8E0F2A96039900F85E5D /* ListCategoriesDelegateProtocol.swift in Sources */,
 				4D2706EB2A77AE0900F106CA /* TrackerCollectionViewCell.swift in Sources */,
 				4DA5C97A2A838F6B0046C149 /* EmojiCollectionViewCell.swift in Sources */,
 				4DA5C9742A82A9CB0046C149 /* CreateCategoryViewController.swift in Sources */,
@@ -290,6 +303,9 @@
 				4D1A9BFE2A726B4C007E527A /* AppDelegate.swift in Sources */,
 				4D1A9C002A726B4C007E527A /* SceneDelegate.swift in Sources */,
 				4D1A3D2F2A7B8D53003026E6 /* Array.swift in Sources */,
+				4DDC8E0D2A96026900F85E5D /* TrackerCategory.swift in Sources */,
+				4DDC8E132A960F2E00F85E5D /* DailySchedule.swift in Sources */,
+				4DDC8E112A960A4B00F85E5D /* ScheduleViewControllerDelegateProtocol.swift in Sources */,
 				4D1A3D352A7EBAB9003026E6 /* TrackerService.swift in Sources */,
 				4D0817CB2A796D56003724B5 /* Schedule.swift in Sources */,
 				4DA3CC452A90A23700DB13C7 /* TrackerRecord.swift in Sources */,

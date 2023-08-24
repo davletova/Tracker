@@ -70,6 +70,7 @@ final class TrackerCollectionViewCell: UICollectionViewCell {
         trackedDaysLabel.textColor = .black
         trackedDaysLabel.translatesAutoresizingMaskIntoConstraints = false
         trackedDaysLabel.textAlignment = .center
+        trackedDaysLabel.font = UIFont.systemFont(ofSize: 12, weight: .medium)
         
         return trackedDaysLabel
     }()
