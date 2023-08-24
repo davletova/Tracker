@@ -13,6 +13,11 @@ import UIKit
 private let emojiCellIdentifier = "emojiCell"
 private let colorCellIdentifier = "colorCell"
 
+enum CollectionSectionType: Int {
+    case emoji = 0
+    case color = 1
+}
+
 struct TableButton {
     var name: String
     var callback: () -> Void
@@ -68,7 +73,6 @@ final class CreateEventViewController: UIViewController {
         )
         collectionView.translatesAutoresizingMaskIntoConstraints = false
         collectionView.allowsMultipleSelection = true
-        collectionView.allowsSelection = true
         
         let layout: UICollectionViewFlowLayout = UICollectionViewFlowLayout()
         layout.minimumInteritemSpacing = 3
@@ -116,9 +120,8 @@ final class CreateEventViewController: UIViewController {
     
     private var selectSchedule: Schedule?
     private var selectCategory: String?
-    private var selectedEmoji: String?
-    private var selectedColor: UIColor?
-
+    private var collectionSections = [CollectionSectionType: IndexPath]()
+    
     override func viewDidLoad() {
         super.viewDidLoad()
         view.backgroundColor = UIColor(named: "WhiteDay")
@@ -265,12 +268,12 @@ final class CreateEventViewController: UIViewController {
             return
         }
         
-        guard let selectedEmoji = self.selectedEmoji else {
+        guard let selectedEmojiIndex = collectionSections[CollectionSectionType.emoji] else {
             print("create tracker: emoji is empty")
             return
         }
         
-        guard let selectedColor = self.selectedColor else {
+        guard let selectedColorIndex = collectionSections[CollectionSectionType.color] else {
             print("create tracker: color is empty")
             return
         }
@@ -291,8 +294,8 @@ final class CreateEventViewController: UIViewController {
                 id: UUID(),
                 name: value,
                 category: selectCategory,
-                emoji: selectedEmoji,
-                color: selectedColor,
+                emoji: emojies[selectedEmojiIndex.row],
+                color: colors[selectedColorIndex.row]!,
                 schedule: schedule
             )
         } else {
@@ -300,8 +303,8 @@ final class CreateEventViewController: UIViewController {
                 id: UUID(),
                 name: value,
                 category: selectCategory,
-                emoji: selectedEmoji,
-                color: selectedColor
+                emoji: emojies[selectedEmojiIndex.row],
+                color: colors[selectedColorIndex.row]!
             )
         }
         
@@ -398,6 +401,7 @@ extension CreateEventViewController: UICollectionViewDataSource {
             
             cell.view.backgroundColor = colors[indexPath.row]
             cell.view.layer.cornerRadius = 8
+            cell.cellColor = colors[indexPath.row]
             return cell
         }
     }
@@ -448,97 +452,32 @@ extension CreateEventViewController: UICollectionViewDelegateFlowLayout {
             verticalFittingPriority: .fittingSizeLevel)
     }
 
-    #if false
     func collectionView(_ collectionView: UICollectionView, didSelectItemAt indexPath: IndexPath) {
-        if collectionView.indexPathsForSelectedItems?.contains(indexPath) ?? false {
-            // Элемент уже выбран, снимите его выделение
-            collectionView.deselectItem(at: indexPath, animated: true)
-        } else {
-            // Элемент не выбран, выделите его
-            collectionView.selectItem(at: indexPath, animated: true, scrollPosition: .none)
-        }
-    }
-    #endif
-    
-    func collectionView(_ collectionView: UICollectionView, didSelectItemAt indexPath: IndexPath) {
-        let selectedCell: UICollectionViewCell = collectionView.cellForItem(at: indexPath)!
-        
-        if indexPath.section == 0 {
-            
-            // отменияем выбор предыдущего эмодзи
-//            if let oldSelectedEmoji = selectedEmoji, !oldSelectedEmoji.isEmpty {
-//                guard let rowOfOldSelection = emojies.firstIndex(of: oldSelectedEmoji) else {
-//                    print("deselectItemAt: search firstIndex of old selection failed")
-//                    return
-//                }
-//
-//                collectionView.deselectItem(at: IndexPath(row: rowOfOldSelection, section: 0), animated: true)
-//            }
-
-//            emojiAndColorCollectionView.deselectItem(at: IndexPath(row: indexPath.row-1, section: 0), animated: true)
-            if emojiAndColorCollectionView.indexPathsForSelectedItems?.contains(indexPath) ?? false {
-                emojiAndColorCollectionView.deselectItem(at: indexPath, animated: true)
-            } else {
-                emojiAndColorCollectionView.selectItem(at: indexPath, animated: true, scrollPosition: .top)
-            }
-            
-            
-            
-            
-            selectedCell.contentView.backgroundColor = UIColor(named: "LightGray")?.withAlphaComponent(0.3)
-            selectedCell.contentView.layer.cornerRadius = 16
-            selectedEmoji = emojies.safetyAccessElement(at: indexPath.row)
+        guard let sectionType = CollectionSectionType(rawValue: indexPath.section) else {
+            print("didSelectItemAt: unknown section type")
             return
         }
         
-        if indexPath.section == 1 {
-            // отменяем выбор предыдущего цвета
-            if let oldSelectedColor = selectedColor {
-                guard let rowOldSelection = colors.firstIndex(of: selectedColor) else {
-                    print("deselectItemAt: search firstIndex of old selection failed")
-                    return
-                }
-                
-                collectionView.deselectItem(at: IndexPath(row: rowOldSelection, section: 1), animated: true)
-            }
-            
-            var color = colors.safetyAccessElement(at: indexPath.row) ?? .lightGray
-            
-            selectedCell.layer.borderWidth = 3
-            selectedCell.layer.borderColor = color?.withAlphaComponent(0.3).cgColor
-            selectedCell.layer.cornerRadius = 8
-
-            let borderLayer = CALayer()
-            borderLayer.frame = selectedCell.bounds
-            borderLayer.borderColor = UIColor.white.cgColor
-            borderLayer.borderWidth = 6
-            borderLayer.cornerRadius = 8
-            selectedCell.layer.insertSublayer(borderLayer, above: selectedCell.layer)
-            
-            guard let color = colors.safetyAccessElement(at: indexPath.row) else {
-                print("select color: safetyAccessElement for index \(indexPath.row) failed")
+        if let oldSelectedCellIndexPath = collectionSections[sectionType] {
+            guard let oldSelectableCell = collectionView.cellForItem(at: oldSelectedCellIndexPath),
+                  let oldSelectableCell = oldSelectableCell as? SelectableCellProtocol else {
+                print("didSelectItemAt: old selection cell is invalid")
                 return
             }
-            selectedColor = color
+            oldSelectableCell.unselectCell()
         }
+        
+        guard let selectedCell = collectionView.cellForItem(at: indexPath),
+              let selectableCell = selectedCell as? SelectableCellProtocol else {
+            print("didSelectItemAt: invalid cell")
+            return
+        }
+        
+        
+        collectionSections[sectionType] = indexPath
+
+        selectableCell.selectCell()
     }
-    
-//    func collectionView(_ collectionView: UICollectionView, didDeselectItemAt indexPath: IndexPath) {
-//        print("deselect \(indexPath)")
-//        guard let cell = collectionView.cellForItem(at: indexPath) else {
-//            print("failed to get cell by index \(indexPath)")
-//            return
-//        }
-//
-//        if indexPath.section == 0 {
-//            cell.contentView.backgroundColor = UIColor(named: "WhiteDay")?.withAlphaComponent(0.3)
-//            return
-//        }
-//
-//        if indexPath.section == 1 {
-//            cell.layer.borderColor = UIColor(named: "WhiteDay")?.cgColor
-//        }
-//    }
 }
 
 

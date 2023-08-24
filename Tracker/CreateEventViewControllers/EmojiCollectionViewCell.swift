@@ -32,3 +32,14 @@ final class EmojiCollectionViewCell: UICollectionViewCell {
         fatalError("init(coder:) has not been implemented")
     }
 }
+
+extension EmojiCollectionViewCell: SelectableCellProtocol {
+    func selectCell() {
+        self.contentView.backgroundColor = UIColor(named: "LightGray")
+        self.contentView.layer.cornerRadius = 16
+    }
+    
+    func unselectCell() {
+        self.contentView.backgroundColor = UIColor(named: "WhiteDay")
+    }
+}

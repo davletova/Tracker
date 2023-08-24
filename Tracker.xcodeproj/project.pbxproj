@@ -38,6 +38,7 @@
 		4DDC8E0F2A96039900F85E5D /* ListCategoriesDelegateProtocol.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4DDC8E0E2A96039900F85E5D /* ListCategoriesDelegateProtocol.swift */; };
 		4DDC8E112A960A4B00F85E5D /* ScheduleViewControllerDelegateProtocol.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4DDC8E102A960A4B00F85E5D /* ScheduleViewControllerDelegateProtocol.swift */; };
 		4DDC8E132A960F2E00F85E5D /* DailySchedule.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4DDC8E122A960F2E00F85E5D /* DailySchedule.swift */; };
+		4DDC8E1B2A97D27100F85E5D /* SelectableCell.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4DDC8E1A2A97D27100F85E5D /* SelectableCell.swift */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXFileReference section */
@@ -74,6 +75,7 @@
 		4DDC8E0E2A96039900F85E5D /* ListCategoriesDelegateProtocol.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ListCategoriesDelegateProtocol.swift; sourceTree = "<group>"; };
 		4DDC8E102A960A4B00F85E5D /* ScheduleViewControllerDelegateProtocol.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ScheduleViewControllerDelegateProtocol.swift; sourceTree = "<group>"; };
 		4DDC8E122A960F2E00F85E5D /* DailySchedule.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DailySchedule.swift; sourceTree = "<group>"; };
+		4DDC8E1A2A97D27100F85E5D /* SelectableCell.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SelectableCell.swift; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -118,6 +120,7 @@
 				4DA5C9752A8344750046C149 /* CategoryService.swift */,
 				4DDC8E0E2A96039900F85E5D /* ListCategoriesDelegateProtocol.swift */,
 				4DDC8E102A960A4B00F85E5D /* ScheduleViewControllerDelegateProtocol.swift */,
+				4DDC8E1A2A97D27100F85E5D /* SelectableCell.swift */,
 			);
 			path = Services;
 			sourceTree = "<group>";
@@ -311,6 +314,7 @@
 				4DA3CC452A90A23700DB13C7 /* TrackerRecord.swift in Sources */,
 				4D0817C92A7968F1003724B5 /* Category.swift in Sources */,
 				4DA5C9762A8344750046C149 /* CategoryService.swift in Sources */,
+				4DDC8E1B2A97D27100F85E5D /* SelectableCell.swift in Sources */,
 				4D6B34C42A8B85BB00C1902C /* Statistics.swift in Sources */,
 				4DA5C97E2A83EA8E0046C149 /* ColorCollectionViewCell.swift in Sources */,
 			);
