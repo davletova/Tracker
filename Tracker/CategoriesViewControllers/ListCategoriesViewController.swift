@@ -26,7 +26,7 @@ final class ListCategoriesViewController: UIViewController {
         title.textAlignment = .center
         
         title.font = UIFont.systemFont(ofSize: 16, weight: .medium)
-        title.textColor = UIColor(named: "BlackDay")
+        title.textColor = BlackDayColor
         view.addSubview(title)
         
         return title
@@ -36,7 +36,7 @@ final class ListCategoriesViewController: UIViewController {
         let table = UITableView()
         table.rowHeight = rowHeight
         table.translatesAutoresizingMaskIntoConstraints = false
-        table.backgroundColor = UIColor(named: "BackgroundDay")
+        table.backgroundColor = BackgroundDayColor
         table.layer.cornerRadius = 16
         table.separatorStyle = .singleLine
         
@@ -51,12 +51,12 @@ final class ListCategoriesViewController: UIViewController {
     
     private lazy var createButton: UIButton = {
         let button = UIButton()
-        button.backgroundColor = UIColor(named: "BlackDay")
+        button.backgroundColor = BlackDayColor
         button.translatesAutoresizingMaskIntoConstraints = false
         button.layer.cornerRadius = 16
         button.setTitle("Добавить категорию", for: .normal)
         button.titleLabel?.font = UIFont.systemFont(ofSize: 16)
-        button.titleLabel?.textColor = UIColor(named: "WhiteDay")
+        button.titleLabel?.textColor = WhiteDayColor
         button.titleLabel?.textAlignment = .center
         view.addSubview(button)
         
@@ -67,7 +67,7 @@ final class ListCategoriesViewController: UIViewController {
     
     override func viewDidLoad() {
         super.viewDidLoad()
-        view.backgroundColor = UIColor(named: "WhiteDay")
+        view.backgroundColor = WhiteDayColor
         
         setConstraint()
         
@@ -125,7 +125,7 @@ extension ListCategoriesViewController: UITableViewDataSource {
     func tableView(_ tableView: UITableView, cellForRowAt indexPath: IndexPath) -> UITableViewCell {
         let cell = tableView.dequeueReusableCell(withIdentifier: cellIdentifier, for: indexPath)
         cell.textLabel?.text = listOfCategories[indexPath.row].name
-        cell.backgroundColor = UIColor(named: "BackgroundDay")
+        cell.backgroundColor = BackgroundDayColor
         
         if indexPath.row == tableView.numberOfRows(inSection: indexPath.section) - 1 {
             cell.separatorInset = UIEdgeInsets(top: 0, left: 0, bottom: 0, right: .greatestFiniteMagnitude)

@@ -52,6 +52,6 @@ extension ColorCollectionViewCell: SelectableCellProtocol {
     }
     
     func unselectCell() {
-        self.layer.borderColor = UIColor(named: "WhiteDay")?.cgColor
+        self.layer.borderColor = WhiteDayColor.cgColor
     }
 }

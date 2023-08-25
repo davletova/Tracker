@@ -15,7 +15,7 @@ final class ScheduleViewController: UIViewController {
         titleLabel.text = "Расписание"
         titleLabel.textAlignment = .center
         titleLabel.font = UIFont.systemFont(ofSize: 16, weight: .medium)
-        titleLabel.textColor = UIColor(named: "BlackDay")
+        titleLabel.textColor = BlackDayColor
         
         view.addSubview(titleLabel)
         
@@ -26,7 +26,7 @@ final class ScheduleViewController: UIViewController {
         let doneButton = UIButton()
         doneButton.translatesAutoresizingMaskIntoConstraints = false
         doneButton.layer.cornerRadius = 16
-        doneButton.backgroundColor = UIColor(named: "BlackDay")
+        doneButton.backgroundColor = BlackDayColor
         doneButton.setTitle("Готово", for: .normal)
         doneButton.addTarget(self, action: #selector(saveSchedule), for: .touchUpInside)
         
@@ -38,7 +38,7 @@ final class ScheduleViewController: UIViewController {
     private lazy var daysTable: UITableView = {
         let daysTable = UITableView()
         daysTable.translatesAutoresizingMaskIntoConstraints = false
-        daysTable.backgroundColor = UIColor(named: "BackgroundDay")
+        daysTable.backgroundColor = BackgroundDayColor
         daysTable.layer.cornerRadius = 16
         daysTable.separatorColor = .gray
         daysTable.separatorStyle = .singleLine
@@ -63,7 +63,7 @@ final class ScheduleViewController: UIViewController {
     
     override func viewDidLoad() {
         super.viewDidLoad()
-        view.backgroundColor = UIColor(named: "WhiteDay")
+        view.backgroundColor = WhiteDayColor
         
         setConstraint()
     }
@@ -130,7 +130,7 @@ extension ScheduleViewController: UITableViewDataSource {
         let cell = tableView.dequeueReusableCell(withIdentifier: cellIdentifier, for: indexPath)
         
         cell.textLabel?.text = dateFormatter.standaloneWeekdaySymbols?[weekdayIndex].localizedCapitalized
-        cell.backgroundColor = UIColor(named: "BackgroundDay")
+        cell.backgroundColor = BackgroundDayColor
         cell.accessoryView = switcher
         cell.selectionStyle = .none
         

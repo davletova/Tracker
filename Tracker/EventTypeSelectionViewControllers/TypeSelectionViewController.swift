@@ -16,7 +16,7 @@ final class TypeSelectionViewController: UIViewController {
         titleLabel.text = "Создание трекера"
         titleLabel.textAlignment = .center
         titleLabel.font = UIFont.systemFont(ofSize: 16, weight: .medium)
-        titleLabel.textColor = UIColor(named: "BlackDay")
+        titleLabel.textColor = BlackDayColor
         
         view.addSubview(titleLabel)
         
@@ -25,12 +25,12 @@ final class TypeSelectionViewController: UIViewController {
     
     private let habitButton: UIButton = {
         let habitButton = UIButton()
-        habitButton.backgroundColor = UIColor(named: "BlackDay")
+        habitButton.backgroundColor = BlackDayColor
         habitButton.translatesAutoresizingMaskIntoConstraints = false
         habitButton.layer.cornerRadius = 16
         habitButton.setTitle("Привычка", for: .normal)
         habitButton.titleLabel?.font = UIFont.systemFont(ofSize: 16)
-        habitButton.titleLabel?.textColor = UIColor(named: "WhiteDay")
+        habitButton.titleLabel?.textColor = WhiteDayColor
         habitButton.titleLabel?.textAlignment = .center
         
         return habitButton
@@ -38,12 +38,12 @@ final class TypeSelectionViewController: UIViewController {
     
     private let eventButton: UIButton = {
         let eventButton = UIButton()
-        eventButton.backgroundColor = UIColor(named: "BlackDay")
+        eventButton.backgroundColor = BlackDayColor
         eventButton.translatesAutoresizingMaskIntoConstraints = false
         eventButton.layer.cornerRadius = 16
         eventButton.setTitle("Нерегулярное событие", for: .normal)
         eventButton.titleLabel?.font = UIFont.systemFont(ofSize: 16)
-        eventButton.titleLabel?.textColor = UIColor(named: "WhiteDay")
+        eventButton.titleLabel?.textColor = WhiteDayColor
         eventButton.titleLabel?.textAlignment = .center
         
         return eventButton
@@ -54,7 +54,7 @@ final class TypeSelectionViewController: UIViewController {
     override func viewDidLoad() {
         super.viewDidLoad()
         
-        view.backgroundColor = UIColor(named: "WhiteDay")
+        view.backgroundColor = WhiteDayColor
         
         habitButton.addTarget(self, action: #selector(goToCreateHabit), for: .touchUpInside)
         view.addSubview(habitButton)

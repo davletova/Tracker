@@ -38,7 +38,7 @@ final class CreateEventViewController: UIViewController {
         titleLabel.translatesAutoresizingMaskIntoConstraints = false
         titleLabel.textAlignment = .center
         titleLabel.font = UIFont.systemFont(ofSize: 16, weight: .medium)
-        titleLabel.textColor = UIColor(named: "BlackDay")
+        titleLabel.textColor = BlackDayColor
         
         return titleLabel
     }()
@@ -46,7 +46,7 @@ final class CreateEventViewController: UIViewController {
     private var trackerNameInput: UITextField = {
         let eventNameInput = UITextField()
         eventNameInput.translatesAutoresizingMaskIntoConstraints = false
-        eventNameInput.backgroundColor = UIColor(named: "BackgroundDay")
+        eventNameInput.backgroundColor = BackgroundDayColor
         eventNameInput.layer.cornerRadius = 16
         eventNameInput.leftView = UIView(frame: CGRectMake(0, 0, 16, eventNameInput.frame.height))
         eventNameInput.leftViewMode = .always
@@ -60,7 +60,7 @@ final class CreateEventViewController: UIViewController {
         buttonsTableView.translatesAutoresizingMaskIntoConstraints = false
         buttonsTableView.register(UITableViewCell.self, forCellReuseIdentifier: "cell")
         buttonsTableView.rowHeight = 75
-        buttonsTableView.backgroundColor = UIColor(named: "BackgroundDay")
+        buttonsTableView.backgroundColor = BackgroundDayColor
         buttonsTableView.layer.cornerRadius = 16
         
         return buttonsTableView
@@ -91,12 +91,12 @@ final class CreateEventViewController: UIViewController {
     private var cancelButton: UIButton = {
         let cancelButton = UIButton()
         cancelButton.translatesAutoresizingMaskIntoConstraints = false
-        cancelButton.backgroundColor = UIColor(named: "WhiteDay")
+        cancelButton.backgroundColor = WhiteDayColor
         cancelButton.layer.cornerRadius = 16
         cancelButton.setTitle("Отменить", for: .normal)
         cancelButton.titleLabel?.font = UIFont.systemFont(ofSize: 16, weight: .medium)
-        cancelButton.setTitleColor(UIColor(named: "Red"), for: .normal)
-        cancelButton.layer.borderColor = UIColor(named: "Red")?.cgColor
+        cancelButton.setTitleColor(RedColor, for: .normal)
+        cancelButton.layer.borderColor = RedColor.cgColor
         cancelButton.layer.borderWidth = 1
         
         return cancelButton
@@ -104,12 +104,12 @@ final class CreateEventViewController: UIViewController {
     
     private var createEventButton: UIButton = {
         let createEventButton = UIButton()
-        createEventButton.backgroundColor = UIColor(named: "BlackDay")
+        createEventButton.backgroundColor = BlackDayColor
         createEventButton.translatesAutoresizingMaskIntoConstraints = false
         createEventButton.layer.cornerRadius = 16
         createEventButton.setTitle("Создать", for: .normal)
         createEventButton.titleLabel?.font = UIFont.systemFont(ofSize: 16, weight: .medium)
-        createEventButton.setTitleColor(UIColor(named: "WhiteDay"), for: .normal)
+        createEventButton.setTitleColor(WhiteDayColor, for: .normal)
         createEventButton.titleLabel?.textAlignment = .center
        
         return createEventButton
@@ -124,7 +124,7 @@ final class CreateEventViewController: UIViewController {
     
     override func viewDidLoad() {
         super.viewDidLoad()
-        view.backgroundColor = UIColor(named: "WhiteDay")
+        view.backgroundColor = WhiteDayColor
         
         categoryAndScheduleButtons.append(TableButton(name: "Категория", callback: openCategories))
         if let isHabit = isHabit, isHabit {
@@ -221,7 +221,7 @@ final class CreateEventViewController: UIViewController {
         if let inputText = trackerNameInput.text,
            inputText.isEmpty {
             createEventButton.isEnabled = false
-            createEventButton.backgroundColor = UIColor(named: "Gray")
+            createEventButton.backgroundColor = GrayColor
         }
         
         view.addSubview(createEventButton)
@@ -317,12 +317,12 @@ final class CreateEventViewController: UIViewController {
         if let nameInputText = trackerNameInput.text,
            !nameInputText.isEmpty {
             createEventButton.isEnabled = true
-            createEventButton.backgroundColor = UIColor(named: "BlackDay")
+            createEventButton.backgroundColor = BlackDayColor
             return
         }
         
         createEventButton.isEnabled = false
-        createEventButton.backgroundColor = UIColor(named: "Gray")
+        createEventButton.backgroundColor = GrayColor
     }
 }
 
@@ -346,7 +346,7 @@ extension CreateEventViewController: UITableViewDataSource {
     func tableView(_ tableView: UITableView, cellForRowAt indexPath: IndexPath) -> UITableViewCell {
         let cell = tableView.dequeueReusableCell(withIdentifier: cellIdentifier, for: indexPath)
         cell.textLabel?.text = categoryAndScheduleButtons[indexPath.row].name
-        cell.backgroundColor = UIColor(named: "BackgroundDay")
+        cell.backgroundColor = BackgroundDayColor
         
         let chevronImageView = UIImageView(image: UIImage(named: "chevron"))
         cell.addSubview(chevronImageView)

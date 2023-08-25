@@ -49,8 +49,8 @@ final class TrackerCollectionView: UIViewController {
     
     private lazy var searchTextField: UISearchTextField = {
         let textField = UISearchTextField()
-        textField.backgroundColor = UIColor(named: "BackgroundDay")
-        textField.textColor = UIColor(named: "BlackDay")
+        textField.backgroundColor = BackgroundDayColor
+        textField.textColor = BlackDayColor
         textField.font = UIFont.systemFont(ofSize: 17, weight: .regular)
         textField.translatesAutoresizingMaskIntoConstraints = false
         textField.layer.cornerRadius = 16
@@ -141,7 +141,7 @@ final class TrackerCollectionView: UIViewController {
         
         setConstraint()
         
-        view.backgroundColor = UIColor(named: "WhiteDay")
+        view.backgroundColor = WhiteDayColor
         
         createNavigationBar()
     }
@@ -161,7 +161,7 @@ final class TrackerCollectionView: UIViewController {
     
     func createNavigationBar() {
         if let navigationBar = navigationController?.navigationBar {
-            navigationBar.backgroundColor = UIColor(named: "WhiteDay")
+            navigationBar.backgroundColor = WhiteDayColor
             navigationBar.tintColor = .black
             
             navigationItem.leftBarButtonItem = UIBarButtonItem(image: UIImage(named: "add"), style: .plain, target: self, action: #selector(clickButtonCreateEvent))
@@ -176,7 +176,7 @@ final class TrackerCollectionView: UIViewController {
             paragraphStyle.alignment = .left
             
             navigationBar.titleTextAttributes = [
-                NSAttributedString.Key.foregroundColor: UIColor(named: "BlackDay") as Any,
+                NSAttributedString.Key.foregroundColor: BlackDayColor as Any,
                 NSAttributedString.Key.font: UIFont.systemFont(ofSize: 34, weight: UIFont.Weight.bold),
                 NSAttributedString.Key.paragraphStyle: paragraphStyle
             ] as [NSAttributedString.Key : Any]

@@ -35,11 +35,11 @@ final class EmojiCollectionViewCell: UICollectionViewCell {
 
 extension EmojiCollectionViewCell: SelectableCellProtocol {
     func selectCell() {
-        self.contentView.backgroundColor = UIColor(named: "LightGray")
+        self.contentView.backgroundColor = LightGrayColor
         self.contentView.layer.cornerRadius = 16
     }
     
     func unselectCell() {
-        self.contentView.backgroundColor = UIColor(named: "WhiteDay")
+        self.contentView.backgroundColor = WhiteDayColor
     }
 }

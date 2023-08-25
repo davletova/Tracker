@@ -18,7 +18,7 @@ final class CreateCategoryViewController: UIViewController {
         title.textAlignment = .center
         
         title.font = UIFont.systemFont(ofSize: 16, weight: .medium)
-        title.textColor = UIColor(named: "BlackDay")
+        title.textColor = BlackDayColor
         view.addSubview(title)
         
         title.leadingAnchor.constraint(equalTo: view.leadingAnchor, constant: 16).isActive = true
@@ -33,7 +33,7 @@ final class CreateCategoryViewController: UIViewController {
     private lazy var nameInput: UITextField = {
         let input = UITextField(frame: CGRect(x: 0, y: 0, width: 288, height: 75))
         input.translatesAutoresizingMaskIntoConstraints = false
-        input.backgroundColor = UIColor(named: "BackgroundDay")
+        input.backgroundColor = BackgroundDayColor
         input.layer.cornerRadius = 16
         input.placeholder = "Введите название категории"
         input.leftView = UIView(frame: CGRectMake(0, 0, 16, input.frame.height))
@@ -45,12 +45,12 @@ final class CreateCategoryViewController: UIViewController {
     
     private lazy var createButton: UIButton = {
         let button = UIButton()
-        button.backgroundColor = UIColor(named: "BlackDay")
+        button.backgroundColor = BlackDayColor
         button.translatesAutoresizingMaskIntoConstraints = false
         button.layer.cornerRadius = 16
         button.setTitle("Добавить категорию", for: .normal)
         button.titleLabel?.font = UIFont.systemFont(ofSize: 16, weight: .medium)
-        button.titleLabel?.textColor = UIColor(named: "WhiteDay")
+        button.titleLabel?.textColor = WhiteDayColor
         button.titleLabel?.textAlignment = .center
         button.addTarget(self, action: #selector(createCategory), for: .touchUpInside)
         view.addSubview(button)
@@ -64,7 +64,7 @@ final class CreateCategoryViewController: UIViewController {
         
         categoryService = CategoryService()
 
-        view.backgroundColor = UIColor(named: "WhiteDay")
+        view.backgroundColor = WhiteDayColor
 
         setConstraint()
 
@@ -73,7 +73,7 @@ final class CreateCategoryViewController: UIViewController {
         if let nameInputText = nameInput.text,
            nameInputText.isEmpty {
             createButton.isEnabled = false
-            createButton.backgroundColor = UIColor(named: "Gray")
+            createButton.backgroundColor = GrayColor
         }
     }
     
@@ -101,12 +101,12 @@ final class CreateCategoryViewController: UIViewController {
         if let nameInputText = nameInput.text,
            !nameInputText.isEmpty {
             createButton.isEnabled = true
-            createButton.backgroundColor = UIColor(named: "BlackDay")
+            createButton.backgroundColor = BlackDayColor
             return
         }
         
         createButton.isEnabled = false
-        createButton.backgroundColor = UIColor(named: "Gray")
+        createButton.backgroundColor = GrayColor
     }
     
     @objc func createCategory() {}
