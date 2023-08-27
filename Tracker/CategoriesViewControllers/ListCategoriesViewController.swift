@@ -10,10 +10,10 @@ import UIKit
 
 final class ListCategoriesViewController: UIViewController {
     private let listOfCategories = [
-        Category(id: UUID(), name: "category1"),
-        Category(id: UUID(), name: "category2"),
-        Category(id: UUID(), name: "category3"),
-        Category(id: UUID(), name: "category4")
+        TrackerCategory(name: "category1"),
+        TrackerCategory(name: "category2"),
+        TrackerCategory(name: "category3"),
+        TrackerCategory(name: "category4")
     ]
     private let cellIdentifier = "cell"
     private let rowHeight: CGFloat = 75

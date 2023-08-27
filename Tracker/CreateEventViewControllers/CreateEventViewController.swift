@@ -33,6 +33,8 @@ final class CreateEventViewController: UIViewController {
     ]
     private let colors = (1...18).map{ UIColor(named: "ColorSelection\($0)") }
     
+    private let trackerStore = TrackerStore()
+    
     private var titleLabel: UILabel = {
         let titleLabel = UILabel()
         titleLabel.translatesAutoresizingMaskIntoConstraints = false
@@ -115,11 +117,10 @@ final class CreateEventViewController: UIViewController {
         return createEventButton
     }()
     
-    var trackerService: TrackerServiceProtocol?
     var isHabit: Bool?
     
     private var selectSchedule: Schedule?
-    private var selectCategory: String?
+    private var selectCategory: TrackerCategory?
     private var collectionSections = [CollectionSectionType: IndexPath]()
     
     override func viewDidLoad() {
@@ -257,12 +258,7 @@ final class CreateEventViewController: UIViewController {
             print("goToCreateEventController: nameInput.text is empty")
             return
         }
-        
-        guard let trackerService = trackerService else {
-            print("goToCreateEventController: trackerService is empty")
-            return
-        }
-        
+                
         guard let isHabit = isHabit else {
             print("goToCreateEventController: isHabit is empty")
             return
@@ -283,14 +279,14 @@ final class CreateEventViewController: UIViewController {
             return
         }
         
-        let newEvent: Tracker
+        let newTracker: Tracker
         if isHabit {
             guard let schedule = selectSchedule else {
                 print("create habit: schedule is empty")
                 return
             }
             
-            newEvent = Habit(
+            newTracker = Habit(
                 id: UUID(),
                 name: value,
                 category: selectCategory,
@@ -299,7 +295,7 @@ final class CreateEventViewController: UIViewController {
                 schedule: schedule
             )
         } else {
-            newEvent = Tracker(
+            newTracker = Tracker(
                 id: UUID(),
                 name: value,
                 category: selectCategory,
@@ -308,7 +304,11 @@ final class CreateEventViewController: UIViewController {
             )
         }
         
-        trackerService.createTracker(tracker: newEvent)
+        do {
+            try trackerStore.addNewTracker(newTracker)
+        } catch {
+            print("failed to create tracker")
+        }
         
         self.view.window?.rootViewController?.dismiss(animated: true, completion: nil)
     }
@@ -334,7 +334,8 @@ extension CreateEventViewController: ScheduleViewControllerDelegateProtocol {
 
 extension CreateEventViewController: ListCategoriesDelegateProtocol {
     func saveCategory(category: String) {
-        self.selectCategory = category
+//        self.selectCategory = category
+        self.selectCategory = TrackerCategory(name: category)
     }
 }
 

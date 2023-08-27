@@ -8,7 +8,7 @@
 import Foundation
 
 extension Date {
-    func dayNumberOfWeek() -> Weekday? {
+    func dayNumberOfWeek() -> Weekday {
         let calendar = Calendar(identifier: .iso8601)
         let numberOfDay = calendar.dateComponents([.weekday], from: self).weekday
         
@@ -25,10 +25,8 @@ extension Date {
             return Weekday.thursday
         case 6:
             return Weekday.friday
-        case 7:
-            return Weekday.saturday
         default:
-            return nil
+            return Weekday.saturday
         }
     }
 }

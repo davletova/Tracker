@@ -11,14 +11,14 @@ import UIKit
 class Tracker {
     let id: UUID
     let name: String
-    let category: String
+    let category: TrackerCategory
     let emoji: String
     let color: UIColor
     
     init(
         id: UUID,
         name: String,
-        category: String,
+        category: TrackerCategory,
         emoji: String,
         color: UIColor
     ) {

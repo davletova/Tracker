@@ -100,7 +100,9 @@ final class TrackerCollectionViewCell: UICollectionViewCell {
                 return
             }
             emogiLabel.text = cellEvent.emoji
+            
             nameLabel.text = cellEvent.name
+            
             nameLabel.lineBreakMode = .byWordWrapping
             nameLabel.numberOfLines = 0
             trackedDaysLabel.text = formatTrackedDays(days: cellEvent.trackedDaysCount)

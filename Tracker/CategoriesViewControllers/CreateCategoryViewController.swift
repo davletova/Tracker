@@ -9,7 +9,7 @@ import Foundation
 import UIKit
 
 final class CreateCategoryViewController: UIViewController {
-    var categoryService: CategoryServiceProtocol?
+//    var categoryService: CategoryServiceProtocol?
     
     private lazy var titleLabel: UILabel = {
         let title = UILabel()
@@ -62,7 +62,7 @@ final class CreateCategoryViewController: UIViewController {
     override func viewDidLoad() {
         super.viewDidLoad()
         
-        categoryService = CategoryService()
+//        categoryService = CategoryService()
 
         view.backgroundColor = WhiteDayColor
 

@@ -31,10 +31,10 @@ struct GeometricParams {
 final class TrackerCollectionView: UIViewController {
     static let TrackerSavedNotification = Notification.Name(rawValue: "CreateEvent")
     
-    private var trackerService: TrackerServiceProtocol?
     private var trackerRecordService: TrackerRecordServiceProtocol?
+    private let trackerStore = TrackerStore()
     
-    private var visibleCategories = [TrackerCategory]()
+    private var visibleCategories = [TrackersByCategory]()
     private var completedTrackers = Set<UUID>()
     
     private var datePicker: UIDatePicker = {
@@ -123,20 +123,14 @@ final class TrackerCollectionView: UIViewController {
                 return
             }
             
-            guard let trackerService = self.trackerService else {
-                print("CreateEventNotification: trackerService is empty")
-                return
-            }
-            
-            self.visibleCategories = trackerService.getTrackers(by: datePicker.date)
+            self.visibleCategories = trackerStore.getTrackers(by: datePicker.date)
             
             self.collectionView.reloadData()
         }
         
-        trackerService = TrackerService()
         trackerRecordService = TrackerRecordService()
         
-        visibleCategories = trackerService!.getTrackers(by: datePicker.date)
+        visibleCategories = trackerStore.getTrackers(by: datePicker.date)
         completedTrackers = trackerRecordService!.getSetOfCOmpletedEvents(by: datePicker.date)
         
         setConstraint()
@@ -201,21 +195,16 @@ final class TrackerCollectionView: UIViewController {
     
     @objc func clickButtonCreateEvent() {
         let typeSelectionViewController = TypeSelectionViewController()
-        typeSelectionViewController.trackerService = trackerService
         typeSelectionViewController.modalPresentationStyle = .popover
         self.present(typeSelectionViewController, animated: true)
     }
     
     @objc func changeDateOnDatePicker(_ datePicker: UIDatePicker) {
-        guard let trackerService = trackerService else {
-            print("changeDateOnDatePicker: trackerService is empty")
-            return
-        }
         guard let trackerRecordService = trackerRecordService else {
             print("changeDateOnDatePicker: trackerRecordService is empty")
             return
         }
-        visibleCategories = trackerService.getTrackers(by: datePicker.date)
+        visibleCategories = trackerStore.getTrackers(by: datePicker.date)
         completedTrackers = trackerRecordService.getSetOfCOmpletedEvents(by: datePicker.date)
         collectionView.reloadData()
         presentedViewController?.dismiss(animated: true)
@@ -230,16 +219,10 @@ extension TrackerCollectionView: UISearchTextFieldDelegate {
             return false
         }
         
-        guard let trackerService = trackerService else {
-            print("performSearch: trackerService is empty")
-            return false
-        }
-        
-        
         if searchText.isEmpty {
-            visibleCategories = trackerService.getTrackers(by: datePicker.date)
+            visibleCategories = trackerStore.getTrackers(by: datePicker.date)
         } else {
-            visibleCategories = trackerService.filterTrackers(by: searchText, date: datePicker.date)
+//            visibleCategories = trackerService.filterTrackers(by: searchText, date: datePicker.date)
         }
         
         collectionView.reloadData()
@@ -269,6 +252,20 @@ extension TrackerCollectionView: TrackEventProtocol {
         trackerRecordService.deleteTrackerRecord(record: TrackerRecord(eventID: eventId, date: Calendar.current.startOfDay(for: datePicker.date)))
         completedTrackers = trackerRecordService.getSetOfCOmpletedEvents(by: datePicker.date)
         collectionView.reloadItems(at: [indexPath])
+    }
+}
+
+extension TrackerCollectionView: TrackerStoreDelegate {
+    func store(_ store: TrackerStore, didUpdate update: TrackerStoreUpdate) {
+        visibleCategories = trackerStore.getTrackers(by: datePicker.date)
+        collectionView.performBatchUpdates {
+            let insertedIndexPaths = update.insertedIndexes.map { IndexPath(item: $0, section: 0) }
+            let deletedIndexPaths = update.deletedIndexes.map { IndexPath(item: $0, section: 0) }
+            let updatedIndexPaths = update.updatedIndexes.map { IndexPath(item: $0, section: 0) }
+            collectionView.insertItems(at: insertedIndexPaths)
+            collectionView.insertItems(at: deletedIndexPaths)
+            collectionView.insertItems(at: updatedIndexPaths)
+        }
     }
 }
 

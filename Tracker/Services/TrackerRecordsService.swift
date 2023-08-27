@@ -17,7 +17,7 @@ protocol TrackerRecordServiceProtocol {
 }
 
 final class TrackerRecordService: TrackerRecordServiceProtocol {
-    var trackerRecords: [TrackerRecord] = mockTrackerRecords
+    var trackerRecords = [TrackerRecord]()
     
     func getRecords(by date: Date) -> [TrackerRecord] {
         var result = [TrackerRecord]()
