@@ -8,5 +8,5 @@
 import Foundation
 
 protocol ListCategoriesDelegateProtocol {
-    func saveCategory(category: String)
+    func saveCategory(category: TrackerCategory)
 }

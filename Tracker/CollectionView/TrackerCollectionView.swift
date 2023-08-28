@@ -31,11 +31,10 @@ struct GeometricParams {
 final class TrackerCollectionView: UIViewController {
     static let TrackerSavedNotification = Notification.Name(rawValue: "CreateEvent")
     
-    private var trackerRecordService: TrackerRecordServiceProtocol?
     private let trackerStore = TrackerStore()
+    private let trackerRecordStore = TrackerRecordStore()
     
     private var visibleCategories = [TrackersByCategory]()
-    private var completedTrackers = Set<UUID>()
     
     private var datePicker: UIDatePicker = {
         var datePicker = UIDatePicker()
@@ -47,7 +46,7 @@ final class TrackerCollectionView: UIViewController {
     
     private let params = GeometricParams(cellCount: 2, leftInset: 10, rightInset: 10, cellSpacing: 10)
     
-    private lazy var searchTextField: UISearchTextField = {
+    private var searchTextField: UISearchTextField = {
         let textField = UISearchTextField()
         textField.backgroundColor = BackgroundDayColor
         textField.textColor = BlackDayColor
@@ -64,25 +63,20 @@ final class TrackerCollectionView: UIViewController {
             attributes: attributes
         )
         textField.attributedPlaceholder = attributedPlaceholder
-        textField.delegate = self
-        
-        view.addSubview(textField)
         
         return textField
     }()
     
-    private lazy var collectionView: UICollectionView = {
+    private var collectionView: UICollectionView = {
         let collectionView = UICollectionView(frame: .zero, collectionViewLayout: UICollectionViewFlowLayout())
         
         collectionView.translatesAutoresizingMaskIntoConstraints = false
-        view.addSubview(collectionView)
         
         collectionView.register(TrackerCollectionViewCell.self, forCellWithReuseIdentifier: cellIdentifier)
         collectionView.register(SupplementaryView.self,
                                 forSupplementaryViewOfKind: UICollectionView.elementKindSectionHeader,
                                 withReuseIdentifier: headerIdentifier)
-        collectionView.dataSource = self
-        collectionView.delegate = self
+        
         return collectionView
     }()
     
@@ -119,21 +113,18 @@ final class TrackerCollectionView: UIViewController {
             queue: OperationQueue.main
         ) { [weak self] _ in
             guard let self = self else {
-                print("TrackerCollectionView, CreateEventNotification: self is empty")
+                assertionFailure("TrackerCollectionView, CreateEventNotification: self is empty")
                 return
             }
             
             self.visibleCategories = trackerStore.getTrackers(by: datePicker.date)
-            
             self.collectionView.reloadData()
         }
         
-        trackerRecordService = TrackerRecordService()
-        
         visibleCategories = trackerStore.getTrackers(by: datePicker.date)
-        completedTrackers = trackerRecordService!.getSetOfCOmpletedEvents(by: datePicker.date)
         
-        setConstraint()
+        setupSearchTextField()
+        setupCollection()
         
         view.backgroundColor = WhiteDayColor
         
@@ -180,12 +171,25 @@ final class TrackerCollectionView: UIViewController {
         }
     }
     
-    func setConstraint() {
+    func setupSearchTextField() {
+        searchTextField.delegate = self
+        
+        view.addSubview(searchTextField)
+        
         NSLayoutConstraint.activate([
             searchTextField.topAnchor.constraint(equalTo: view.safeAreaLayoutGuide.topAnchor, constant: 10),
             searchTextField.leadingAnchor.constraint(equalTo: view.leadingAnchor, constant: 16),
-            searchTextField.trailingAnchor.constraint(equalTo: view.trailingAnchor, constant: -16),
-            
+            searchTextField.trailingAnchor.constraint(equalTo: view.trailingAnchor, constant: -16)
+        ])
+    }
+    
+    func setupCollection() {
+        view.addSubview(collectionView)
+        
+        collectionView.dataSource = self
+        collectionView.delegate = self
+        
+        NSLayoutConstraint.activate([
             collectionView.topAnchor.constraint(equalTo: searchTextField.bottomAnchor, constant: 24),
             collectionView.bottomAnchor.constraint(equalTo: view.safeAreaLayoutGuide.bottomAnchor),
             collectionView.leadingAnchor.constraint(equalTo: view.leadingAnchor),
@@ -200,12 +204,7 @@ final class TrackerCollectionView: UIViewController {
     }
     
     @objc func changeDateOnDatePicker(_ datePicker: UIDatePicker) {
-        guard let trackerRecordService = trackerRecordService else {
-            print("changeDateOnDatePicker: trackerRecordService is empty")
-            return
-        }
         visibleCategories = trackerStore.getTrackers(by: datePicker.date)
-        completedTrackers = trackerRecordService.getSetOfCOmpletedEvents(by: datePicker.date)
         collectionView.reloadData()
         presentedViewController?.dismiss(animated: true)
     }
@@ -222,7 +221,7 @@ extension TrackerCollectionView: UISearchTextFieldDelegate {
         if searchText.isEmpty {
             visibleCategories = trackerStore.getTrackers(by: datePicker.date)
         } else {
-//            visibleCategories = trackerService.filterTrackers(by: searchText, date: datePicker.date)
+            visibleCategories = trackerStore.getTrackers(by: datePicker.date, withName: searchText)
         }
         
         collectionView.reloadData()
@@ -232,40 +231,31 @@ extension TrackerCollectionView: UISearchTextFieldDelegate {
 }
 
 extension TrackerCollectionView: TrackEventProtocol {
-    func trackEvent(eventId: UUID, indexPath: IndexPath) {
-        guard let trackerRecordService = trackerRecordService else {
-            print("changeDate: trackerRecordService is empty")
-            return
-        }
-        
-        trackerRecordService.addRecords(record: TrackerRecord(eventID: eventId, date: Calendar.current.startOfDay(for: datePicker.date)))
-        completedTrackers = trackerRecordService.getSetOfCOmpletedEvents(by: datePicker.date)
-        collectionView.reloadItems(at: [indexPath])
-    }
-    
-    func untrackEvent(eventId: UUID, indexPath: IndexPath) {
-        guard let trackerRecordService = trackerRecordService else {
-            print("changeDate: trackerRecordService is empty")
-            return
-        }
-        
-        trackerRecordService.deleteTrackerRecord(record: TrackerRecord(eventID: eventId, date: Calendar.current.startOfDay(for: datePicker.date)))
-        completedTrackers = trackerRecordService.getSetOfCOmpletedEvents(by: datePicker.date)
-        collectionView.reloadItems(at: [indexPath])
-    }
-}
-
-extension TrackerCollectionView: TrackerStoreDelegate {
-    func store(_ store: TrackerStore, didUpdate update: TrackerStoreUpdate) {
+    func trackEvent(indexPath: IndexPath) {
         visibleCategories = trackerStore.getTrackers(by: datePicker.date)
-        collectionView.performBatchUpdates {
-            let insertedIndexPaths = update.insertedIndexes.map { IndexPath(item: $0, section: 0) }
-            let deletedIndexPaths = update.deletedIndexes.map { IndexPath(item: $0, section: 0) }
-            let updatedIndexPaths = update.updatedIndexes.map { IndexPath(item: $0, section: 0) }
-            collectionView.insertItems(at: insertedIndexPaths)
-            collectionView.insertItems(at: deletedIndexPaths)
-            collectionView.insertItems(at: updatedIndexPaths)
+        guard
+            let category = visibleCategories.safetyAccessElement(at: indexPath.section),
+            let cellTracker = category.trackers.safetyAccessElement(at: indexPath.row)
+        else {
+            return
         }
+
+        if cellTracker.tracked {
+            do {
+                try trackerRecordStore.deleteRecord(TrackerRecord(eventID: cellTracker.tracker.id!, date: Calendar.current.startOfDay(for: datePicker.date)))
+            } catch {
+                print("failed to create new record")
+            }
+        } else {
+            do {
+                try trackerRecordStore.addNewRecord(TrackerRecord(eventID: cellTracker.tracker.id!, date: Calendar.current.startOfDay(for: datePicker.date)))
+            } catch {
+                print("failed to create new record")
+            }
+        }
+        
+        
+        visibleCategories = trackerStore.getTrackers(by: datePicker.date)
     }
 }
 
@@ -300,27 +290,17 @@ extension TrackerCollectionView: UICollectionViewDataSource {
             return UICollectionViewCell()
         }
         
-        guard let event = section.trackers.safetyAccessElement(at: indexPath.row) else {
+        guard let trackerCell = section.trackers.safetyAccessElement(at: indexPath.row) else {
             print("failed to get element from section: \(section.categoryName) by index \(indexPath.row)")
             return UICollectionViewCell()
         }
-        
-        guard let trackerRecordService = trackerRecordService else {
-            print("collectionView cellForItemAt: trackerRecordService is empty")
-            return UICollectionViewCell()
-        }
-        
-        let trackedDaysCount = trackerRecordService.getTrackerDaysCount(of: event.id)
-        let cellEvent = TrackerCell(
-            event: event,
-            trackedDaysCount: trackedDaysCount,
-            tracked: completedTrackers.contains(event.id)
-        )
-        cell.cellEvent = cellEvent
+                
         cell.indexPath = indexPath
         cell.delegate = self
         cell.contentView.layer.cornerRadius = 16
         
+        cell.configureCell(cellTracker: trackerCell)
+       
         if Calendar.current.startOfDay(for: datePicker.date) > Date() {
             cell.disableTrackButton()
         } else {

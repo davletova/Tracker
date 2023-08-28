@@ -144,7 +144,7 @@ final class CreateEventViewController: UIViewController {
         view.addSubview(titleLabel)
         
         guard let isHabit = isHabit else {
-            print("create titleLabel: isHabit is empty")
+            assertionFailure("create titleLabel: isHabit is empty")
             return
         }
         
@@ -287,7 +287,6 @@ final class CreateEventViewController: UIViewController {
             }
             
             newTracker = Habit(
-                id: UUID(),
                 name: value,
                 category: selectCategory,
                 emoji: emojies[selectedEmojiIndex.row],
@@ -296,7 +295,6 @@ final class CreateEventViewController: UIViewController {
             )
         } else {
             newTracker = Tracker(
-                id: UUID(),
                 name: value,
                 category: selectCategory,
                 emoji: emojies[selectedEmojiIndex.row],
@@ -333,9 +331,8 @@ extension CreateEventViewController: ScheduleViewControllerDelegateProtocol {
 }
 
 extension CreateEventViewController: ListCategoriesDelegateProtocol {
-    func saveCategory(category: String) {
-//        self.selectCategory = category
-        self.selectCategory = TrackerCategory(name: category)
+    func saveCategory(category: TrackerCategory) {
+        self.selectCategory = category
     }
 }
 
@@ -455,14 +452,14 @@ extension CreateEventViewController: UICollectionViewDelegateFlowLayout {
 
     func collectionView(_ collectionView: UICollectionView, didSelectItemAt indexPath: IndexPath) {
         guard let sectionType = CollectionSectionType(rawValue: indexPath.section) else {
-            print("didSelectItemAt: unknown section type")
+            assertionFailure("didSelectItemAt: unknown section type")
             return
         }
         
         if let oldSelectedCellIndexPath = collectionSections[sectionType] {
             guard let oldSelectableCell = collectionView.cellForItem(at: oldSelectedCellIndexPath),
                   let oldSelectableCell = oldSelectableCell as? SelectableCellProtocol else {
-                print("didSelectItemAt: old selection cell is invalid")
+                assertionFailure("didSelectItemAt: old selection cell is invalid")
                 return
             }
             oldSelectableCell.unselectCell()
@@ -470,7 +467,7 @@ extension CreateEventViewController: UICollectionViewDelegateFlowLayout {
         
         guard let selectedCell = collectionView.cellForItem(at: indexPath),
               let selectableCell = selectedCell as? SelectableCellProtocol else {
-            print("didSelectItemAt: invalid cell")
+            assertionFailure("didSelectItemAt: invalid cell")
             return
         }
         

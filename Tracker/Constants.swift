@@ -18,3 +18,5 @@ let LightGrayColor = UIColor(named: "LightGray")!
 let RedColor = UIColor(named: "Red")!
 let WhiteDayColor = UIColor(named: "WhiteDay")!
 let WhiteNightColor = UIColor(named: "WhiteNight")!
+
+let RowHeight: CGFloat = 75

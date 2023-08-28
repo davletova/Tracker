@@ -8,10 +8,9 @@
         <attribute name="colorHex" attributeType="String"/>
         <attribute name="createDate" attributeType="Date" usesScalarValueType="NO"/>
         <attribute name="emoji" attributeType="String"/>
-        <attribute name="id" attributeType="UUID" usesScalarValueType="NO"/>
         <attribute name="name" attributeType="String"/>
         <relationship name="category" maxCount="1" deletionRule="Cascade" destinationEntity="TrackerCategoryCoreData" inverseName="trackers" inverseEntity="TrackerCategoryCoreData"/>
-        <relationship name="records" optional="YES" maxCount="1" deletionRule="Nullify" destinationEntity="TrackerRecordCoreData" inverseName="tracker" inverseEntity="TrackerRecordCoreData"/>
+        <relationship name="records" optional="YES" toMany="YES" deletionRule="Nullify" destinationEntity="TrackerRecordCoreData" inverseName="tracker" inverseEntity="TrackerRecordCoreData"/>
         <relationship name="schedule" optional="YES" maxCount="1" deletionRule="Nullify" destinationEntity="TrackerScheduleCoreData" inverseName="tracker" inverseEntity="TrackerScheduleCoreData"/>
     </entity>
     <entity name="TrackerRecordCoreData" representedClassName="TrackerRecordCoreData" syncable="YES" codeGenerationType="class">
@@ -20,7 +19,6 @@
     </entity>
     <entity name="TrackerScheduleCoreData" representedClassName="TrackerScheduleCoreData" syncable="YES" codeGenerationType="class">
         <attribute name="friday" attributeType="Boolean" defaultValueString="NO" usesScalarValueType="YES"/>
-        <attribute name="id" optional="YES" attributeType="UUID" usesScalarValueType="NO"/>
         <attribute name="monday" attributeType="Boolean" defaultValueString="NO" usesScalarValueType="YES"/>
         <attribute name="saturday" attributeType="Boolean" defaultValueString="NO" usesScalarValueType="YES"/>
         <attribute name="sunday" attributeType="Boolean" defaultValueString="NO" usesScalarValueType="YES"/>

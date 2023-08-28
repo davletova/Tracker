@@ -9,10 +9,7 @@ import Foundation
 import UIKit
 
 struct TrackerCell {
-    let id: UUID
-    let name: String
-    let emoji: String
-    let color: UIColor
+    var tracker: Tracker
     var tracked: Bool
     var trackedDaysCount: Int
     
@@ -20,22 +17,19 @@ struct TrackerCell {
          trackedDaysCount: Int,
          tracked: Bool
     ) {
-        self.id = event.id
-        self.name = event.name
-        self.emoji = event.emoji
-        self.color = event.color
-        
+        self.tracker = event
         self.trackedDaysCount = trackedDaysCount
         self.tracked = tracked
     }
 }
 
 protocol TrackEventProtocol {
-    func trackEvent(eventId: UUID, indexPath: IndexPath)
-    func untrackEvent(eventId: UUID, indexPath: IndexPath)
+    func trackEvent(indexPath: IndexPath)
 }
 
 final class TrackerCollectionViewCell: UICollectionViewCell {
+    static let TrackerRecordSavedNotification = Notification.Name(rawValue: "CreateRecord")
+    
     private var emogiLabel: UILabel = {
         var emogiLabel = UILabel()
         emogiLabel.frame = CGRect(x: 0, y: 0, width: 30, height: 30)
@@ -93,34 +87,6 @@ final class TrackerCollectionViewCell: UICollectionViewCell {
         return trackView
     }()
     
-    var cellEvent: TrackerCell? {
-        didSet {
-            guard let cellEvent = cellEvent else {
-                print("event didSet: event is empty")
-                return
-            }
-            emogiLabel.text = cellEvent.emoji
-            
-            nameLabel.text = cellEvent.name
-            
-            nameLabel.lineBreakMode = .byWordWrapping
-            nameLabel.numberOfLines = 0
-            trackedDaysLabel.text = formatTrackedDays(days: cellEvent.trackedDaysCount)
-            eventNameView.backgroundColor = cellEvent.color
-            emogiLabel.backgroundColor = .white.withAlphaComponent(0.3)
-            trackButton.backgroundColor = cellEvent.color
-            
-            if cellEvent.tracked {
-                trackButton.setImage(UIImage(systemName: "checkmark"), for: .normal)
-                trackButton.backgroundColor = trackButton.backgroundColor?.withAlphaComponent(0.3)
-            } else {
-                trackButton.setImage(UIImage(systemName: "plus"), for: .normal)
-                trackButton.backgroundColor = trackButton.backgroundColor?.withAlphaComponent(1)
-                trackButton.tintColor = .white
-            }
-        }
-    }
-    
     var indexPath: IndexPath?
     
     var delegate: TrackEventProtocol?
@@ -173,30 +139,40 @@ final class TrackerCollectionViewCell: UICollectionViewCell {
             trackButton.heightAnchor.constraint(equalToConstant: 40)
         ])
     }
+
+    func configureCell(cellTracker: TrackerCell) {
+        emogiLabel.text = cellTracker.tracker.emoji
+        
+        nameLabel.text = cellTracker.tracker.name
+        
+        nameLabel.lineBreakMode = .byWordWrapping
+        nameLabel.numberOfLines = 0
+        trackedDaysLabel.text = formatTrackedDays(days: cellTracker.trackedDaysCount)
+        eventNameView.backgroundColor = cellTracker.tracker.color
+        emogiLabel.backgroundColor = .white.withAlphaComponent(0.3)
+        trackButton.backgroundColor = cellTracker.tracker.color
+        
+        if cellTracker.tracked {
+            trackButton.setImage(UIImage(systemName: "checkmark"), for: .normal)
+            trackButton.backgroundColor = trackButton.backgroundColor?.withAlphaComponent(0.3)
+        } else {
+            trackButton.setImage(UIImage(systemName: "plus"), for: .normal)
+            trackButton.backgroundColor = trackButton.backgroundColor?.withAlphaComponent(1)
+            trackButton.tintColor = .white
+        }
+    }
     
     @objc private func trackEvent() {
-        guard var cellEvent = cellEvent else {
-            print("Event track failed: event is empty")
-            return
-        }
-        
         guard let indexPath = indexPath else {
             print("TrackerCollectionViewCell: indexPath is empty")
             return
         }
         
         guard let delegate = delegate else {
-            print("TrackerCollectionViewCell: delegate is empty")
+            assertionFailure("TrackerCollectionViewCell: delegate is empty")
             return
         }
-        
-        if cellEvent.tracked {
-            delegate.untrackEvent(eventId: cellEvent.id, indexPath: indexPath)
-        } else {
-            delegate.trackEvent(eventId: cellEvent.id, indexPath: indexPath)
-        }
-        self.cellEvent = cellEvent
-        trackedDaysLabel.text = formatTrackedDays(days: cellEvent.trackedDaysCount)
+        delegate.trackEvent(indexPath: indexPath)
     }
     
     func disableTrackButton() { trackButton.isEnabled = false }

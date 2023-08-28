@@ -17,6 +17,7 @@ enum TrackerStoreError: Error {
     case decodingErrorInvalidEmojies
     case decodingErrorInvalidColorHex
     case categoryNotFound
+    case generateURLError
 }
 
 struct TrackerStoreUpdate {
@@ -25,21 +26,10 @@ struct TrackerStoreUpdate {
     let updatedIndexes: IndexSet
 }
 
-protocol TrackerStoreDelegate: AnyObject {
-    func store(
-        _ store: TrackerStore,
-        didUpdate update: TrackerStoreUpdate
-    )
-}
-
 final class TrackerStore: NSObject {
     private let uiColorMarshalling = UIColorMarshalling()
     private let context: NSManagedObjectContext
     
-    private var insertedIndexes: IndexSet?
-    private var deletedIndexes: IndexSet?
-    private var updatedIndexes: IndexSet?
-
     private var fetchedResultsController: NSFetchedResultsController<TrackerCoreData>!
     
     convenience override init() {
@@ -52,9 +42,7 @@ final class TrackerStore: NSObject {
         super.init()
         
         let fetchRequest = TrackerCoreData.fetchRequest()
-//        let fetchRequest = NSFetchRequest<TrackerCoreData>(entityName: "TrackerCoreData")
         fetchRequest.sortDescriptors = [
-//            NSSortDescriptor(key: "category", ascending: true),
             NSSortDescriptor(key: "createDate", ascending: true)
         ]
         
@@ -71,19 +59,29 @@ final class TrackerStore: NSObject {
     }
     
     
-    func getTrackers(by date: Date) -> [TrackersByCategory] {
-        let request: NSFetchRequest<TrackerCoreData> = TrackerCoreData.fetchRequest()
+    func getTrackers(by date: Date, withName name: String? = nil) -> [TrackersByCategory] {
+        let request = TrackerCoreData.fetchRequest()
         request.returnsObjectsAsFaults = false
-        // request.predicate = NSPredicate(format: "%K == nil", #keyPath(TrackerCoreData.schedule))
-        
+        request.sortDescriptors = [NSSortDescriptor(key: "createDate", ascending: true)]
+                
         let dayOfWeek = String(describing: date.dayNumberOfWeek())
-        request.predicate = NSCompoundPredicate.init(type: .or, subpredicates: [
+        
+        var requestPredicate = NSCompoundPredicate.init(type: .or, subpredicates: [
             NSCompoundPredicate.init(type: .and, subpredicates: [
                 NSPredicate(format: "%K != nil", #keyPath(TrackerCoreData.schedule)),
                 NSPredicate(format: "%K.\(dayOfWeek) = true", #keyPath(TrackerCoreData.schedule)),
             ]),
             NSPredicate(format: "%K == nil", #keyPath(TrackerCoreData.schedule))
         ])
+        
+        if let name = name, !name.isEmpty {
+            requestPredicate = NSCompoundPredicate.init(type: .and, subpredicates: [
+                requestPredicate,
+                NSPredicate(format: "%K CONTAINS[cd] %@", #keyPath(TrackerCoreData.name), name)
+            ])
+        }
+        
+        request.predicate = requestPredicate
         
         let trackers = try! context.fetch(request)
         let trackersByCategory = Dictionary(grouping: trackers) { (tracker) -> String in
@@ -92,69 +90,35 @@ final class TrackerStore: NSObject {
         
         return trackersByCategory.map { (categoryName: String, trackersManaged: [TrackerCoreData]) in
             let trackers = try! trackersManaged.map { trackerManaged in
-                guard let baz = try? makeTracker(from: trackerManaged) else {
+                guard let baz = try? makeTracker(from: trackerManaged, date: date) else {
                     throw TrackerStoreError.categoryNotFound
                 }
                 return baz
             }
 
             return TrackersByCategory(categoryName: categoryName, trackers: trackers)
-        }
-        
-//        let request = NSFetchRequest<TrackerCategoryCoreData>(entityName: "TrackerCategoryCoreData")
-//        request.returnsObjectsAsFaults = false
-//
-//        // request.predicate = NSPredicate(format: "%K = true", #keyPath(TrackerCoreData.schedule.monday))
-//
-//        let categories = try! context.fetch(request)
-//        return categories.map { trackerCategoryCoreData in
-//            let trackers = try! trackerCategoryCoreData.trackers?.allObjects.filter { qqq in
-//                guard let foo = qqq as? TrackerCoreData else {
-//                    throw TrackerStoreError.categoryNotFound
-//                }
-//
-//                guard let schedule = foo.schedule else {
-//                    return true
-//                }
-//
-//                guard let dayOfWeek = date.dayNumberOfWeek() else {
-//                    print("failed to get day of week")
-//                    return [TrackersByCategory]()
-//                }
-//
-//                date.
-//                schedule
-//
-//                guard let baz = try? makeTracker(from: foo) else {
-//                    throw TrackerStoreError.categoryNotFound
-//                }
-//                return baz
-//            }
-//            return TrackersByCategory(categoryName: trackerCategoryCoreData.name!, trackers: trackers!)
-//        }
+        }.sorted(by: {$0.categoryName < $1.categoryName } )
     }
     
     func addNewTracker(_ tracker: Tracker) throws {
-        let request = NSFetchRequest<TrackerCategoryCoreData>(entityName: "TrackerCategoryCoreData")
-        request.returnsObjectsAsFaults = false
-        request.predicate = NSPredicate(format: "%K == %@", #keyPath(TrackerCategoryCoreData.name), tracker.category.name)
-        
-        var categories = try! context.fetch(request)
-        if categories.isEmpty {
-            // временный код добавления категорий
-            // пока не создан модуль создания категорий
-            let trackerCategoryCoreData = TrackerCategoryCoreData(context: context)
-            trackerCategoryCoreData.name = tracker.category.name
-            categories = try! context.fetch(request)
-//            throw TrackerStoreError.categoryNotFound
-            
-            
+        guard
+            let id = tracker.category.id,
+            let idString = URL(string: id)
+        else {
+            throw TrackerStoreError.generateURLError
         }
-                
+        
+        guard let objectId = context.persistentStoreCoordinator?.managedObjectID(forURIRepresentation: idString) else {
+            throw TrackerStoreError.categoryNotFound
+        }
+        
+        guard let category = try context.existingObject(with: objectId) as? TrackerCategoryCoreData else {
+            throw TrackerStoreError.decodingErrorInvalidCategory
+        }
+        
         let trackerCoreData = TrackerCoreData(context: context)
-        trackerCoreData.id = tracker.id
         trackerCoreData.name = tracker.name
-        trackerCoreData.category = categories[0]
+        trackerCoreData.category = category
         trackerCoreData.createDate = Date()
         trackerCoreData.emoji = tracker.emoji
         trackerCoreData.colorHex = uiColorMarshalling.hexString(from: tracker.color)
@@ -190,18 +154,10 @@ final class TrackerStore: NSObject {
             trackerCoreData.schedule = trackerScheduleCoreData
         }
         
-        do {
-            try context.save()
-        } catch {
-            print("=========  dfsdfd  =+========")
-        }
-        
+        context.safeSave()
     }
         
-    private func makeTracker(from trackerCoreData: TrackerCoreData) throws -> Tracker {
-        guard let trackerId = trackerCoreData.id else {
-            throw TrackerStoreError.decodingErrorInvalidId
-        }
+    private func makeTracker(from trackerCoreData: TrackerCoreData, date: Date) throws -> TrackerCell {
         guard let trackerName = trackerCoreData.name else {
             throw TrackerStoreError.decodingErrorInvalidName
         }
@@ -217,13 +173,30 @@ final class TrackerStore: NSObject {
         guard let trackerColorHex = trackerCoreData.colorHex else {
             throw TrackerStoreError.decodingErrorInvalidColorHex
         }
-        return Tracker(
-            id: trackerId,
+        let tracker = Tracker(
             name: trackerName,
             category: trackerCategory,
             emoji: trackerEmoji,
             color: uiColorMarshalling.color(from: trackerColorHex)
         )
+        tracker.id = trackerCoreData.objectID.uriRepresentation().absoluteString
+        
+        guard let records = trackerCoreData.records else {
+            return TrackerCell(event: tracker, trackedDaysCount: 0, tracked: false)
+        }
+        
+        var tracked = false
+        for record in records.allObjects {
+            if let trackerRecordCoreData = record as? TrackerRecordCoreData {
+                if trackerRecordCoreData.date == Calendar.current.startOfDay(for: date) {
+                    tracked = true
+                }
+            } else {
+                print("failed to convert tarckerRecordCoreData")
+            }
+        }
+        
+        return TrackerCell(event: tracker, trackedDaysCount: records.count, tracked: tracked)
     }
     
     private func makeTrackerCategory(from categoryCoreData: TrackerCategoryCoreData) throws -> TrackerCategory {
@@ -235,24 +208,10 @@ final class TrackerStore: NSObject {
 }
 
 extension TrackerStore: NSFetchedResultsControllerDelegate {
-    func controllerWillChangeContent(_ controller: NSFetchedResultsController<NSFetchRequestResult>) {
-        insertedIndexes = IndexSet()
-        deletedIndexes = IndexSet()
-        updatedIndexes = IndexSet()
-    }
-    
     func controllerDidChangeContent(_ controller: NSFetchedResultsController<NSFetchRequestResult>) {
         NotificationCenter.default.post(
             name: TrackerCollectionView.TrackerSavedNotification,
-            object: self,
-            userInfo: ["event": TrackerStoreUpdate(
-                insertedIndexes: insertedIndexes!,
-                deletedIndexes: deletedIndexes!,
-                updatedIndexes: updatedIndexes!
-            )]
+            object: self
         )
-        insertedIndexes = nil
-        deletedIndexes = nil
-        updatedIndexes = nil
     }
 }
