@@ -78,17 +78,5 @@ enum AppColor {
     }
 }
 
-//
-//let backgroundDayColor = UIColor(named: "BackgroundDay")!
-//let backgroundNightColor = UIColor(named: "BackgroundNight")!
-//let blackDayColor = UIColor(named: "BlackDay")!
-//let blackNightColor = UIColor(named: "BlackNight")!
-//let blueColor = UIColor(named: "Blue")!
-//let grayColor = UIColor(named: "Gray")!
-//let lightGrayColor = UIColor(named: "LightGray")!
-//let redColor = UIColor(named: "Red")!
-//let whiteDayColor = UIColor(named: "WhiteDay")!
-//let whiteNightColor = UIColor(named: "WhiteNight")!
-
 let rowHeight: CGFloat = 75
 let buttonHeight: CGFloat = 60

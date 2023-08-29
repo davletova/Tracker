@@ -84,6 +84,32 @@ final class TrackerCollectionView: UIViewController {
         let label = UILabel()
         label.text = "Что будем отслеживать?"
         label.textAlignment = .center
+        label.font = UIFont.systemFont(ofSize: 12, weight: .medium)
+        
+        view.translatesAutoresizingMaskIntoConstraints = false
+        imageView.translatesAutoresizingMaskIntoConstraints = false
+        label.translatesAutoresizingMaskIntoConstraints = false
+        
+        view.addSubview(imageView)
+        view.addSubview(label)
+        
+        NSLayoutConstraint.activate([
+            imageView.topAnchor.constraint(equalTo: view.topAnchor),
+            imageView.centerXAnchor.constraint(equalTo: view.centerXAnchor),
+            label.topAnchor.constraint(equalTo: imageView.bottomAnchor, constant: 10),
+            label.centerXAnchor.constraint(equalTo: view.centerXAnchor)
+        ])
+        
+        return view
+    }()
+    
+    private lazy var errorCollectionView: UIView = {
+        let view = UIView()
+        let imageView = UIImageView(image: UIImage(named: "error"))
+        let label = UILabel()
+        label.text = "Ничего не найдено"
+        label.textAlignment = .center
+        label.font = UIFont.systemFont(ofSize: 12, weight: .medium)
         
         view.translatesAutoresizingMaskIntoConstraints = false
         imageView.translatesAutoresizingMaskIntoConstraints = false
@@ -140,6 +166,16 @@ final class TrackerCollectionView: UIViewController {
     }
     
     func showEmptyCollection() {
+        if let search = searchTextField.text,
+           !search.isEmpty
+        {
+            collectionView.addSubview(errorCollectionView)
+            NSLayoutConstraint.activate([
+                errorCollectionView.centerXAnchor.constraint(equalTo: view.centerXAnchor),
+                errorCollectionView.centerYAnchor.constraint(equalTo: view.centerYAnchor)
+            ])
+            return
+        }
         collectionView.addSubview(emptyCollectionView)
         
         NSLayoutConstraint.activate([
@@ -150,6 +186,20 @@ final class TrackerCollectionView: UIViewController {
     
     func hideEmptyView() {
         emptyCollectionView.removeFromSuperview()
+        errorCollectionView.removeFromSuperview()
+    }
+    
+    func showErrorCollection() {
+        collectionView.addSubview(errorCollectionView)
+        
+        NSLayoutConstraint.activate([
+            errorCollectionView.centerXAnchor.constraint(equalTo: view.centerXAnchor),
+            errorCollectionView.centerYAnchor.constraint(equalTo: view.centerYAnchor)
+        ])
+    }
+    
+    func hideErrorView() {
+        errorCollectionView.removeFromSuperview()
     }
     
     private func createNavigationBar() {

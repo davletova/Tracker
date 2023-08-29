@@ -120,6 +120,8 @@ extension ScheduleViewController: UITableViewDataSource {
         dateFormatter.locale = Locale(identifier: "ru_RU")
         
         let switcher = UISwitch(frame: CGRect(x: 0, y: 0, width: 51, height: 31))
+        switcher.onTintColor = UIColor.getAppColors(.blue)
+        switcher.tintColor = UIColor.getAppColors(.backgroundDay)
         switcher.setOn(scheduleDays[weekdayIndex].isScheduled, animated: true)
         switcher.tag = indexPath.row
         switcher.addTarget(self, action: #selector(weekDaySwitcherValueChanged), for: .valueChanged)

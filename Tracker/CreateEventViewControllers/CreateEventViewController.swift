@@ -33,7 +33,7 @@ final class CreateEventViewController: UIViewController {
     private let colors = (1...18).map{ UIColor(named: "ColorSelection\($0)") }
     
     private let trackerStore = TrackerStore()
-    
+
     private let titleLabel: UILabel = {
         let titleLabel = UILabel()
         titleLabel.translatesAutoresizingMaskIntoConstraints = false
@@ -144,7 +144,7 @@ final class CreateEventViewController: UIViewController {
         if let isHabit = isHabit, isHabit {
             categoryAndScheduleButtons.append(TableButton(name: "Расписание", callback: openSchedule))
         }
-        
+                
         setupTitle()
         setupTrackerNameInput()
         setupButtonsTableView()
@@ -169,7 +169,7 @@ final class CreateEventViewController: UIViewController {
         
         NSLayoutConstraint.activate([
             titleLabel.heightAnchor.constraint(equalToConstant: 22),
-            titleLabel.topAnchor.constraint(equalTo: view.topAnchor, constant: 24),
+            titleLabel.topAnchor.constraint(equalTo: view.topAnchor, constant: 16),
             titleLabel.centerXAnchor.constraint(equalTo: view.centerXAnchor)
         ])
     }
@@ -209,7 +209,7 @@ final class CreateEventViewController: UIViewController {
         
         NSLayoutConstraint.activate([
             emojiAndColorCollectionView.heightAnchor.constraint(equalToConstant: 450),
-            emojiAndColorCollectionView.topAnchor.constraint(equalTo: buttonsTableView.bottomAnchor, constant: 16),
+            emojiAndColorCollectionView.topAnchor.constraint(equalTo: buttonsTableView.bottomAnchor, constant: 30),
             emojiAndColorCollectionView.leadingAnchor.constraint(equalTo: view.leadingAnchor, constant: 16),
             emojiAndColorCollectionView.trailingAnchor.constraint(equalTo: view.trailingAnchor, constant: -16),
             emojiAndColorCollectionView.bottomAnchor.constraint(lessThanOrEqualTo: view.bottomAnchor, constant: -buttonHeight - CGFloat(44))
@@ -223,6 +223,7 @@ final class CreateEventViewController: UIViewController {
         
         NSLayoutConstraint.activate([
             cancelButton.bottomAnchor.constraint(equalTo: view.bottomAnchor, constant: -34),
+            cancelButton.topAnchor.constraint(equalTo: emojiAndColorCollectionView.bottomAnchor, constant: 24),
             cancelButton.heightAnchor.constraint(equalToConstant: buttonHeight),
             cancelButton.trailingAnchor.constraint(equalTo: view.trailingAnchor, constant: -(view.frame.width / 2 + 3)),
             cancelButton.leadingAnchor.constraint(equalTo: view.leadingAnchor, constant: 16)
@@ -239,12 +240,13 @@ final class CreateEventViewController: UIViewController {
         }
         
         view.addSubview(createEventButton)
- 
+        
         NSLayoutConstraint.activate([
             createEventButton.leadingAnchor.constraint(equalTo: cancelButton.trailingAnchor, constant: 6),
             createEventButton.trailingAnchor.constraint(equalTo: view.trailingAnchor, constant: -16),
             createEventButton.heightAnchor.constraint(equalToConstant: buttonHeight),
-            createEventButton.bottomAnchor.constraint(equalTo: view.bottomAnchor, constant: -34)
+            createEventButton.bottomAnchor.constraint(equalTo: view.bottomAnchor, constant: -34),
+            createEventButton.topAnchor.constraint(equalTo: emojiAndColorCollectionView.bottomAnchor, constant: 24)
         ])
     }
     
@@ -474,6 +476,10 @@ extension CreateEventViewController: UICollectionViewDelegateFlowLayout {
             verticalFittingPriority: .fittingSizeLevel)
     }
 
+    func collectionView(_ collectionView: UICollectionView, layout collectionViewLayout: UICollectionViewLayout, insetForSectionAt section: Int) -> UIEdgeInsets {
+        return UIEdgeInsets(top: 24.0, left: 10.0, bottom: 24.0, right: 10.0)
+    }
+    
     func collectionView(_ collectionView: UICollectionView, didSelectItemAt indexPath: IndexPath) {
         guard let sectionType = CollectionSectionType(rawValue: indexPath.section) else {
             assertionFailure("didSelectItemAt: unknown section type")
@@ -494,7 +500,6 @@ extension CreateEventViewController: UICollectionViewDelegateFlowLayout {
             assertionFailure("didSelectItemAt: invalid cell")
             return
         }
-        
         
         collectionSections[sectionType] = indexPath
 
