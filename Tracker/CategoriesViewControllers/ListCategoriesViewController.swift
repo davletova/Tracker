@@ -15,49 +15,53 @@ final class ListCategoriesViewController: UIViewController {
     private let cellIdentifier = "cell"
     private let buttonHeight: CGFloat = 60
     
-    private var titleLabel: UILabel = {
+    private let titleLabel: UILabel = {
         let title = UILabel()
         title.translatesAutoresizingMaskIntoConstraints = false
         title.text = "Категория"
         title.textAlignment = .center
         
         title.font = UIFont.systemFont(ofSize: 16, weight: .medium)
-        title.textColor = BlackDayColor
+        title.textColor = UIColor.getAppColors(.blackDay)
         
         return title
     }()
     
-    private var table: UITableView = {
+    private let table: UITableView = {
         let table = UITableView()
-        table.rowHeight = RowHeight
+        table.rowHeight = rowHeight
         table.translatesAutoresizingMaskIntoConstraints = false
-        table.backgroundColor = BackgroundDayColor
+        table.backgroundColor = UIColor.getAppColors(.backgroundDay)
         table.layer.cornerRadius = 16
         table.separatorStyle = .singleLine
         
         return table
     }()
     
-    private var createButton: UIButton = {
+    private let createButton: UIButton = {
         let button = UIButton()
-        button.backgroundColor = BlackDayColor
+        button.backgroundColor = UIColor.getAppColors(.blackDay)
         button.translatesAutoresizingMaskIntoConstraints = false
         button.layer.cornerRadius = 16
         button.setTitle("Добавить категорию", for: .normal)
         button.titleLabel?.font = UIFont.systemFont(ofSize: 16)
-        button.titleLabel?.textColor = WhiteDayColor
+        button.titleLabel?.textColor = UIColor.getAppColors(.whiteDay)
         button.titleLabel?.textAlignment = .center
         
         return button
     }()
     
-    var delegate: ListCategoriesDelegateProtocol?
+    weak var delegate: ListCategoriesDelegateProtocol?
     
     override func viewDidLoad() {
         super.viewDidLoad()
-        view.backgroundColor = WhiteDayColor
+        view.backgroundColor = UIColor.getAppColors(.whiteDay)
         
-        listOfCategories = try! trackerCategoriesStore.getCategories()
+        do {
+            listOfCategories = try trackerCategoriesStore.getCategories()
+        } catch {
+            print("failed to get list of categories")
+        }
         
         setupTitle()
         setupTable()
@@ -68,7 +72,7 @@ final class ListCategoriesViewController: UIViewController {
         }
     }
     
-    func setupTitle() {
+    private func setupTitle() {
         view.addSubview(titleLabel)
         
         NSLayoutConstraint.activate([
@@ -79,7 +83,7 @@ final class ListCategoriesViewController: UIViewController {
         ])
     }
     
-    func setupTable() {
+    private func setupTable() {
         table.dataSource = self
         table.delegate = self
         
@@ -91,12 +95,12 @@ final class ListCategoriesViewController: UIViewController {
             table.topAnchor.constraint(equalTo: titleLabel.bottomAnchor, constant: 24),
             table.leadingAnchor.constraint(equalTo: view.leadingAnchor, constant: 10),
             table.trailingAnchor.constraint(equalTo: view.trailingAnchor, constant: -10),
-            table.heightAnchor.constraint(equalToConstant: RowHeight * CGFloat(listOfCategories.count)),
+            table.heightAnchor.constraint(equalToConstant: rowHeight * CGFloat(listOfCategories.count)),
             table.bottomAnchor.constraint(lessThanOrEqualTo: view.bottomAnchor, constant: -buttonHeight - CGFloat(44))
         ])
     }
     
-    func setupButton() {
+    private func setupButton() {
         view.addSubview(createButton)
       
         createButton.addTarget(self, action: #selector(createCategory), for: .touchUpInside)
@@ -110,7 +114,7 @@ final class ListCategoriesViewController: UIViewController {
         ])
     }
     
-    func showEmptyCollection() {
+    private func showEmptyCollection() {
         let imageView = UIImageView(image: UIImage(named: "star"))
         imageView.translatesAutoresizingMaskIntoConstraints = false
         
@@ -136,7 +140,7 @@ extension ListCategoriesViewController: UITableViewDataSource {
     func tableView(_ tableView: UITableView, cellForRowAt indexPath: IndexPath) -> UITableViewCell {
         let cell = tableView.dequeueReusableCell(withIdentifier: cellIdentifier, for: indexPath)
         cell.textLabel?.text = listOfCategories[indexPath.row].name
-        cell.backgroundColor = BackgroundDayColor
+        cell.backgroundColor = UIColor.getAppColors(.backgroundDay)
         
         if indexPath.row == tableView.numberOfRows(inSection: indexPath.section) - 1 {
             cell.separatorInset = UIEdgeInsets(top: 0, left: 0, bottom: 0, right: .greatestFiniteMagnitude)

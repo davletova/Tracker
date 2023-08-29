@@ -23,6 +23,10 @@
 		4D1A9C072A726B50007E527A /* Assets.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = 4D1A9C062A726B50007E527A /* Assets.xcassets */; };
 		4D1A9C0A2A726B50007E527A /* LaunchScreen.storyboard in Resources */ = {isa = PBXBuildFile; fileRef = 4D1A9C082A726B50007E527A /* LaunchScreen.storyboard */; };
 		4D2706EB2A77AE0900F106CA /* TrackerCollectionViewCell.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4D2706EA2A77AE0900F106CA /* TrackerCollectionViewCell.swift */; };
+		4D6923F02A9D0FD200B9261F /* TrackerStoreProtocol.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4D6923EF2A9D0FD200B9261F /* TrackerStoreProtocol.swift */; };
+		4D6923F22A9D10FD00B9261F /* TrackerRecordStoreProtocol.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4D6923F12A9D10FD00B9261F /* TrackerRecordStoreProtocol.swift */; };
+		4D6923F42A9D1A4F00B9261F /* TrackerViewModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4D6923F32A9D1A4F00B9261F /* TrackerViewModel.swift */; };
+		4D6923F62A9E00F900B9261F /* Color.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4D6923F52A9E00F900B9261F /* Color.swift */; };
 		4D6B34C42A8B85BB00C1902C /* Statistics.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4D6B34C32A8B85BB00C1902C /* Statistics.swift */; };
 		4DA3CC452A90A23700DB13C7 /* TrackerRecord.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4DA3CC442A90A23700DB13C7 /* TrackerRecord.swift */; };
 		4DA5C9722A82313B0046C149 /* ListCategoriesViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4DA5C9712A82313B0046C149 /* ListCategoriesViewController.swift */; };
@@ -63,6 +67,10 @@
 		4D1A9C092A726B50007E527A /* Base */ = {isa = PBXFileReference; lastKnownFileType = file.storyboard; name = Base; path = Base.lproj/LaunchScreen.storyboard; sourceTree = "<group>"; };
 		4D1A9C0B2A726B50007E527A /* Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = Info.plist; sourceTree = "<group>"; };
 		4D2706EA2A77AE0900F106CA /* TrackerCollectionViewCell.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TrackerCollectionViewCell.swift; sourceTree = "<group>"; };
+		4D6923EF2A9D0FD200B9261F /* TrackerStoreProtocol.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TrackerStoreProtocol.swift; sourceTree = "<group>"; };
+		4D6923F12A9D10FD00B9261F /* TrackerRecordStoreProtocol.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TrackerRecordStoreProtocol.swift; sourceTree = "<group>"; };
+		4D6923F32A9D1A4F00B9261F /* TrackerViewModel.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TrackerViewModel.swift; sourceTree = "<group>"; };
+		4D6923F52A9E00F900B9261F /* Color.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Color.swift; sourceTree = "<group>"; };
 		4D6B34C32A8B85BB00C1902C /* Statistics.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Statistics.swift; sourceTree = "<group>"; };
 		4DA3CC442A90A23700DB13C7 /* TrackerRecord.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TrackerRecord.swift; sourceTree = "<group>"; };
 		4DA5C9712A82313B0046C149 /* ListCategoriesViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ListCategoriesViewController.swift; sourceTree = "<group>"; };
@@ -105,6 +113,7 @@
 				4DA3CC442A90A23700DB13C7 /* TrackerRecord.swift */,
 				4DDC8E0C2A96026900F85E5D /* TrackersByCategory.swift */,
 				4DDC8E122A960F2E00F85E5D /* DailySchedule.swift */,
+				4D6923F32A9D1A4F00B9261F /* TrackerViewModel.swift */,
 			);
 			path = Models;
 			sourceTree = "<group>";
@@ -115,6 +124,7 @@
 				4D0817CD2A796E9D003724B5 /* Date.swift */,
 				4D1A3D2E2A7B8D53003026E6 /* Array.swift */,
 				4DA9702F2A9BA390006CED88 /* Context.swift */,
+				4D6923F52A9E00F900B9261F /* Color.swift */,
 			);
 			path = Helpers;
 			sourceTree = "<group>";
@@ -125,6 +135,8 @@
 				4DDC8E0E2A96039900F85E5D /* ListCategoriesDelegateProtocol.swift */,
 				4DDC8E102A960A4B00F85E5D /* ScheduleViewControllerDelegateProtocol.swift */,
 				4DDC8E1A2A97D27100F85E5D /* SelectableCell.swift */,
+				4D6923EF2A9D0FD200B9261F /* TrackerStoreProtocol.swift */,
+				4D6923F12A9D10FD00B9261F /* TrackerRecordStoreProtocol.swift */,
 			);
 			path = Services;
 			sourceTree = "<group>";
@@ -322,10 +334,12 @@
 				4D2706EB2A77AE0900F106CA /* TrackerCollectionViewCell.swift in Sources */,
 				4DDC8E1D2A989C7400F85E5D /* Constants.swift in Sources */,
 				4DA5C97A2A838F6B0046C149 /* EmojiCollectionViewCell.swift in Sources */,
+				4D6923F62A9E00F900B9261F /* Color.swift in Sources */,
 				4DA5C9742A82A9CB0046C149 /* CreateCategoryViewController.swift in Sources */,
 				4D1A3D2D2A7B87EB003026E6 /* SupplementaryView.swift in Sources */,
 				4DA5C9722A82313B0046C149 /* ListCategoriesViewController.swift in Sources */,
 				4D0817CE2A796E9D003724B5 /* Date.swift in Sources */,
+				4D6923F02A9D0FD200B9261F /* TrackerStoreProtocol.swift in Sources */,
 				4D17AA462A9C6C3700BC5999 /* TrackerCategoryStore.swift in Sources */,
 				4D1A3D3E2A814F69003026E6 /* TypeSelectionViewController.swift in Sources */,
 				4DDC8E262A98C6FB00F85E5D /* TrackerStore.swift in Sources */,
@@ -336,9 +350,11 @@
 				4DDC8E242A98C45B00F85E5D /* TrackerRecordStore.swift in Sources */,
 				4D1A3D2F2A7B8D53003026E6 /* Array.swift in Sources */,
 				4DDC8E0D2A96026900F85E5D /* TrackersByCategory.swift in Sources */,
+				4D6923F22A9D10FD00B9261F /* TrackerRecordStoreProtocol.swift in Sources */,
 				4DDC8E132A960F2E00F85E5D /* DailySchedule.swift in Sources */,
 				4DDC8E112A960A4B00F85E5D /* ScheduleViewControllerDelegateProtocol.swift in Sources */,
 				4D0817CB2A796D56003724B5 /* Schedule.swift in Sources */,
+				4D6923F42A9D1A4F00B9261F /* TrackerViewModel.swift in Sources */,
 				4DA3CC452A90A23700DB13C7 /* TrackerRecord.swift in Sources */,
 				4D0817C92A7968F1003724B5 /* TrackerCategory.swift in Sources */,
 				4DDC8E212A98B15100F85E5D /* Model.xcdatamodeld in Sources */,

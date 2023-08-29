@@ -8,15 +8,87 @@
 import Foundation
 import UIKit
 
-let BackgroundDayColor = UIColor(named: "BackgroundDay")!
-let BackgroundNightColor = UIColor(named: "BackgroundNight")!
-let BlackDayColor = UIColor(named: "BlackDay")!
-let BlackNightColor = UIColor(named: "BlackNight")!
-let BlueColor = UIColor(named: "Blue")!
-let GrayColor = UIColor(named: "Gray")!
-let LightGrayColor = UIColor(named: "LightGray")!
-let RedColor = UIColor(named: "Red")!
-let WhiteDayColor = UIColor(named: "WhiteDay")!
-let WhiteNightColor = UIColor(named: "WhiteNight")!
+enum AppColor {
+    case backgroundDay, backgroundNight, blackDay, blackNight, blue, gray
+    case lightGray, red, whiteDay, whiteNight
+    
+    func getColor() -> UIColor {
+        switch self {
+        case .backgroundDay:
+            guard let backgroundDay = UIColor(named: "BackgroundDay") else {
+                assertionFailure("backgroundDayColor not found")
+                return .gray
+            }
+            return backgroundDay
+        case .backgroundNight:
+            guard let backgroundNight = UIColor(named: "BackgroundNight") else {
+                assertionFailure("BackgroundNight color not found")
+                return UIColor.gray
+            }
+            return backgroundNight
+        case .blackDay:
+            guard let blackDay = UIColor(named: "BlackDay") else {
+                assertionFailure("BlackDay color not found")
+                return UIColor.gray
+            }
+            return blackDay
+        case .blackNight:
+            guard let blackNight = UIColor(named: "BlackNight") else {
+                assertionFailure("BlackNight color not found")
+                return UIColor.white
+            }
+            return blackNight
+        case .blue:
+            guard let blue = UIColor(named: "Blue") else {
+                assertionFailure("blueColor not found")
+                return UIColor.blue
+            }
+            return blue
+        case .gray:
+            guard let gray = UIColor(named: "Gray") else {
+                assertionFailure("Gray not found")
+                return UIColor.gray
+            }
+            return gray
+        case .lightGray:
+            guard let lightGray = UIColor(named: "Gray") else {
+                assertionFailure("lightGray not found")
+                return UIColor.lightGray
+            }
+            return lightGray
+        case .red:
+            guard let red = UIColor(named: "Red") else {
+                assertionFailure("Red not found")
+                return UIColor.red
+            }
+            return red
+        case .whiteDay:
+            guard let whiteDay = UIColor(named: "WhiteDay") else {
+                assertionFailure("whiteDay not found")
+                return UIColor.red
+            }
+            return whiteDay
+        case .whiteNight:
+            guard let whiteNightColor = UIColor(named: "WhiteNight") else {
+                assertionFailure("WhiteNight not found")
+                return UIColor.red
+            }
+            return whiteNightColor
+        }
+    }
+}
 
-let RowHeight: CGFloat = 75
+//
+//let backgroundDayColor = UIColor(named: "BackgroundDay")!
+//let backgroundNightColor = UIColor(named: "BackgroundNight")!
+//let blackDayColor = UIColor(named: "BlackDay")!
+//let blackNightColor = UIColor(named: "BlackNight")!
+//let blueColor = UIColor(named: "Blue")!
+//let grayColor = UIColor(named: "Gray")!
+//let lightGrayColor = UIColor(named: "LightGray")!
+//let redColor = UIColor(named: "Red")!
+//let whiteDayColor = UIColor(named: "WhiteDay")!
+//let whiteNightColor = UIColor(named: "WhiteNight")!
+
+let rowHeight: CGFloat = 75
+let buttonHeight: CGFloat = 60

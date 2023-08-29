@@ -25,7 +25,7 @@ struct TrackerRecordStoreUpdate {
     let deletedIndexes: IndexSet
 }
 
-final class TrackerRecordStore: NSObject {
+final class TrackerRecordStore: NSObject, TrackerRecordStoreProtocol {
     private let context: NSManagedObjectContext
     
     convenience override init() {

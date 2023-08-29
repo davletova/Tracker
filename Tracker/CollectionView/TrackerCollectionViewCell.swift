@@ -8,29 +8,15 @@
 import Foundation
 import UIKit
 
-struct TrackerCell {
-    var tracker: Tracker
-    var tracked: Bool
-    var trackedDaysCount: Int
-    
-    init(event: Tracker,
-         trackedDaysCount: Int,
-         tracked: Bool
-    ) {
-        self.tracker = event
-        self.trackedDaysCount = trackedDaysCount
-        self.tracked = tracked
-    }
-}
 
-protocol TrackEventProtocol {
+protocol TrackEventProtocol: AnyObject {
     func trackEvent(indexPath: IndexPath)
 }
 
 final class TrackerCollectionViewCell: UICollectionViewCell {
     static let TrackerRecordSavedNotification = Notification.Name(rawValue: "CreateRecord")
     
-    private var emogiLabel: UILabel = {
+    private let emogiLabel: UILabel = {
         var emogiLabel = UILabel()
         emogiLabel.frame = CGRect(x: 0, y: 0, width: 30, height: 30)
         emogiLabel.translatesAutoresizingMaskIntoConstraints = false
@@ -42,7 +28,7 @@ final class TrackerCollectionViewCell: UICollectionViewCell {
         return emogiLabel
     }()
     
-    private var nameLabel: UILabel = {
+    private let nameLabel: UILabel = {
         var nameLabel = UILabel()
         nameLabel.translatesAutoresizingMaskIntoConstraints = false
         nameLabel.font = UIFont.systemFont(ofSize: 12, weight: .medium)
@@ -51,7 +37,7 @@ final class TrackerCollectionViewCell: UICollectionViewCell {
         return nameLabel
     }()
     
-    private var eventNameView: UIView = {
+    private let eventNameView: UIView = {
         let eventNameView = UIView()
         eventNameView.translatesAutoresizingMaskIntoConstraints = false
         eventNameView.layer.cornerRadius = 16
@@ -59,7 +45,7 @@ final class TrackerCollectionViewCell: UICollectionViewCell {
         return eventNameView
     }()
     
-    private var trackedDaysLabel: UILabel = {
+    private let trackedDaysLabel: UILabel = {
         let trackedDaysLabel = UILabel()
         trackedDaysLabel.textColor = .black
         trackedDaysLabel.translatesAutoresizingMaskIntoConstraints = false
@@ -69,7 +55,7 @@ final class TrackerCollectionViewCell: UICollectionViewCell {
         return trackedDaysLabel
     }()
     
-    private var trackButton: UIButton = {
+    private let trackButton: UIButton = {
         var trackButton = UIButton()
         trackButton.frame = CGRect(x: 0, y: 0, width: 40, height: 40)
         trackButton.layer.masksToBounds = true
@@ -80,7 +66,7 @@ final class TrackerCollectionViewCell: UICollectionViewCell {
         return trackButton
     }()
     
-    private var trackView: UIView = {
+    private let trackView: UIView = {
         var trackView = UIView()
         trackView.translatesAutoresizingMaskIntoConstraints = false
         
@@ -89,7 +75,7 @@ final class TrackerCollectionViewCell: UICollectionViewCell {
     
     var indexPath: IndexPath?
     
-    var delegate: TrackEventProtocol?
+    weak var delegate: TrackEventProtocol?
     
     override init(frame: CGRect) {
         super.init(frame: frame)
@@ -140,7 +126,7 @@ final class TrackerCollectionViewCell: UICollectionViewCell {
         ])
     }
 
-    func configureCell(cellTracker: TrackerCell) {
+    func configureCell(cellTracker: TrackerViewModel) {
         emogiLabel.text = cellTracker.tracker.emoji
         
         nameLabel.text = cellTracker.tracker.name

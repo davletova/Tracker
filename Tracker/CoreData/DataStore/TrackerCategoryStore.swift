@@ -61,7 +61,14 @@ final class TrackerCategoryStore: NSObject {
             throw TrackerCategoryStoreError.getCategoriesFailed
         }
         
-        return categories.map({ try! makeTrackerCategory(from: $0) })
+        var trackerCategories = [TrackerCategory]()
+        for category in categories {
+            if let trackerCategory = try? makeTrackerCategory(from: category) {
+                trackerCategories.append(trackerCategory)
+            }
+        }
+        
+        return trackerCategories
     }
     
     private func makeTrackerCategory(from trackerCategoryCoreData: TrackerCategoryCoreData) throws -> TrackerCategory {

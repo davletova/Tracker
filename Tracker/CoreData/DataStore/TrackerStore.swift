@@ -26,11 +26,23 @@ struct TrackerStoreUpdate {
     let updatedIndexes: IndexSet
 }
 
-final class TrackerStore: NSObject {
+final class TrackerStore: NSObject, TrackerStoreProtocol {
     private let uiColorMarshalling = UIColorMarshalling()
     private let context: NSManagedObjectContext
     
-    private var fetchedResultsController: NSFetchedResultsController<TrackerCoreData>!
+    private lazy var fetchedResultsController: NSFetchedResultsController<TrackerCoreData> = {
+        let fetchRequest = TrackerCoreData.fetchRequest()
+        fetchRequest.sortDescriptors = [
+            NSSortDescriptor(key: "createDate", ascending: true)
+        ]
+        
+        return NSFetchedResultsController(
+            fetchRequest: fetchRequest,
+            managedObjectContext: context,
+            sectionNameKeyPath: "category",
+            cacheName: nil
+        )
+    }()
     
     convenience override init() {
         let context = (UIApplication.shared.delegate as! AppDelegate).persistentContainer.viewContext
@@ -41,23 +53,9 @@ final class TrackerStore: NSObject {
         self.context = context
         super.init()
         
-        let fetchRequest = TrackerCoreData.fetchRequest()
-        fetchRequest.sortDescriptors = [
-            NSSortDescriptor(key: "createDate", ascending: true)
-        ]
-        
-        let controller = NSFetchedResultsController(
-            fetchRequest: fetchRequest,
-            managedObjectContext: context,
-            sectionNameKeyPath: "category",
-            cacheName: nil
-        )
-        
-        controller.delegate = self
-        self.fetchedResultsController = controller
-        try? controller.performFetch()
+        self.fetchedResultsController.delegate = self
+        try? fetchedResultsController.performFetch()
     }
-    
     
     func getTrackers(by date: Date, withName name: String? = nil) -> [TrackersByCategory] {
         let request = TrackerCoreData.fetchRequest()
@@ -83,19 +81,24 @@ final class TrackerStore: NSObject {
         
         request.predicate = requestPredicate
         
-        let trackers = try! context.fetch(request)
-        let trackersByCategory = Dictionary(grouping: trackers) { (tracker) -> String in
+        guard let trackers = try? context.fetch(request) else {
+            print("")
+            return [TrackersByCategory]()
+        }
+        let trackersByCategoryDictionary = Dictionary(grouping: trackers) { (tracker) -> String in
+            
             return tracker.category!.name!
         }
         
-        return trackersByCategory.map { (categoryName: String, trackersManaged: [TrackerCoreData]) in
-            let trackers = try! trackersManaged.map { trackerManaged in
-                guard let baz = try? makeTracker(from: trackerManaged, date: date) else {
-                    throw TrackerStoreError.categoryNotFound
+       return trackersByCategoryDictionary.map { (categoryName: String, trackersManaged: [TrackerCoreData]) in
+            var trackers = [TrackerViewModel]()
+            for trackerManaged in trackersManaged {
+                guard let tracker = try? makeTracker(from: trackerManaged, date: date) else {
+                    print("failed to make tracker from \(String(describing: trackerManaged.name))")
+                    continue
                 }
-                return baz
+                trackers.append(tracker)
             }
-
             return TrackersByCategory(categoryName: categoryName, trackers: trackers)
         }.sorted(by: {$0.categoryName < $1.categoryName } )
     }
@@ -157,7 +160,7 @@ final class TrackerStore: NSObject {
         context.safeSave()
     }
         
-    private func makeTracker(from trackerCoreData: TrackerCoreData, date: Date) throws -> TrackerCell {
+    private func makeTracker(from trackerCoreData: TrackerCoreData, date: Date) throws -> TrackerViewModel {
         guard let trackerName = trackerCoreData.name else {
             throw TrackerStoreError.decodingErrorInvalidName
         }
@@ -182,7 +185,7 @@ final class TrackerStore: NSObject {
         tracker.id = trackerCoreData.objectID.uriRepresentation().absoluteString
         
         guard let records = trackerCoreData.records else {
-            return TrackerCell(event: tracker, trackedDaysCount: 0, tracked: false)
+            return TrackerViewModel(event: tracker, trackedDaysCount: 0, tracked: false)
         }
         
         var tracked = false
@@ -196,7 +199,7 @@ final class TrackerStore: NSObject {
             }
         }
         
-        return TrackerCell(event: tracker, trackedDaysCount: records.count, tracked: tracked)
+        return TrackerViewModel(event: tracker, trackedDaysCount: records.count, tracked: tracked)
     }
     
     private func makeTrackerCategory(from categoryCoreData: TrackerCategoryCoreData) throws -> TrackerCategory {

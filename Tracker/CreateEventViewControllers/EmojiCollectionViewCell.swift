@@ -9,7 +9,7 @@ import Foundation
 import UIKit
 
 final class EmojiCollectionViewCell: UICollectionViewCell {
-    var titleLabel: UILabel = {
+    let titleLabel: UILabel = {
         var titleLabel = UILabel()
         titleLabel.font = UIFont.systemFont(ofSize: 32, weight: .bold)
         titleLabel.translatesAutoresizingMaskIntoConstraints = false
@@ -35,11 +35,11 @@ final class EmojiCollectionViewCell: UICollectionViewCell {
 
 extension EmojiCollectionViewCell: SelectableCellProtocol {
     func selectCell() {
-        self.contentView.backgroundColor = LightGrayColor
+        self.contentView.backgroundColor = UIColor.getAppColors(.lightGray)
         self.contentView.layer.cornerRadius = 16
     }
     
     func unselectCell() {
-        self.contentView.backgroundColor = WhiteDayColor
+        self.contentView.backgroundColor = UIColor.getAppColors(.whiteDay)
     }
 }

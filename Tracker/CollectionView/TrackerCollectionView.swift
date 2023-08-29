@@ -10,8 +10,6 @@ import UIKit
 let cellIdentifier = "cell"
 let headerIdentifier = "header"
 
-
-
 struct GeometricParams {
     let cellCount: Int
     let leftInset: CGFloat
@@ -31,12 +29,12 @@ struct GeometricParams {
 final class TrackerCollectionView: UIViewController {
     static let TrackerSavedNotification = Notification.Name(rawValue: "CreateEvent")
     
-    private let trackerStore = TrackerStore()
-    private let trackerRecordStore = TrackerRecordStore()
+    private var trackerStore: TrackerStoreProtocol
+    private var trackerRecordStore: TrackerRecordStoreProtocol
     
     private var visibleCategories = [TrackersByCategory]()
     
-    private var datePicker: UIDatePicker = {
+    private let datePicker: UIDatePicker = {
         var datePicker = UIDatePicker()
         var datePickerCalendar = Calendar(identifier: .gregorian)
         datePickerCalendar.firstWeekday = 2
@@ -46,10 +44,10 @@ final class TrackerCollectionView: UIViewController {
     
     private let params = GeometricParams(cellCount: 2, leftInset: 10, rightInset: 10, cellSpacing: 10)
     
-    private var searchTextField: UISearchTextField = {
+    private let searchTextField: UISearchTextField = {
         let textField = UISearchTextField()
-        textField.backgroundColor = BackgroundDayColor
-        textField.textColor = BlackDayColor
+        textField.backgroundColor = UIColor.getAppColors(.backgroundDay)
+        textField.textColor = UIColor.getAppColors(.blackDay)
         textField.font = UIFont.systemFont(ofSize: 17, weight: .regular)
         textField.translatesAutoresizingMaskIntoConstraints = false
         textField.layer.cornerRadius = 16
@@ -67,7 +65,7 @@ final class TrackerCollectionView: UIViewController {
         return textField
     }()
     
-    private var collectionView: UICollectionView = {
+    private let collectionView: UICollectionView = {
         let collectionView = UICollectionView(frame: .zero, collectionViewLayout: UICollectionViewFlowLayout())
         
         collectionView.translatesAutoresizingMaskIntoConstraints = false
@@ -104,6 +102,16 @@ final class TrackerCollectionView: UIViewController {
         return view
     }()
     
+    init() {
+        trackerStore = TrackerStore()
+        trackerRecordStore = TrackerRecordStore()
+        super.init(nibName: nil, bundle: nil)
+    }
+    
+    required init?(coder: NSCoder) {
+        fatalError("init(coder:) has not been implemented")
+    }
+    
     override func viewDidLoad() {
         super.viewDidLoad()
         
@@ -116,17 +124,17 @@ final class TrackerCollectionView: UIViewController {
                 assertionFailure("TrackerCollectionView, CreateEventNotification: self is empty")
                 return
             }
-            
-            self.visibleCategories = trackerStore.getTrackers(by: datePicker.date)
+                        
+            self.visibleCategories = trackerStore.getTrackers(by: datePicker.date, withName: nil)
             self.collectionView.reloadData()
         }
-        
-        visibleCategories = trackerStore.getTrackers(by: datePicker.date)
+                
+        visibleCategories = trackerStore.getTrackers(by: datePicker.date, withName:  nil)
         
         setupSearchTextField()
         setupCollection()
         
-        view.backgroundColor = WhiteDayColor
+        view.backgroundColor = UIColor.getAppColors(.whiteDay)
         
         createNavigationBar()
     }
@@ -144,9 +152,9 @@ final class TrackerCollectionView: UIViewController {
         emptyCollectionView.removeFromSuperview()
     }
     
-    func createNavigationBar() {
+    private func createNavigationBar() {
         if let navigationBar = navigationController?.navigationBar {
-            navigationBar.backgroundColor = WhiteDayColor
+            navigationBar.backgroundColor = UIColor.getAppColors(.whiteDay)
             navigationBar.tintColor = .black
             
             navigationItem.leftBarButtonItem = UIBarButtonItem(image: UIImage(named: "add"), style: .plain, target: self, action: #selector(clickButtonCreateEvent))
@@ -161,7 +169,7 @@ final class TrackerCollectionView: UIViewController {
             paragraphStyle.alignment = .left
             
             navigationBar.titleTextAttributes = [
-                NSAttributedString.Key.foregroundColor: BlackDayColor as Any,
+                NSAttributedString.Key.foregroundColor: UIColor.getAppColors(.blackDay) as Any,
                 NSAttributedString.Key.font: UIFont.systemFont(ofSize: 34, weight: UIFont.Weight.bold),
                 NSAttributedString.Key.paragraphStyle: paragraphStyle
             ] as [NSAttributedString.Key : Any]
@@ -171,7 +179,7 @@ final class TrackerCollectionView: UIViewController {
         }
     }
     
-    func setupSearchTextField() {
+    private func setupSearchTextField() {
         searchTextField.delegate = self
         
         view.addSubview(searchTextField)
@@ -183,7 +191,7 @@ final class TrackerCollectionView: UIViewController {
         ])
     }
     
-    func setupCollection() {
+    private func setupCollection() {
         view.addSubview(collectionView)
         
         collectionView.dataSource = self
@@ -204,7 +212,7 @@ final class TrackerCollectionView: UIViewController {
     }
     
     @objc func changeDateOnDatePicker(_ datePicker: UIDatePicker) {
-        visibleCategories = trackerStore.getTrackers(by: datePicker.date)
+        visibleCategories = trackerStore.getTrackers(by: datePicker.date, withName: nil)
         collectionView.reloadData()
         presentedViewController?.dismiss(animated: true)
     }
@@ -219,7 +227,7 @@ extension TrackerCollectionView: UISearchTextFieldDelegate {
         }
         
         if searchText.isEmpty {
-            visibleCategories = trackerStore.getTrackers(by: datePicker.date)
+            visibleCategories = trackerStore.getTrackers(by: datePicker.date, withName: nil)
         } else {
             visibleCategories = trackerStore.getTrackers(by: datePicker.date, withName: searchText)
         }
@@ -232,7 +240,7 @@ extension TrackerCollectionView: UISearchTextFieldDelegate {
 
 extension TrackerCollectionView: TrackEventProtocol {
     func trackEvent(indexPath: IndexPath) {
-        visibleCategories = trackerStore.getTrackers(by: datePicker.date)
+        visibleCategories = trackerStore.getTrackers(by: datePicker.date, withName: nil)
         guard
             let category = visibleCategories.safetyAccessElement(at: indexPath.section),
             let cellTracker = category.trackers.safetyAccessElement(at: indexPath.row)
@@ -240,22 +248,26 @@ extension TrackerCollectionView: TrackEventProtocol {
             return
         }
 
+        guard let trackerId = cellTracker.tracker.id else {
+            print("tracker id is empty")
+            return
+        }
+        
         if cellTracker.tracked {
             do {
-                try trackerRecordStore.deleteRecord(TrackerRecord(eventID: cellTracker.tracker.id!, date: Calendar.current.startOfDay(for: datePicker.date)))
+                try trackerRecordStore.deleteRecord(TrackerRecord(eventID: trackerId, date: Calendar.current.startOfDay(for: datePicker.date)))
             } catch {
                 print("failed to create new record")
             }
         } else {
             do {
-                try trackerRecordStore.addNewRecord(TrackerRecord(eventID: cellTracker.tracker.id!, date: Calendar.current.startOfDay(for: datePicker.date)))
+                try trackerRecordStore.addNewRecord(TrackerRecord(eventID: trackerId, date: Calendar.current.startOfDay(for: datePicker.date)))
             } catch {
                 print("failed to create new record")
             }
         }
         
-        
-        visibleCategories = trackerStore.getTrackers(by: datePicker.date)
+        visibleCategories = trackerStore.getTrackers(by: datePicker.date, withName:  nil)
     }
 }
 
