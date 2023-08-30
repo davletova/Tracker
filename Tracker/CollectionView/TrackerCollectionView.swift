@@ -166,6 +166,7 @@ final class TrackerCollectionView: UIViewController {
     }
     
     func showEmptyCollection() {
+        hideEmptyView()
         if let search = searchTextField.text,
            !search.isEmpty
         {
@@ -186,19 +187,6 @@ final class TrackerCollectionView: UIViewController {
     
     func hideEmptyView() {
         emptyCollectionView.removeFromSuperview()
-        errorCollectionView.removeFromSuperview()
-    }
-    
-    func showErrorCollection() {
-        collectionView.addSubview(errorCollectionView)
-        
-        NSLayoutConstraint.activate([
-            errorCollectionView.centerXAnchor.constraint(equalTo: view.centerXAnchor),
-            errorCollectionView.centerYAnchor.constraint(equalTo: view.centerYAnchor)
-        ])
-    }
-    
-    func hideErrorView() {
         errorCollectionView.removeFromSuperview()
     }
     

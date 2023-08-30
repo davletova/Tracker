@@ -112,9 +112,9 @@ final class CreateEventViewController: UIViewController {
             changeStateCreateButtonifNeedIt()
         }
     }
-
+    
     private var selectEmojiIndexPath: IndexPath? { didSet { changeStateCreateButtonifNeedIt() } }
-
+    
     private var selectColorIndexPath: IndexPath? { didSet { changeStateCreateButtonifNeedIt() } }
     
     override func viewDidLoad() {
@@ -125,7 +125,7 @@ final class CreateEventViewController: UIViewController {
         if isHabit {
             trackerProperties[.schedule] = TrackerProperty(name: "Расписание", callback: openSchedule)
         }
-                
+        
         setupTitle()
         setupCollectionView()
     }
@@ -196,23 +196,23 @@ extension CreateEventViewController: TrackerActionProtocol {
     func cancelCreateEvent() {
         self.view.window?.rootViewController?.dismiss(animated: true, completion: nil)
     }
-
+    
     func createEvent() {
         guard let value = trackerName else {
             print("goToCreateEventController: nameInput.text is empty")
             return
         }
-
+        
         guard let selectedEmojiIndex = selectEmojiIndexPath else {
             print("create tracker: emoji is empty")
             return
         }
-
+        
         guard let selectedColorIndex = selectColorIndexPath else {
             print("create tracker: color is empty")
             return
         }
-
+        
         guard let selectCategory = self.selectCategory else {
             print("create tracker: category is empty")
             return
@@ -229,7 +229,7 @@ extension CreateEventViewController: TrackerActionProtocol {
                 print("create habit: schedule is empty")
                 return
             }
-
+            
             newTracker = Habit(
                 name: value,
                 category: selectCategory,
@@ -245,13 +245,13 @@ extension CreateEventViewController: TrackerActionProtocol {
                 color: color
             )
         }
-
+        
         do {
             try trackerStore.addNewTracker(newTracker)
         } catch {
             print("failed to create tracker")
         }
-
+        
         self.view.window?.rootViewController?.dismiss(animated: true, completion: nil)
     }
 }
@@ -284,7 +284,7 @@ extension CreateEventViewController: UICollectionViewDataSource {
             assertionFailure("invalid section")
             return 0
         }
-
+        
         switch sectionType {
         case .name:
             return 1
@@ -408,7 +408,7 @@ extension CreateEventViewController: UICollectionViewDelegateFlowLayout {
         case 1:
             return CGSize(width: view.bounds.width - 32, height: rowHeight)
         case 2, 3:
-            return CGSize(width: 52, height: 52)
+            return CGSize(width: collectionView.bounds.width / 6, height: collectionView.bounds.width / 6)
         case 4:
             return CGSize(width: view.bounds.width - 32 , height: buttonHeight)
         default:
@@ -432,16 +432,18 @@ extension CreateEventViewController: UICollectionViewDelegateFlowLayout {
             return .zero
         }
     }
-
+    
     func collectionView(_ collectionView: UICollectionView, layout collectionViewLayout: UICollectionViewLayout, insetForSectionAt section: Int) -> UIEdgeInsets {
         switch section {
         case 0:
             return UIEdgeInsets(top: 24, left: 0, bottom: 0, right: 10)
         case 1:
             return UIEdgeInsets(top: 24, left: 0, bottom: 32, right: 10)
-        case 2, 3:
+        case 2:
+            return UIEdgeInsets(top: 24, left: 0, bottom: 40, right: 10)
+        case 3:
             return UIEdgeInsets(top: 24, left: 0, bottom: 16, right: 10)
-       default:
+        default:
             return UIEdgeInsets(top: 24, left: 0, bottom: 0, right: 10)
         }
     }
