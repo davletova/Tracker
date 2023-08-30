@@ -10,7 +10,7 @@ import UIKit
 
 enum AppColor {
     case backgroundDay, backgroundNight, blackDay, blackNight, blue, gray
-    case lightGray, red, whiteDay, whiteNight
+    case lightGray, red, whiteDay, whiteNight, tabBarBorder
     
     func getColor() -> UIColor {
         switch self {
@@ -69,11 +69,18 @@ enum AppColor {
             }
             return whiteDay
         case .whiteNight:
-            guard let whiteNightColor = UIColor(named: "WhiteNight") else {
+            guard let whiteNight = UIColor(named: "WhiteNight") else {
                 assertionFailure("WhiteNight not found")
                 return UIColor.red
             }
-            return whiteNightColor
+            return whiteNight
+        case .tabBarBorder:
+            guard let tabBarBorder = UIColor(named: "TabBarBorder") else {
+                assertionFailure("TabBarBorder not found")
+                return UIColor.lightGray
+            }
+            return tabBarBorder
+            
         }
     }
 }

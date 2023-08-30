@@ -41,7 +41,7 @@ final class ColorCollectionViewCell: UICollectionViewCell {
     }
 }
 
-extension ColorCollectionViewCell: SelectableCellProtocol {
+extension ColorCollectionViewCell:SelectableCellProtocol {
     func selectCell() {
         guard let color = cellColor else {
             assertionFailure("select cell: cell color is empty")

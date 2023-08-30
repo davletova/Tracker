@@ -19,7 +19,7 @@ class SceneDelegate: UIResponder, UIWindowSceneDelegate {
         let tabBar = UITabBarController()
         
         let lineView = UIView(frame: CGRect(x: 0, y: 0, width:tabBar.tabBar.frame.size.width, height: 1))
-        lineView.backgroundColor = UIColor.getAppColors(.gray)
+        lineView.backgroundColor = UIColor.getAppColors(.tabBarBorder)
         tabBar.tabBar.addSubview(lineView)
         
         let navigationController = UINavigationController(rootViewController: TrackerCollectionView())

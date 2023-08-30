@@ -25,4 +25,27 @@ struct Schedule {
         self.startDate = startDate
         self.repetition = repetition
     }
+    
+    func getRepetitionString() -> String {
+        var repetitionString = repetition.map({ weekday in
+            switch weekday {
+            case .monday:
+                return "Пн"
+            case .tuesday:
+                return "Вт"
+            case .wednesday:
+                 return "Ср"
+            case .thursday:
+                return "Чт"
+            case .friday:
+                return "Пт"
+            case .saturday:
+                return "Сб"
+            case .sunday:
+                return "Вс"
+            }
+        })
+        
+        return repetitionString.joined(separator: ", ")
+    }
 }
