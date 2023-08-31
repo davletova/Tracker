@@ -15,7 +15,7 @@ final class ScheduleViewController: UIViewController {
         titleLabel.text = "Расписание"
         titleLabel.textAlignment = .center
         titleLabel.font = UIFont.systemFont(ofSize: 16, weight: .medium)
-        titleLabel.textColor = UIColor(named: "BlackDay")
+        titleLabel.textColor = UIColor.getAppColors(.blackDay)
         
         view.addSubview(titleLabel)
         
@@ -25,8 +25,9 @@ final class ScheduleViewController: UIViewController {
     private lazy var doneButton: UIButton = {
         let doneButton = UIButton()
         doneButton.translatesAutoresizingMaskIntoConstraints = false
+        doneButton.titleLabel?.font = UIFont.systemFont(ofSize: 16, weight: .medium)
         doneButton.layer.cornerRadius = 16
-        doneButton.backgroundColor = UIColor(named: "BlackDay")
+        doneButton.backgroundColor = UIColor.getAppColors(.blackDay)
         doneButton.setTitle("Готово", for: .normal)
         doneButton.addTarget(self, action: #selector(saveSchedule), for: .touchUpInside)
         
@@ -38,7 +39,7 @@ final class ScheduleViewController: UIViewController {
     private lazy var daysTable: UITableView = {
         let daysTable = UITableView()
         daysTable.translatesAutoresizingMaskIntoConstraints = false
-        daysTable.backgroundColor = UIColor(named: "BackgroundDay")
+        daysTable.backgroundColor = UIColor.getAppColors(.backgroundDay)
         daysTable.layer.cornerRadius = 16
         daysTable.separatorColor = .gray
         daysTable.separatorStyle = .singleLine
@@ -52,18 +53,15 @@ final class ScheduleViewController: UIViewController {
         return daysTable
     }()
     
-    private let rowHeight: CGFloat = 75.0
-    private let buttonHeight: CGFloat = 60.0
-    
     private var scheduleDays = Weekday.allCases.map { weekday in
         DailySchedule(dayOfWeek: weekday, isScheduled: false)
     }
     
-    var delegate: ScheduleViewControllerDelegateProtocol?
+    weak var delegate: ScheduleViewControllerDelegateProtocol?
     
     override func viewDidLoad() {
         super.viewDidLoad()
-        view.backgroundColor = UIColor(named: "WhiteDay")
+        view.backgroundColor = UIColor.getAppColors(.whiteDay)
         
         setConstraint()
     }
@@ -123,6 +121,8 @@ extension ScheduleViewController: UITableViewDataSource {
         dateFormatter.locale = Locale(identifier: "ru_RU")
         
         let switcher = UISwitch(frame: CGRect(x: 0, y: 0, width: 51, height: 31))
+        switcher.onTintColor = UIColor.getAppColors(.blue)
+        switcher.tintColor = UIColor.getAppColors(.backgroundDay)
         switcher.setOn(scheduleDays[weekdayIndex].isScheduled, animated: true)
         switcher.tag = indexPath.row
         switcher.addTarget(self, action: #selector(weekDaySwitcherValueChanged), for: .valueChanged)
@@ -130,7 +130,7 @@ extension ScheduleViewController: UITableViewDataSource {
         let cell = tableView.dequeueReusableCell(withIdentifier: cellIdentifier, for: indexPath)
         
         cell.textLabel?.text = dateFormatter.standaloneWeekdaySymbols?[weekdayIndex].localizedCapitalized
-        cell.backgroundColor = UIColor(named: "BackgroundDay")
+        cell.backgroundColor = UIColor.getAppColors(.backgroundDay)
         cell.accessoryView = switcher
         cell.selectionStyle = .none
         

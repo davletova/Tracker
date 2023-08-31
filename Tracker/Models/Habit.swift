@@ -7,6 +7,7 @@
 
 import Foundation
 import UIKit
+import CoreData
 
 protocol Timetable {
     func getSchedule() -> Schedule
@@ -15,15 +16,15 @@ protocol Timetable {
 final class Habit: Tracker {
     var schedule: Schedule
     
-    init(id: UUID,
-         name: String,
-         category: String,
-         emoji: String,
-         color: UIColor,
-         schedule: Schedule
+    init(
+        name: String,
+        category: TrackerCategory,
+        emoji: String,
+        color: UIColor,
+        schedule: Schedule
     ) {
         self.schedule = schedule
-        super.init(id: id, name: name, category: category, emoji: emoji, color: color)
+        super.init(name: name, category: category, emoji: emoji, color: color)
     }
 }
 

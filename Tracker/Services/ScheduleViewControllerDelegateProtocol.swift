@@ -7,6 +7,6 @@
 
 import Foundation
 
-protocol ScheduleViewControllerDelegateProtocol {
+protocol ScheduleViewControllerDelegateProtocol: AnyObject {
     func saveSchedule(schedule: Schedule)
 }

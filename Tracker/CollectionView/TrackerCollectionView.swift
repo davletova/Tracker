@@ -10,8 +10,6 @@ import UIKit
 let cellIdentifier = "cell"
 let headerIdentifier = "header"
 
-
-
 struct GeometricParams {
     let cellCount: Int
     let leftInset: CGFloat
@@ -31,13 +29,12 @@ struct GeometricParams {
 final class TrackerCollectionView: UIViewController {
     static let TrackerSavedNotification = Notification.Name(rawValue: "CreateEvent")
     
-    private var trackerService: TrackerServiceProtocol?
-    private var trackerRecordService: TrackerRecordServiceProtocol?
+    private var trackerStore: TrackerStoreProtocol
+    private var trackerRecordStore: TrackerRecordStoreProtocol
     
-    private var visibleCategories = [TrackerCategory]()
-    private var completedTrackers = Set<UUID>()
+    private var visibleCategories = [TrackersByCategory]()
     
-    private var datePicker: UIDatePicker = {
+    private let datePicker: UIDatePicker = {
         var datePicker = UIDatePicker()
         var datePickerCalendar = Calendar(identifier: .gregorian)
         datePickerCalendar.firstWeekday = 2
@@ -47,10 +44,10 @@ final class TrackerCollectionView: UIViewController {
     
     private let params = GeometricParams(cellCount: 2, leftInset: 10, rightInset: 10, cellSpacing: 10)
     
-    private lazy var searchTextField: UISearchTextField = {
+    private let searchTextField: UISearchTextField = {
         let textField = UISearchTextField()
-        textField.backgroundColor = UIColor(named: "BackgroundDay")
-        textField.textColor = UIColor(named: "BlackDay")
+        textField.backgroundColor = UIColor.getAppColors(.backgroundDay)
+        textField.textColor = UIColor.getAppColors(.blackDay)
         textField.font = UIFont.systemFont(ofSize: 17, weight: .regular)
         textField.translatesAutoresizingMaskIntoConstraints = false
         textField.layer.cornerRadius = 16
@@ -64,25 +61,20 @@ final class TrackerCollectionView: UIViewController {
             attributes: attributes
         )
         textField.attributedPlaceholder = attributedPlaceholder
-        textField.delegate = self
-        
-        view.addSubview(textField)
         
         return textField
     }()
     
-    private lazy var collectionView: UICollectionView = {
+    private let collectionView: UICollectionView = {
         let collectionView = UICollectionView(frame: .zero, collectionViewLayout: UICollectionViewFlowLayout())
         
         collectionView.translatesAutoresizingMaskIntoConstraints = false
-        view.addSubview(collectionView)
         
         collectionView.register(TrackerCollectionViewCell.self, forCellWithReuseIdentifier: cellIdentifier)
         collectionView.register(SupplementaryView.self,
                                 forSupplementaryViewOfKind: UICollectionView.elementKindSectionHeader,
                                 withReuseIdentifier: headerIdentifier)
-        collectionView.dataSource = self
-        collectionView.delegate = self
+        
         return collectionView
     }()
     
@@ -92,6 +84,7 @@ final class TrackerCollectionView: UIViewController {
         let label = UILabel()
         label.text = "Что будем отслеживать?"
         label.textAlignment = .center
+        label.font = UIFont.systemFont(ofSize: 12, weight: .medium)
         
         view.translatesAutoresizingMaskIntoConstraints = false
         imageView.translatesAutoresizingMaskIntoConstraints = false
@@ -110,6 +103,41 @@ final class TrackerCollectionView: UIViewController {
         return view
     }()
     
+    private lazy var errorCollectionView: UIView = {
+        let view = UIView()
+        let imageView = UIImageView(image: UIImage(named: "error"))
+        let label = UILabel()
+        label.text = "Ничего не найдено"
+        label.textAlignment = .center
+        label.font = UIFont.systemFont(ofSize: 12, weight: .medium)
+        
+        view.translatesAutoresizingMaskIntoConstraints = false
+        imageView.translatesAutoresizingMaskIntoConstraints = false
+        label.translatesAutoresizingMaskIntoConstraints = false
+        
+        view.addSubview(imageView)
+        view.addSubview(label)
+        
+        NSLayoutConstraint.activate([
+            imageView.topAnchor.constraint(equalTo: view.topAnchor),
+            imageView.centerXAnchor.constraint(equalTo: view.centerXAnchor),
+            label.topAnchor.constraint(equalTo: imageView.bottomAnchor, constant: 10),
+            label.centerXAnchor.constraint(equalTo: view.centerXAnchor)
+        ])
+        
+        return view
+    }()
+    
+    init() {
+        trackerStore = TrackerStore()
+        trackerRecordStore = TrackerRecordStore()
+        super.init(nibName: nil, bundle: nil)
+    }
+    
+    required init?(coder: NSCoder) {
+        fatalError("init(coder:) has not been implemented")
+    }
+    
     override func viewDidLoad() {
         super.viewDidLoad()
         
@@ -119,34 +147,36 @@ final class TrackerCollectionView: UIViewController {
             queue: OperationQueue.main
         ) { [weak self] _ in
             guard let self = self else {
-                print("TrackerCollectionView, CreateEventNotification: self is empty")
+                assertionFailure("TrackerCollectionView, CreateEventNotification: self is empty")
                 return
             }
-            
-            guard let trackerService = self.trackerService else {
-                print("CreateEventNotification: trackerService is empty")
-                return
-            }
-            
-            self.visibleCategories = trackerService.getTrackers(by: datePicker.date)
-            
+                        
+            self.visibleCategories = trackerStore.getTrackers(by: datePicker.date, withName: nil)
             self.collectionView.reloadData()
         }
+                
+        visibleCategories = trackerStore.getTrackers(by: datePicker.date, withName:  nil)
         
-        trackerService = TrackerService()
-        trackerRecordService = TrackerRecordService()
+        setupSearchTextField()
+        setupCollection()
         
-        visibleCategories = trackerService!.getTrackers(by: datePicker.date)
-        completedTrackers = trackerRecordService!.getSetOfCOmpletedEvents(by: datePicker.date)
-        
-        setConstraint()
-        
-        view.backgroundColor = UIColor(named: "WhiteDay")
+        view.backgroundColor = UIColor.getAppColors(.whiteDay)
         
         createNavigationBar()
     }
     
     func showEmptyCollection() {
+        hideEmptyView()
+        if let search = searchTextField.text,
+           !search.isEmpty
+        {
+            collectionView.addSubview(errorCollectionView)
+            NSLayoutConstraint.activate([
+                errorCollectionView.centerXAnchor.constraint(equalTo: view.centerXAnchor),
+                errorCollectionView.centerYAnchor.constraint(equalTo: view.centerYAnchor)
+            ])
+            return
+        }
         collectionView.addSubview(emptyCollectionView)
         
         NSLayoutConstraint.activate([
@@ -157,14 +187,16 @@ final class TrackerCollectionView: UIViewController {
     
     func hideEmptyView() {
         emptyCollectionView.removeFromSuperview()
+        errorCollectionView.removeFromSuperview()
     }
     
-    func createNavigationBar() {
+    private func createNavigationBar() {
         if let navigationBar = navigationController?.navigationBar {
-            navigationBar.backgroundColor = UIColor(named: "WhiteDay")
+            navigationBar.backgroundColor = UIColor.getAppColors(.whiteDay)
             navigationBar.tintColor = .black
             
             navigationItem.leftBarButtonItem = UIBarButtonItem(image: UIImage(named: "add"), style: .plain, target: self, action: #selector(clickButtonCreateEvent))
+            navigationItem.leftBarButtonItem?.imageInsets = UIEdgeInsets(top: 0, left: -10, bottom: 0, right: 0)
             
             datePicker.preferredDatePickerStyle = .compact
             datePicker.datePickerMode = UIDatePicker.Mode.date
@@ -176,7 +208,7 @@ final class TrackerCollectionView: UIViewController {
             paragraphStyle.alignment = .left
             
             navigationBar.titleTextAttributes = [
-                NSAttributedString.Key.foregroundColor: UIColor(named: "BlackDay") as Any,
+                NSAttributedString.Key.foregroundColor: UIColor.getAppColors(.blackDay) as Any,
                 NSAttributedString.Key.font: UIFont.systemFont(ofSize: 34, weight: UIFont.Weight.bold),
                 NSAttributedString.Key.paragraphStyle: paragraphStyle
             ] as [NSAttributedString.Key : Any]
@@ -186,12 +218,25 @@ final class TrackerCollectionView: UIViewController {
         }
     }
     
-    func setConstraint() {
+    private func setupSearchTextField() {
+        searchTextField.delegate = self
+        
+        view.addSubview(searchTextField)
+        
         NSLayoutConstraint.activate([
             searchTextField.topAnchor.constraint(equalTo: view.safeAreaLayoutGuide.topAnchor, constant: 10),
             searchTextField.leadingAnchor.constraint(equalTo: view.leadingAnchor, constant: 16),
-            searchTextField.trailingAnchor.constraint(equalTo: view.trailingAnchor, constant: -16),
-            
+            searchTextField.trailingAnchor.constraint(equalTo: view.trailingAnchor, constant: -16)
+        ])
+    }
+    
+    private func setupCollection() {
+        view.addSubview(collectionView)
+        
+        collectionView.dataSource = self
+        collectionView.delegate = self
+        
+        NSLayoutConstraint.activate([
             collectionView.topAnchor.constraint(equalTo: searchTextField.bottomAnchor, constant: 24),
             collectionView.bottomAnchor.constraint(equalTo: view.safeAreaLayoutGuide.bottomAnchor),
             collectionView.leadingAnchor.constraint(equalTo: view.leadingAnchor),
@@ -201,22 +246,12 @@ final class TrackerCollectionView: UIViewController {
     
     @objc func clickButtonCreateEvent() {
         let typeSelectionViewController = TypeSelectionViewController()
-        typeSelectionViewController.trackerService = trackerService
         typeSelectionViewController.modalPresentationStyle = .popover
         self.present(typeSelectionViewController, animated: true)
     }
     
     @objc func changeDateOnDatePicker(_ datePicker: UIDatePicker) {
-        guard let trackerService = trackerService else {
-            print("changeDateOnDatePicker: trackerService is empty")
-            return
-        }
-        guard let trackerRecordService = trackerRecordService else {
-            print("changeDateOnDatePicker: trackerRecordService is empty")
-            return
-        }
-        visibleCategories = trackerService.getTrackers(by: datePicker.date)
-        completedTrackers = trackerRecordService.getSetOfCOmpletedEvents(by: datePicker.date)
+        visibleCategories = trackerStore.getTrackers(by: datePicker.date, withName: nil)
         collectionView.reloadData()
         presentedViewController?.dismiss(animated: true)
     }
@@ -230,16 +265,10 @@ extension TrackerCollectionView: UISearchTextFieldDelegate {
             return false
         }
         
-        guard let trackerService = trackerService else {
-            print("performSearch: trackerService is empty")
-            return false
-        }
-        
-        
         if searchText.isEmpty {
-            visibleCategories = trackerService.getTrackers(by: datePicker.date)
+            visibleCategories = trackerStore.getTrackers(by: datePicker.date, withName: nil)
         } else {
-            visibleCategories = trackerService.filterTrackers(by: searchText, date: datePicker.date)
+            visibleCategories = trackerStore.getTrackers(by: datePicker.date, withName: searchText)
         }
         
         collectionView.reloadData()
@@ -249,26 +278,35 @@ extension TrackerCollectionView: UISearchTextFieldDelegate {
 }
 
 extension TrackerCollectionView: TrackEventProtocol {
-    func trackEvent(eventId: UUID, indexPath: IndexPath) {
-        guard let trackerRecordService = trackerRecordService else {
-            print("changeDate: trackerRecordService is empty")
+    func trackEvent(indexPath: IndexPath) {
+        visibleCategories = trackerStore.getTrackers(by: datePicker.date, withName: nil)
+        guard
+            let category = visibleCategories.safetyAccessElement(at: indexPath.section),
+            let cellTracker = category.trackers.safetyAccessElement(at: indexPath.row)
+        else {
+            return
+        }
+
+        guard let trackerId = cellTracker.tracker.id else {
+            print("tracker id is empty")
             return
         }
         
-        trackerRecordService.addRecords(record: TrackerRecord(eventID: eventId, date: Calendar.current.startOfDay(for: datePicker.date)))
-        completedTrackers = trackerRecordService.getSetOfCOmpletedEvents(by: datePicker.date)
-        collectionView.reloadItems(at: [indexPath])
-    }
-    
-    func untrackEvent(eventId: UUID, indexPath: IndexPath) {
-        guard let trackerRecordService = trackerRecordService else {
-            print("changeDate: trackerRecordService is empty")
-            return
+        if cellTracker.tracked {
+            do {
+                try trackerRecordStore.deleteRecord(TrackerRecord(eventID: trackerId, date: Calendar.current.startOfDay(for: datePicker.date)))
+            } catch {
+                print("failed to create new record")
+            }
+        } else {
+            do {
+                try trackerRecordStore.addNewRecord(TrackerRecord(eventID: trackerId, date: Calendar.current.startOfDay(for: datePicker.date)))
+            } catch {
+                print("failed to create new record")
+            }
         }
         
-        trackerRecordService.deleteTrackerRecord(record: TrackerRecord(eventID: eventId, date: Calendar.current.startOfDay(for: datePicker.date)))
-        completedTrackers = trackerRecordService.getSetOfCOmpletedEvents(by: datePicker.date)
-        collectionView.reloadItems(at: [indexPath])
+        visibleCategories = trackerStore.getTrackers(by: datePicker.date, withName:  nil)
     }
 }
 
@@ -303,27 +341,17 @@ extension TrackerCollectionView: UICollectionViewDataSource {
             return UICollectionViewCell()
         }
         
-        guard let event = section.trackers.safetyAccessElement(at: indexPath.row) else {
+        guard let trackerCell = section.trackers.safetyAccessElement(at: indexPath.row) else {
             print("failed to get element from section: \(section.categoryName) by index \(indexPath.row)")
             return UICollectionViewCell()
         }
-        
-        guard let trackerRecordService = trackerRecordService else {
-            print("collectionView cellForItemAt: trackerRecordService is empty")
-            return UICollectionViewCell()
-        }
-        
-        let trackedDaysCount = trackerRecordService.getTrackerDaysCount(of: event.id)
-        let cellEvent = TrackerCell(
-            event: event,
-            trackedDaysCount: trackedDaysCount,
-            tracked: completedTrackers.contains(event.id)
-        )
-        cell.cellEvent = cellEvent
+                
         cell.indexPath = indexPath
         cell.delegate = self
         cell.contentView.layer.cornerRadius = 16
         
+        cell.configureCell(cellTracker: trackerCell)
+       
         if Calendar.current.startOfDay(for: datePicker.date) > Date() {
             cell.disableTrackButton()
         } else {

@@ -5,20 +5,39 @@
 //  Created by Алия Давлетова on 07.08.2023.
 //
 
+
+//6420
 import Foundation
 import UIKit
 
+private let nameCellIdentifier = "nameCell"
+private let propertyCellIdentifier = "propertyCell"
 private let emojiCellIdentifier = "emojiCell"
 private let colorCellIdentifier = "colorCell"
+private let buttonsCellIdentifier = "buttonCell"
 
-struct TableButton {
+enum CollectionSectionType: Int {
+    case name = 0
+    case properties = 1
+    case emoji = 2
+    case color = 3
+    case buttons = 4
+}
+
+enum PropertyType: Int, Hashable {
+    case category = 0
+    case schedule = 1
+}
+
+struct TrackerProperty {
     var name: String
     var callback: () -> Void
+    
+    var selectedValue: String?
 }
 
 final class CreateEventViewController: UIViewController {
-    private let buttonHeight = CGFloat(60)
-    private var categoryAndScheduleButtons = [TableButton]()
+    private var trackerProperties = [PropertyType: TrackerProperty]()
     private let emojies = [
         "🙂", "😻", "🌺", "🐶", "❤️", "😱",
         "😇", "😡", "🥶", "🤔", "🙌", "🍔",
@@ -26,174 +45,113 @@ final class CreateEventViewController: UIViewController {
     ]
     private let colors = (1...18).map{ UIColor(named: "ColorSelection\($0)") }
     
-    private lazy var titleLabel: UILabel = {
+    private let trackerStore = TrackerStore()
+    
+    private let titleLabel: UILabel = {
         let titleLabel = UILabel()
         titleLabel.translatesAutoresizingMaskIntoConstraints = false
         titleLabel.textAlignment = .center
         titleLabel.font = UIFont.systemFont(ofSize: 16, weight: .medium)
-        titleLabel.textColor = UIColor(named: "BlackDay")
-        
-        view.addSubview(titleLabel)
-        
-        guard let isHabit = isHabit else {
-            print("create titleLabel: isHabit is empty")
-            return titleLabel
-        }
-        
-        if isHabit {
-            titleLabel.text = "Новая привычка"
-        } else {
-            titleLabel.text = "Новое нерегулярное событие"
-        }
+        titleLabel.textColor = UIColor.getAppColors(.blackDay)
         
         return titleLabel
     }()
     
-    private lazy var eventNameInput: UITextField = {
-        let eventNameInput = UITextField()
-        eventNameInput.translatesAutoresizingMaskIntoConstraints = false
-        eventNameInput.backgroundColor = UIColor(named: "BackgroundDay")
-        eventNameInput.layer.cornerRadius = 16
-        eventNameInput.leftView = UIView(frame: CGRectMake(0, 0, 16, eventNameInput.frame.height))
-        eventNameInput.leftViewMode = .always
-        eventNameInput.placeholder = "Введите название трекера"
-        eventNameInput.addTarget(self, action: #selector(textFieldDidChange(textField:)), for: .editingChanged)
-        
-        view.addSubview(eventNameInput)
-        
-        return eventNameInput
-    }()
-    
-    private lazy var buttonsTableView: UITableView = {
-        let buttonsTableView = UITableView()
-        buttonsTableView.translatesAutoresizingMaskIntoConstraints = false
-        buttonsTableView.register(UITableViewCell.self, forCellReuseIdentifier: "cell")
-        buttonsTableView.rowHeight = 75
-        buttonsTableView.backgroundColor = UIColor(named: "BackgroundDay")
-        buttonsTableView.layer.cornerRadius = 16
-        
-        buttonsTableView.dataSource = self
-        buttonsTableView.delegate = self
-        
-        view.addSubview(buttonsTableView)
-        
-        return buttonsTableView
-    }()
-    
-    private lazy var emojiCollectionView: UICollectionView = {
+    private let collectionView: UICollectionView = {
         let collectionView = UICollectionView(
             frame: .zero,
             collectionViewLayout: UICollectionViewFlowLayout()
         )
-        
         collectionView.translatesAutoresizingMaskIntoConstraints = false
+        collectionView.allowsMultipleSelection = true
         
-        collectionView.dataSource = self
-        collectionView.delegate = self
+        let layout: UICollectionViewFlowLayout = UICollectionViewFlowLayout()
+        layout.minimumInteritemSpacing = 0
+        layout.minimumLineSpacing = 0
+        
+        collectionView.collectionViewLayout = layout
+        
+        collectionView.register(NameCollectionViewCell.self, forCellWithReuseIdentifier: nameCellIdentifier)
+        collectionView.register(PropertiesCollectionViewCell.self, forCellWithReuseIdentifier: propertyCellIdentifier)
         collectionView.register(EmojiCollectionViewCell.self, forCellWithReuseIdentifier: emojiCellIdentifier)
         collectionView.register(ColorCollectionViewCell.self, forCellWithReuseIdentifier: colorCellIdentifier)
+        collectionView.register(ButtonCollectionViewCell.self, forCellWithReuseIdentifier: buttonsCellIdentifier)
+        
         collectionView.register(CreateEventSupplementaryView.self,
                                 forSupplementaryViewOfKind: UICollectionView.elementKindSectionHeader,
                                 withReuseIdentifier: "header")
         
-        let layout: UICollectionViewFlowLayout = UICollectionViewFlowLayout()
-        layout.minimumInteritemSpacing = 3
-        layout.minimumLineSpacing = 0
-        collectionView.collectionViewLayout = layout
-        
-        view.addSubview(collectionView)
-        
         return collectionView
     }()
     
-    private lazy var cancelButton: UIButton = {
-        let cancelButton = UIButton()
-        cancelButton.translatesAutoresizingMaskIntoConstraints = false
-        cancelButton.backgroundColor = UIColor(named: "WhiteDay")
-        cancelButton.layer.cornerRadius = 16
-        cancelButton.setTitle("Отменить", for: .normal)
-        cancelButton.titleLabel?.font = UIFont.systemFont(ofSize: 16, weight: .medium)
-        cancelButton.setTitleColor(UIColor(named: "Red"), for: .normal)
-        cancelButton.layer.borderColor = UIColor(named: "Red")?.cgColor
-        cancelButton.layer.borderWidth = 1
-        cancelButton.addTarget(self, action: #selector(cancelCreateEvent), for: .touchUpInside)
-        
-        view.addSubview(cancelButton)
-        
-        return cancelButton
-    }()
+    var delegate: ChangeButtonStateProtocol?
     
-    private lazy var createEventButton: UIButton = {
-        let createEventButton = UIButton()
-        createEventButton.backgroundColor = UIColor(named: "BlackDay")
-        createEventButton.translatesAutoresizingMaskIntoConstraints = false
-        createEventButton.layer.cornerRadius = 16
-        createEventButton.setTitle("Создать", for: .normal)
-        createEventButton.titleLabel?.font = UIFont.systemFont(ofSize: 16, weight: .medium)
-        createEventButton.setTitleColor(UIColor(named: "WhiteDay"), for: .normal)
-        createEventButton.titleLabel?.textAlignment = .center
-        createEventButton.addTarget(self, action: #selector(goToCreateEventController), for: .touchUpInside)
-        
-        if let inputText = eventNameInput.text,
-           inputText.isEmpty {
-            createEventButton.isEnabled = false
-            createEventButton.backgroundColor = UIColor(named: "Gray")
+    var isHabit: Bool = false
+    
+    private var trackerName: String? { didSet { changeStateCreateButtonifNeedIt() } }
+    
+    private var selectSchedule: Schedule? {
+        didSet {
+            guard var _ = trackerProperties[.schedule] else {
+                return
+            }
+            trackerProperties[.schedule]!.selectedValue = selectSchedule?.getRepetitionString()
+            collectionView.reloadItems(at: [IndexPath(row: PropertyType.schedule.rawValue, section: CollectionSectionType.properties.rawValue)])
+            changeStateCreateButtonifNeedIt()
         }
-        
-        view.addSubview(createEventButton)
-        
-        return createEventButton
-    }()
+    }
     
-    var trackerService: TrackerServiceProtocol?
-    var isHabit: Bool?
+    private var selectCategory: TrackerCategory?  {
+        didSet {
+            guard var _ = trackerProperties[.category] else {
+                assertionFailure("failed to get property category")
+                return
+            }
+            trackerProperties[.category]!.selectedValue = selectCategory?.name
+            collectionView.reloadItems(at: [IndexPath(row: PropertyType.category.rawValue, section: CollectionSectionType.properties.rawValue)])
+            changeStateCreateButtonifNeedIt()
+        }
+    }
     
-    private var schedule: Schedule?
-    private var category: String?
+    private var selectEmojiIndexPath: IndexPath? { didSet { changeStateCreateButtonifNeedIt() } }
+    
+    private var selectColorIndexPath: IndexPath? { didSet { changeStateCreateButtonifNeedIt() } }
     
     override func viewDidLoad() {
         super.viewDidLoad()
-        view.backgroundColor = UIColor(named: "WhiteDay")
+        view.backgroundColor = UIColor.getAppColors(.whiteDay)
         
-        categoryAndScheduleButtons.append(TableButton(name: "Категория", callback: openCategories))
-        if let isHabit = isHabit, isHabit {
-            categoryAndScheduleButtons.append(TableButton(name: "Расписание", callback: openSchedule))
+        trackerProperties[.category] = TrackerProperty(name: "Категория", callback: openCategories)
+        if isHabit {
+            trackerProperties[.schedule] = TrackerProperty(name: "Расписание", callback: openSchedule)
         }
         
-        setConstraint()
+        setupTitle()
+        setupCollectionView()
     }
     
-    private func setConstraint() {
+    private func setupTitle() {
+        view.addSubview(titleLabel)
+        titleLabel.text = isHabit ? "Новая привычка" : "Новое нерегулярное событие"
+        
         NSLayoutConstraint.activate([
-            titleLabel.heightAnchor.constraint(equalToConstant: 22),
-            titleLabel.topAnchor.constraint(equalTo: view.topAnchor, constant: 24),
-            titleLabel.centerXAnchor.constraint(equalTo: view.centerXAnchor),
-            
-            eventNameInput.heightAnchor.constraint(equalToConstant: 75),
-            eventNameInput.topAnchor.constraint(equalTo: titleLabel.bottomAnchor, constant: 24),
-            eventNameInput.leadingAnchor.constraint(equalTo: view.leadingAnchor, constant: 16),
-            eventNameInput.trailingAnchor.constraint(equalTo: view.trailingAnchor, constant: -16),
-            
-            buttonsTableView.topAnchor.constraint(equalTo: eventNameInput.bottomAnchor, constant: 24),
-            buttonsTableView.leadingAnchor.constraint(equalTo: view.leadingAnchor, constant: 16),
-            buttonsTableView.trailingAnchor.constraint(equalTo: view.trailingAnchor, constant: -16),
-            buttonsTableView.heightAnchor.constraint(equalToConstant: 75 * CGFloat(categoryAndScheduleButtons.count)),
-            
-            emojiCollectionView.heightAnchor.constraint(equalToConstant: 450),
-            emojiCollectionView.topAnchor.constraint(equalTo: buttonsTableView.bottomAnchor, constant: 16),
-            emojiCollectionView.leadingAnchor.constraint(equalTo: view.leadingAnchor, constant: 16),
-            emojiCollectionView.trailingAnchor.constraint(equalTo: view.trailingAnchor, constant: -16),
-            emojiCollectionView.bottomAnchor.constraint(lessThanOrEqualTo: view.bottomAnchor, constant: -buttonHeight - CGFloat(44)),
-            
-            cancelButton.bottomAnchor.constraint(equalTo: view.bottomAnchor, constant: -34),
-            cancelButton.heightAnchor.constraint(equalToConstant: buttonHeight),
-            cancelButton.trailingAnchor.constraint(equalTo: view.trailingAnchor, constant: -(view.frame.width / 2 + 3)),
-            cancelButton.leadingAnchor.constraint(equalTo: view.leadingAnchor, constant: 16),
-            
-            createEventButton.leadingAnchor.constraint(equalTo: cancelButton.trailingAnchor, constant: 6),
-            createEventButton.trailingAnchor.constraint(equalTo: view.trailingAnchor, constant: -16),
-            createEventButton.heightAnchor.constraint(equalToConstant: buttonHeight),
-            createEventButton.bottomAnchor.constraint(equalTo: view.bottomAnchor, constant: -34)
+            titleLabel.heightAnchor.constraint(equalToConstant: 32),
+            titleLabel.topAnchor.constraint(equalTo: view.topAnchor, constant: 16),
+            titleLabel.centerXAnchor.constraint(equalTo: view.centerXAnchor)
+        ])
+    }
+    
+    private func setupCollectionView() {
+        collectionView.dataSource = self
+        collectionView.delegate = self
+        
+        view.addSubview(collectionView)
+        
+        NSLayoutConstraint.activate([
+            collectionView.topAnchor.constraint(equalTo: titleLabel.bottomAnchor),
+            collectionView.leadingAnchor.constraint(equalTo: view.leadingAnchor, constant: 16),
+            collectionView.trailingAnchor.constraint(equalTo: view.trailingAnchor, constant: -8),
+            collectionView.bottomAnchor.constraint(equalTo: view.bottomAnchor, constant: -34)
         ])
     }
     
@@ -211,150 +169,201 @@ final class CreateEventViewController: UIViewController {
         self.present(scheduleViewController, animated: true)
     }
     
-    @objc func cancelCreateEvent() {
+    func changeStateCreateButtonifNeedIt() {
+        guard let delegate = delegate else {
+            print("changeStateCreateButtonifNeedIt: delegate is empty")
+            return
+        }
+        
+        if
+            let nameInputText = trackerName,
+            !nameInputText.isEmpty,
+            selectCategory != nil,
+            let _ = selectEmojiIndexPath,
+            let _ = selectColorIndexPath
+        {
+            if !isHabit || (isHabit && selectSchedule != nil) {
+                delegate.enableButton()
+                return
+            }
+        }
+        
+        delegate.disableButton()
+    }
+}
+
+extension CreateEventViewController: TrackerActionProtocol {
+    func cancelCreateEvent() {
         self.view.window?.rootViewController?.dismiss(animated: true, completion: nil)
     }
     
-    @objc func goToCreateEventController() {
-        guard let value = eventNameInput.text else {
+    func createEvent() {
+        guard let value = trackerName else {
             print("goToCreateEventController: nameInput.text is empty")
             return
         }
         
-        guard let trackerService = trackerService else {
-            print("goToCreateEventController: trackerService is empty")
+        guard let selectedEmojiIndex = selectEmojiIndexPath else {
+            print("create tracker: emoji is empty")
             return
         }
         
-        guard let isHabit = isHabit else {
-            print("goToCreateEventController: isHabit is empty")
+        guard let selectedColorIndex = selectColorIndexPath else {
+            print("create tracker: color is empty")
             return
         }
         
-        let newEvent: Tracker
-        
-        guard let selectCategory = self.category else {
+        guard let selectCategory = self.selectCategory else {
             print("create tracker: category is empty")
             return
         }
         
+        guard let color = colors[selectedColorIndex.row] else {
+            assertionFailure("create tracker: color by indes \(selectedColorIndex.row) is undefined")
+            return
+        }
+        
+        let newTracker: Tracker
         if isHabit {
-            guard let schedule = schedule else {
+            guard let schedule = selectSchedule else {
                 print("create habit: schedule is empty")
                 return
             }
             
-            newEvent = Habit(
-                id: UUID(),
+            newTracker = Habit(
                 name: value,
                 category: selectCategory,
-                emoji: "🏓",
-                color: UIColor(named: "ColorSelection3")!,
+                emoji: emojies[selectedEmojiIndex.row],
+                color: color,
                 schedule: schedule
             )
         } else {
-            newEvent = Tracker(
-                id: UUID(),
+            newTracker = Tracker(
                 name: value,
                 category: selectCategory,
-                emoji: "🏓",
-                color: UIColor(named: "ColorSelection3")!
+                emoji: emojies[selectedEmojiIndex.row],
+                color: color
             )
         }
         
-        trackerService.createTracker(tracker: newEvent)
+        do {
+            try trackerStore.addNewTracker(newTracker)
+        } catch {
+            print("failed to create tracker")
+        }
         
         self.view.window?.rootViewController?.dismiss(animated: true, completion: nil)
     }
-    
-    @objc func textFieldDidChange(textField: UITextField) {
-        if let nameInputText = eventNameInput.text,
-           !nameInputText.isEmpty {
-            createEventButton.isEnabled = true
-            createEventButton.backgroundColor = UIColor(named: "BlackDay")
-            return
-        }
-        
-        createEventButton.isEnabled = false
-        createEventButton.backgroundColor = UIColor(named: "Gray")
+}
+
+extension CreateEventViewController: SetTrackerNameProtocol {
+    func setTrackerName(name: String) {
+        trackerName = name
     }
 }
 
 extension CreateEventViewController: ScheduleViewControllerDelegateProtocol {
     func saveSchedule(schedule: Schedule) {
-        self.schedule = schedule
+        self.selectSchedule = schedule
     }
 }
 
 extension CreateEventViewController: ListCategoriesDelegateProtocol {
-    func saveCategory(category: String) {
-        self.category = category
-    }
-}
-
-extension CreateEventViewController: UITableViewDataSource {
-    func tableView(_ tableView: UITableView, numberOfRowsInSection section: Int) -> Int {
-        return categoryAndScheduleButtons.count
-    }
-    
-    func tableView(_ tableView: UITableView, cellForRowAt indexPath: IndexPath) -> UITableViewCell {
-        let cell = tableView.dequeueReusableCell(withIdentifier: cellIdentifier, for: indexPath)
-        cell.textLabel?.text = categoryAndScheduleButtons[indexPath.row].name
-        cell.backgroundColor = UIColor(named: "BackgroundDay")
-        
-        let chevronImageView = UIImageView(image: UIImage(named: "chevron"))
-        cell.addSubview(chevronImageView)
-        chevronImageView.translatesAutoresizingMaskIntoConstraints = false
-        
-        NSLayoutConstraint.activate([
-            chevronImageView.centerYAnchor.constraint(equalTo: cell.centerYAnchor),
-            chevronImageView.trailingAnchor.constraint(equalTo: cell.trailingAnchor, constant: -15),
-            chevronImageView.widthAnchor.constraint(equalToConstant: 24),
-            chevronImageView.heightAnchor.constraint(equalToConstant: 24)
-        ])
-        
-        cell.selectionStyle = .none
-        return cell
-    }
-}
-
-extension CreateEventViewController: UITableViewDelegate {
-    func tableView(_ tableView: UITableView, didSelectRowAt indexPath: IndexPath) {
-        categoryAndScheduleButtons[indexPath.row].callback()
-    }
-    func tableView(_ tableView: UITableView, willDisplay cell: UITableViewCell, forRowAt indexPath: IndexPath) {
-        if indexPath.row == tableView.numberOfRows(inSection: indexPath.section) - 1 {
-            cell.separatorInset = UIEdgeInsets(top: 0, left: 0, bottom: 0, right: .greatestFiniteMagnitude)
-        } else {
-            cell.separatorInset = UIEdgeInsets(top: 0, left: 16, bottom: 0, right: 16)
-        }
+    func saveCategory(category: TrackerCategory) {
+        self.selectCategory = category
     }
 }
 
 extension CreateEventViewController: UICollectionViewDataSource {
     func numberOfSections(in collectionView: UICollectionView) -> Int {
-        2
+        5
     }
     
     func collectionView(_ collectionView: UICollectionView, numberOfItemsInSection section: Int) -> Int {
-        if section == 0 {
+        guard let sectionType = CollectionSectionType(rawValue: section) else {
+            assertionFailure("invalid section")
+            return 0
+        }
+        
+        switch sectionType {
+        case .name:
+            return 1
+        case .properties:
+            return trackerProperties.count
+        case .emoji:
             return emojies.count
-        } else {
+        case .color:
             return colors.count
+        case .buttons:
+            return 1
         }
     }
     
     func collectionView(_ collectionView: UICollectionView, cellForItemAt indexPath: IndexPath) -> UICollectionViewCell {
-        if indexPath.section == 0 {
-            let cell = collectionView.dequeueReusableCell(withReuseIdentifier: emojiCellIdentifier, for: indexPath) as! EmojiCollectionViewCell
+        guard let sectionType = CollectionSectionType(rawValue: indexPath.section) else {
+            assertionFailure("invalid section")
+            return UICollectionViewCell()
+        }
+        
+        switch sectionType {
+        case .name:
+            let cell = collectionView.dequeueReusableCell(withReuseIdentifier: nameCellIdentifier, for: indexPath) as! NameCollectionViewCell
+            cell.delegate = self
+            return cell
+        case .properties:
+            guard
+                let propertyType = PropertyType(rawValue: indexPath.row),
+                let trackerProperty = trackerProperties[propertyType]
+            else {
+                assertionFailure("invalid property")
+                return UICollectionViewCell()
+            }
             
+            let cell = collectionView.dequeueReusableCell(withReuseIdentifier: propertyCellIdentifier, for: indexPath) as! PropertiesCollectionViewCell
+            cell.title.text = trackerProperty.name
+            
+            // Если категория или расписание выбраны
+            // то устанавливаем subtitle
+            if let property = trackerProperties[propertyType],
+               let selectedProperty = property.selectedValue
+            {
+                cell.setSubtitle(subtitle: selectedProperty)
+            }
+            
+            var cornerMasks = CACornerMask()
+            // Для первой (верхней) ячейки скругляем верхние углы
+            if indexPath.row == 0 {
+                cornerMasks.insert(.layerMinXMinYCorner)
+                cornerMasks.insert(.layerMaxXMinYCorner)
+            }
+            // для последней (нижней) ячейки скругляем нижние ячейки
+            if indexPath.row == trackerProperties.count - 1 {
+                cornerMasks.insert(.layerMinXMaxYCorner)
+                cornerMasks.insert(.layerMaxXMaxYCorner)
+            }
+            cell.configureCornersRadius(masks: cornerMasks)
+            
+            // Если количество свойств > 1, то у каждой нечетной ячейки сверху отрисовываем линию
+            if trackerProperties.count > 1 && indexPath.row % 2 == 1 {
+                cell.showSeparator()
+            }
+            
+            return cell
+        case .emoji:
+            let cell = collectionView.dequeueReusableCell(withReuseIdentifier: emojiCellIdentifier, for: indexPath) as! EmojiCollectionViewCell
             cell.titleLabel.text = emojies[indexPath.row]
             return cell
-        } else {
+        case .color:
             let cell = collectionView.dequeueReusableCell(withReuseIdentifier: colorCellIdentifier, for: indexPath) as! ColorCollectionViewCell
-            
             cell.view.backgroundColor = colors[indexPath.row]
             cell.view.layer.cornerRadius = 8
+            cell.cellColor = colors[indexPath.row]
+            return cell
+        case .buttons:
+            let cell = collectionView.dequeueReusableCell(withReuseIdentifier: buttonsCellIdentifier, for: indexPath) as! ButtonCollectionViewCell
+            self.delegate = cell
+            cell.delegate = self
+            changeStateCreateButtonifNeedIt()
             return cell
         }
     }
@@ -367,7 +376,8 @@ extension CreateEventViewController: UICollectionViewDataSource {
         case UICollectionView.elementKindSectionFooter:
             id = "footer"
         default:
-            id = ""
+            assertionFailure("kind of supplementary element invalid")
+            return UICollectionReusableView()
         }
         
         guard let view = collectionView.dequeueReusableSupplementaryView(ofKind: kind, withReuseIdentifier: id, for: indexPath) as? CreateEventSupplementaryView else {
@@ -375,10 +385,13 @@ extension CreateEventViewController: UICollectionViewDataSource {
             return UICollectionReusableView()
         }
         
-        if indexPath.section == 0 {
+        switch indexPath.section {
+        case 2:
             view.titleLabel.text = "Emoji"
-        } else {
+        case 3:
             view.titleLabel.text = "Цвет"
+        default:
+            return view
         }
         
         return view
@@ -387,23 +400,103 @@ extension CreateEventViewController: UICollectionViewDataSource {
 
 extension CreateEventViewController: UICollectionViewDelegateFlowLayout {
     func collectionView(_ collectionView: UICollectionView, layout collectionViewLayout: UICollectionViewLayout, sizeForItemAt indexPath: IndexPath) -> CGSize {
-        return CGSize(width: 52, height: 52)
-    }
-    
-    func collectionView(_ collectionView: UICollectionView, layout collectionViewLayout: UICollectionViewLayout, minimumInteritemSpacingForSectionAt section: Int) -> CGFloat {
-        return 0
+        switch indexPath.section {
+        case 0:
+            return CGSize(width: view.bounds.width - 32, height: rowHeight)
+        case 1:
+            return CGSize(width: view.bounds.width - 32, height: rowHeight)
+        case 2, 3:
+            return CGSize(width: collectionView.bounds.width / 6 - 2, height: collectionView.bounds.width / 6 - 2)
+        case 4:
+            return CGSize(width: view.bounds.width - 32 , height: buttonHeight)
+        default:
+            assertionFailure("invalid section")
+            return .zero
+        }
     }
     
     func collectionView(_ collectionView: UICollectionView, layout collectionViewLayout: UICollectionViewLayout, referenceSizeForHeaderInSection section: Int) -> CGSize {
-        let indexPath = IndexPath(row: 0, section: section)
+        switch section {
+        case 2, 3:
+            let indexPath = IndexPath(row: 0, section: section)
+            
+            let headerView = self.collectionView(collectionView, viewForSupplementaryElementOfKind: UICollectionView.elementKindSectionHeader, at: indexPath)
+            
+            return headerView.systemLayoutSizeFitting(
+                CGSize(width: collectionView.frame.width, height: UIView.layoutFittingExpandedSize.height),
+                withHorizontalFittingPriority: .required,
+                verticalFittingPriority: .fittingSizeLevel)
+        default:
+            return .zero
+        }
+    }
+    
+    func collectionView(_ collectionView: UICollectionView, layout collectionViewLayout: UICollectionViewLayout, insetForSectionAt section: Int) -> UIEdgeInsets {
+        switch section {
+        case 0:
+            return UIEdgeInsets(top: 24, left: 0, bottom: 0, right: 10)
+        case 1:
+            return UIEdgeInsets(top: 24, left: 0, bottom: 32, right: 10)
+        case 2:
+            return UIEdgeInsets(top: 24, left: 0, bottom: 40, right: 10)
+        case 3:
+            return UIEdgeInsets(top: 24, left: 0, bottom: 16, right: 10)
+        default:
+            return UIEdgeInsets(top: 24, left: 0, bottom: 0, right: 10)
+        }
+    }
+    
+    func collectionView(_ collectionView: UICollectionView, didSelectItemAt indexPath: IndexPath) {
+        guard let sectionType = CollectionSectionType(rawValue: indexPath.section) else {
+            assertionFailure("didSelectItemAt: unknown section type")
+            return
+        }
         
-        let headerView = self.collectionView(collectionView, viewForSupplementaryElementOfKind: UICollectionView.elementKindSectionHeader, at: indexPath)
-        
-        return headerView.systemLayoutSizeFitting(
-            CGSize(width: collectionView.frame.width, height: UIView.layoutFittingExpandedSize.height),
-            withHorizontalFittingPriority: .required,
-            verticalFittingPriority: .fittingSizeLevel)
+        switch sectionType {
+        case .buttons, .name:
+            return
+        case .properties:
+            guard
+                let propertyType = PropertyType(rawValue: indexPath.row),
+                let trackerProperty = trackerProperties[propertyType]
+            else {
+                assertionFailure("didSelectItemAt: unknown row type for properties")
+                return
+            }
+            
+            trackerProperty.callback()
+        case .emoji, .color:
+            
+            let oldSelectedIndexPath = sectionType == .emoji ? selectEmojiIndexPath : selectColorIndexPath
+            
+            // если ранее уже было выбрано эмодзи или цвет
+            if let oldSelectedIndexPath = oldSelectedIndexPath {
+                // берем ранее выбранную ячейку
+                // проверяем, что она реализует протокол SelectableCellProtocol
+                guard let oldSelectableCell = collectionView.cellForItem(at: oldSelectedIndexPath),
+                      let oldSelectableCell = oldSelectableCell as? SelectableCellProtocol else {
+                    assertionFailure("didSelectItemAt: old selection cell is invalid")
+                    return
+                }
+                // отменяем предыдущий выбор эмодзи или цвета
+                oldSelectableCell.unselectCell()
+            }
+            
+            // берем текущую выбранную ячейку
+            // проверяем, что она реализует протокол SelectableCellProtocol
+            guard let selectedCell = collectionView.cellForItem(at: indexPath),
+                  let selectableCell = selectedCell as? SelectableCellProtocol else {
+                assertionFailure("didSelectItemAt: invalid cell")
+                return
+            }
+            
+            if sectionType == .emoji {
+                selectEmojiIndexPath = indexPath
+            } else {
+                selectColorIndexPath = indexPath
+            }
+            
+            selectableCell.selectCell()
+        }
     }
 }
-
-

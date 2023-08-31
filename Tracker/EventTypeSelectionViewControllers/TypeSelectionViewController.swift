@@ -16,7 +16,7 @@ final class TypeSelectionViewController: UIViewController {
         titleLabel.text = "Создание трекера"
         titleLabel.textAlignment = .center
         titleLabel.font = UIFont.systemFont(ofSize: 16, weight: .medium)
-        titleLabel.textColor = UIColor(named: "BlackDay")
+        titleLabel.textColor = UIColor.getAppColors(.blackDay)
         
         view.addSubview(titleLabel)
         
@@ -25,12 +25,12 @@ final class TypeSelectionViewController: UIViewController {
     
     private let habitButton: UIButton = {
         let habitButton = UIButton()
-        habitButton.backgroundColor = UIColor(named: "BlackDay")
+        habitButton.backgroundColor = UIColor.getAppColors(.blackDay)
         habitButton.translatesAutoresizingMaskIntoConstraints = false
         habitButton.layer.cornerRadius = 16
         habitButton.setTitle("Привычка", for: .normal)
         habitButton.titleLabel?.font = UIFont.systemFont(ofSize: 16)
-        habitButton.titleLabel?.textColor = UIColor(named: "WhiteDay")
+        habitButton.titleLabel?.textColor = UIColor.getAppColors(.whiteDay)
         habitButton.titleLabel?.textAlignment = .center
         
         return habitButton
@@ -38,23 +38,21 @@ final class TypeSelectionViewController: UIViewController {
     
     private let eventButton: UIButton = {
         let eventButton = UIButton()
-        eventButton.backgroundColor = UIColor(named: "BlackDay")
+        eventButton.backgroundColor = UIColor.getAppColors(.blackDay)
         eventButton.translatesAutoresizingMaskIntoConstraints = false
         eventButton.layer.cornerRadius = 16
         eventButton.setTitle("Нерегулярное событие", for: .normal)
         eventButton.titleLabel?.font = UIFont.systemFont(ofSize: 16)
-        eventButton.titleLabel?.textColor = UIColor(named: "WhiteDay")
+        eventButton.titleLabel?.textColor = UIColor.getAppColors(.whiteDay)
         eventButton.titleLabel?.textAlignment = .center
         
         return eventButton
     }()
-    
-    var trackerService: TrackerServiceProtocol?
-    
+        
     override func viewDidLoad() {
         super.viewDidLoad()
         
-        view.backgroundColor = UIColor(named: "WhiteDay")
+        view.backgroundColor = UIColor.getAppColors(.whiteDay)
         
         habitButton.addTarget(self, action: #selector(goToCreateHabit), for: .touchUpInside)
         view.addSubview(habitButton)
@@ -86,14 +84,12 @@ final class TypeSelectionViewController: UIViewController {
     
     @objc func goToCreateEvent() {
         let addingEventViewController = CreateEventViewController()
-        addingEventViewController.trackerService = trackerService
         addingEventViewController.isHabit = false
         self.present(addingEventViewController, animated: true)
     }
     
     @objc func goToCreateHabit() {
         let addingEventViewController = CreateEventViewController()
-        addingEventViewController.trackerService = trackerService
         addingEventViewController.isHabit = true
         self.present(addingEventViewController, animated: true)
     }

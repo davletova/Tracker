@@ -9,7 +9,7 @@ import Foundation
 import UIKit
 
 final class EmojiCollectionViewCell: UICollectionViewCell {
-    var titleLabel: UILabel = {
+    let titleLabel: UILabel = {
         var titleLabel = UILabel()
         titleLabel.font = UIFont.systemFont(ofSize: 32, weight: .bold)
         titleLabel.translatesAutoresizingMaskIntoConstraints = false
@@ -30,5 +30,16 @@ final class EmojiCollectionViewCell: UICollectionViewCell {
     
     required init?(coder: NSCoder) {
         fatalError("init(coder:) has not been implemented")
+    }
+}
+
+extension EmojiCollectionViewCell: SelectableCellProtocol {
+    func selectCell() {
+        self.contentView.backgroundColor = UIColor.getAppColors(.lightGray)
+        self.contentView.layer.cornerRadius = 16
+    }
+    
+    func unselectCell() {
+        self.contentView.backgroundColor = UIColor.getAppColors(.whiteDay)
     }
 }

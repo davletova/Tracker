@@ -7,6 +7,6 @@
 
 import Foundation
 
-protocol ListCategoriesDelegateProtocol {
-    func saveCategory(category: String)
+protocol ListCategoriesDelegateProtocol: AnyObject {
+    func saveCategory(category: TrackerCategory)
 }

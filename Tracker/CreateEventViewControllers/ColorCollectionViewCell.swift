@@ -16,6 +16,8 @@ final class ColorCollectionViewCell: UICollectionViewCell {
         return view
     }()
     
+    var cellColor: UIColor?
+    
     override init(frame: CGRect) {
         super.init(frame: frame)
         
@@ -27,6 +29,11 @@ final class ColorCollectionViewCell: UICollectionViewCell {
             view.centerXAnchor.constraint(equalTo: contentView.centerXAnchor),
             view.centerYAnchor.constraint(equalTo: contentView.centerYAnchor)
         ])
+        
+        self.layer.borderWidth = 3
+        self.layer.cornerRadius = 10
+        self.contentView.frame.inset(by: UIEdgeInsets(top: 5, left: 5, bottom: 5, right: 5))
+        self.unselectCell()
     }
     
     required init?(coder: NSCoder) {
@@ -34,3 +41,17 @@ final class ColorCollectionViewCell: UICollectionViewCell {
     }
 }
 
+extension ColorCollectionViewCell:SelectableCellProtocol {
+    func selectCell() {
+        guard let color = cellColor else {
+            assertionFailure("select cell: cell color is empty")
+            return
+        }
+        
+        self.layer.borderColor = color.withAlphaComponent(0.3).cgColor
+    }
+    
+    func unselectCell() {
+        self.layer.borderColor = UIColor.getAppColors(.whiteDay).cgColor
+    }
+}

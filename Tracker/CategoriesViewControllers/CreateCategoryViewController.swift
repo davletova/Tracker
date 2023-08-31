@@ -9,7 +9,6 @@ import Foundation
 import UIKit
 
 final class CreateCategoryViewController: UIViewController {
-    var categoryService: CategoryServiceProtocol?
     
     private lazy var titleLabel: UILabel = {
         let title = UILabel()
@@ -18,7 +17,7 @@ final class CreateCategoryViewController: UIViewController {
         title.textAlignment = .center
         
         title.font = UIFont.systemFont(ofSize: 16, weight: .medium)
-        title.textColor = UIColor(named: "BlackDay")
+        title.textColor = UIColor.getAppColors(.blackDay)
         view.addSubview(title)
         
         title.leadingAnchor.constraint(equalTo: view.leadingAnchor, constant: 16).isActive = true
@@ -33,7 +32,7 @@ final class CreateCategoryViewController: UIViewController {
     private lazy var nameInput: UITextField = {
         let input = UITextField(frame: CGRect(x: 0, y: 0, width: 288, height: 75))
         input.translatesAutoresizingMaskIntoConstraints = false
-        input.backgroundColor = UIColor(named: "BackgroundDay")
+        input.backgroundColor = UIColor.getAppColors(.backgroundDay)
         input.layer.cornerRadius = 16
         input.placeholder = "Введите название категории"
         input.leftView = UIView(frame: CGRectMake(0, 0, 16, input.frame.height))
@@ -45,12 +44,12 @@ final class CreateCategoryViewController: UIViewController {
     
     private lazy var createButton: UIButton = {
         let button = UIButton()
-        button.backgroundColor = UIColor(named: "BlackDay")
+        button.backgroundColor = UIColor.getAppColors(.blackDay)
         button.translatesAutoresizingMaskIntoConstraints = false
         button.layer.cornerRadius = 16
         button.setTitle("Добавить категорию", for: .normal)
         button.titleLabel?.font = UIFont.systemFont(ofSize: 16, weight: .medium)
-        button.titleLabel?.textColor = UIColor(named: "WhiteDay")
+        button.titleLabel?.textColor = UIColor.getAppColors(.whiteDay)
         button.titleLabel?.textAlignment = .center
         button.addTarget(self, action: #selector(createCategory), for: .touchUpInside)
         view.addSubview(button)
@@ -61,10 +60,8 @@ final class CreateCategoryViewController: UIViewController {
     
     override func viewDidLoad() {
         super.viewDidLoad()
-        
-        categoryService = CategoryService()
 
-        view.backgroundColor = UIColor(named: "WhiteDay")
+        view.backgroundColor = UIColor.getAppColors(.whiteDay)
 
         setConstraint()
 
@@ -73,7 +70,7 @@ final class CreateCategoryViewController: UIViewController {
         if let nameInputText = nameInput.text,
            nameInputText.isEmpty {
             createButton.isEnabled = false
-            createButton.backgroundColor = UIColor(named: "Gray")
+            createButton.backgroundColor = UIColor.getAppColors(.gray)
         }
     }
     
@@ -101,12 +98,12 @@ final class CreateCategoryViewController: UIViewController {
         if let nameInputText = nameInput.text,
            !nameInputText.isEmpty {
             createButton.isEnabled = true
-            createButton.backgroundColor = UIColor(named: "BlackDay")
+            createButton.backgroundColor = UIColor.getAppColors(.blackDay)
             return
         }
         
         createButton.isEnabled = false
-        createButton.backgroundColor = UIColor(named: "Gray")
+        createButton.backgroundColor = UIColor.getAppColors(.gray)
     }
     
     @objc func createCategory() {}
