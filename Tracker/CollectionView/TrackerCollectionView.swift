@@ -196,6 +196,7 @@ final class TrackerCollectionView: UIViewController {
             navigationBar.tintColor = .black
             
             navigationItem.leftBarButtonItem = UIBarButtonItem(image: UIImage(named: "add"), style: .plain, target: self, action: #selector(clickButtonCreateEvent))
+            navigationItem.leftBarButtonItem?.imageInsets = UIEdgeInsets(top: 0, left: -10, bottom: 0, right: 0)
             
             datePicker.preferredDatePickerStyle = .compact
             datePicker.datePickerMode = UIDatePicker.Mode.date

@@ -25,6 +25,7 @@ final class ScheduleViewController: UIViewController {
     private lazy var doneButton: UIButton = {
         let doneButton = UIButton()
         doneButton.translatesAutoresizingMaskIntoConstraints = false
+        doneButton.titleLabel?.font = UIFont.systemFont(ofSize: 16, weight: .medium)
         doneButton.layer.cornerRadius = 16
         doneButton.backgroundColor = UIColor.getAppColors(.blackDay)
         doneButton.setTitle("Готово", for: .normal)

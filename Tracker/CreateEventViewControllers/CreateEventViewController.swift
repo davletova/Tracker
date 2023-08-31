@@ -345,9 +345,7 @@ extension CreateEventViewController: UICollectionViewDataSource {
             
             // Если количество свойств > 1, то у каждой нечетной ячейки сверху отрисовываем линию
             if trackerProperties.count > 1 && indexPath.row % 2 == 1 {
-                let lineView = UIView(frame: CGRect(x: 16, y: cell.bounds.minY, width: cell.frame.size.width - 32, height: 0.5))
-                lineView.backgroundColor = UIColor.getAppColors(.gray)
-                cell.addSubview(lineView)
+                cell.showSeparator()
             }
             
             return cell
@@ -408,7 +406,7 @@ extension CreateEventViewController: UICollectionViewDelegateFlowLayout {
         case 1:
             return CGSize(width: view.bounds.width - 32, height: rowHeight)
         case 2, 3:
-            return CGSize(width: collectionView.bounds.width / 6, height: collectionView.bounds.width / 6)
+            return CGSize(width: collectionView.bounds.width / 6 - 2, height: collectionView.bounds.width / 6 - 2)
         case 4:
             return CGSize(width: view.bounds.width - 32 , height: buttonHeight)
         default:

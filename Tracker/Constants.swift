@@ -51,7 +51,7 @@ enum AppColor {
             }
             return gray
         case .lightGray:
-            guard let lightGray = UIColor(named: "Gray") else {
+            guard let lightGray = UIColor(named: "LightGray") else {
                 assertionFailure("lightGray not found")
                 return UIColor.lightGray
             }

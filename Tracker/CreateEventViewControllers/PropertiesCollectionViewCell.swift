@@ -9,6 +9,14 @@ import Foundation
 import UIKit
 
 final class PropertiesCollectionViewCell: UICollectionViewCell {
+    private lazy var lineView: UIView = {
+        let uiView = UIView(frame: .zero)
+        uiView.translatesAutoresizingMaskIntoConstraints = false
+        uiView.backgroundColor = UIColor.getAppColors(.gray)
+        uiView.isHidden = true
+        return uiView
+    }()
+    
     let title: UILabel = {
         let title = UILabel()
         title.font = .systemFont(ofSize: 17, weight: .regular)
@@ -25,6 +33,13 @@ final class PropertiesCollectionViewCell: UICollectionViewCell {
         title.translatesAutoresizingMaskIntoConstraints = false
         
         return title
+    }()
+    
+    let chevronImageView : UIImageView = {
+        let image = UIImageView(image: UIImage(named: "chevron"))
+        image.translatesAutoresizingMaskIntoConstraints = false
+        
+        return image
     }()
     
     lazy var titleCenterYConstraint: NSLayoutConstraint = {
@@ -44,9 +59,9 @@ final class PropertiesCollectionViewCell: UICollectionViewCell {
         contentView.addSubview(title)
         contentView.addSubview(subTitle)
         
-        let chevronImageView = UIImageView(image: UIImage(named: "chevron"))
-        chevronImageView.translatesAutoresizingMaskIntoConstraints = false
         contentView.addSubview(chevronImageView)
+        
+        contentView.addSubview(lineView)
        
         
         titleCenterYConstraint.isActive = true
@@ -60,7 +75,11 @@ final class PropertiesCollectionViewCell: UICollectionViewCell {
             chevronImageView.centerYAnchor.constraint(equalTo: contentView.centerYAnchor),
             chevronImageView.trailingAnchor.constraint(equalTo: contentView.trailingAnchor, constant: -15),
             chevronImageView.widthAnchor.constraint(equalToConstant: 24),
-            chevronImageView.heightAnchor.constraint(equalToConstant: 24)
+            chevronImageView.heightAnchor.constraint(equalToConstant: 24),
+            lineView.topAnchor.constraint(equalTo: contentView.topAnchor),
+            lineView.leadingAnchor.constraint(equalTo: contentView.leadingAnchor, constant: 16),
+            lineView.trailingAnchor.constraint(equalTo: contentView.trailingAnchor, constant: -16),
+            lineView.heightAnchor.constraint(equalToConstant: 0.5),
         ])
     }
     
@@ -75,7 +94,16 @@ final class PropertiesCollectionViewCell: UICollectionViewCell {
         titleYConstraint.isActive = true
     }
     
+    func showSeparator() {
+        lineView.isHidden = false
+    }
+    
     required init?(coder: NSCoder) {
         fatalError("init(coder:) has not been implemented")
+    }
+    
+    override func prepareForReuse() {
+        super.prepareForReuse()
+        lineView.isHidden = true
     }
 }
