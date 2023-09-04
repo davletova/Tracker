@@ -21,11 +21,12 @@ final class NameCollectionViewCell: UICollectionViewCell {
         return eventNameInput
     }()
     
-    weak var delegate: SetTrackerNameProtocol?
+    var setTrackerNameClosure: ((_ name: String) -> Void)?
     
     override init(frame: CGRect) {
         super.init(frame: frame)
         
+        trackerNameInput.delegate = self
         trackerNameInput.addTarget(self, action: #selector(textFieldDidChange(textField:)), for: .editingChanged)
         
         contentView.addSubview(trackerNameInput)
@@ -44,9 +45,21 @@ final class NameCollectionViewCell: UICollectionViewCell {
     
     @objc func textFieldDidChange(textField: UITextField) {
         if let nameInputText = trackerNameInput.text {
-            delegate?.setTrackerName(name: nameInputText)
+            guard let setTrackerName = setTrackerNameClosure else {
+                print("NameCollectionViewCell: setTrackerNameClosure is empty")
+                return
+            }
+            setTrackerName(nameInputText)
         }
     }
-       
+}
+
+extension NameCollectionViewCell: UITextFieldDelegate {
+    func textField(_ textField: UITextField, shouldChangeCharactersIn range: NSRange, replacementString string: String) -> Bool {
+        let currentText = textField.text ?? ""
+        guard let stringRange = Range(range, in: currentText) else { return false }
+        let updatedText = currentText.replacingCharacters(in: stringRange, with: string)
+        return updatedText.count <= 38
+    }
 }
 

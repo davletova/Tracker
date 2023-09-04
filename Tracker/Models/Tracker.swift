@@ -9,18 +9,20 @@ import Foundation
 import UIKit
 
 class Tracker {
-    var id: String?
+    var id: UUID
     let name: String
     let category: TrackerCategory
     let emoji: String
     let color: UIColor
     
     init(
+        id: UUID,
         name: String,
         category: TrackerCategory,
         emoji: String,
         color: UIColor
     ) {
+        self.id = id
         self.name = name
         self.category = category
         self.emoji = emoji

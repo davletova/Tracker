@@ -5,8 +5,6 @@
 //  Created by Алия Давлетова on 07.08.2023.
 //
 
-
-//6420
 import Foundation
 import UIKit
 
@@ -84,50 +82,87 @@ final class CreateEventViewController: UIViewController {
         return collectionView
     }()
     
-    var delegate: ChangeButtonStateProtocol?
+    weak var delegate: ChangeButtonStateProtocol?
     
     var isHabit: Bool = false
     
     private var trackerName: String? { didSet { changeStateCreateButtonifNeedIt() } }
     
-    private var selectSchedule: Schedule? {
+    private var selectedSchedule: Schedule? {
         didSet {
             guard var _ = trackerProperties[.schedule] else {
                 return
             }
-            trackerProperties[.schedule]!.selectedValue = selectSchedule?.getRepetitionString()
-            collectionView.reloadItems(at: [IndexPath(row: PropertyType.schedule.rawValue, section: CollectionSectionType.properties.rawValue)])
+            trackerProperties[.schedule]!.selectedValue = selectedSchedule?.getRepetitionString()
+            UIView.performWithoutAnimation {
+                collectionView.reloadItems(at: [IndexPath(row: PropertyType.schedule.rawValue, section: CollectionSectionType.properties.rawValue)])
+            }
             changeStateCreateButtonifNeedIt()
         }
     }
     
-    private var selectCategory: TrackerCategory?  {
+    private var selectedCategory: TrackerCategory?  {
         didSet {
             guard var _ = trackerProperties[.category] else {
                 assertionFailure("failed to get property category")
                 return
             }
-            trackerProperties[.category]!.selectedValue = selectCategory?.name
-            collectionView.reloadItems(at: [IndexPath(row: PropertyType.category.rawValue, section: CollectionSectionType.properties.rawValue)])
+            trackerProperties[.category]!.selectedValue = selectedCategory?.name
+            UIView.performWithoutAnimation {
+                collectionView.reloadItems(at: [IndexPath(row: PropertyType.category.rawValue, section: CollectionSectionType.properties.rawValue)])
+            }
             changeStateCreateButtonifNeedIt()
         }
     }
     
-    private var selectEmojiIndexPath: IndexPath? { didSet { changeStateCreateButtonifNeedIt() } }
+    private var selectedEmojiIndexPath: IndexPath? { didSet { changeStateCreateButtonifNeedIt() } }
     
-    private var selectColorIndexPath: IndexPath? { didSet { changeStateCreateButtonifNeedIt() } }
+    private var selectedColorIndexPath: IndexPath? { didSet { changeStateCreateButtonifNeedIt() } }
     
     override func viewDidLoad() {
         super.viewDidLoad()
         view.backgroundColor = UIColor.getAppColors(.whiteDay)
         
-        trackerProperties[.category] = TrackerProperty(name: "Категория", callback: openCategories)
+        trackerProperties[.category] = TrackerProperty(
+            name: "Категория",
+            callback: { [weak self] in
+                guard let self = self else {
+                    assertionFailure("open list of category callback: self is empty")
+                    return
+                }
+                
+                let categoriesViewModel = ListCategoriesViewModel()
+                let categoriesViewController = ListCategoriesViewController(categoriesViewModel)
+                categoriesViewController.delegate = self
+                categoriesViewController.selectedCategory = self.selectedCategory
+                categoriesViewController.modalPresentationStyle = .popover
+                self.present(categoriesViewController, animated: true)
+            }
+        )
         if isHabit {
-            trackerProperties[.schedule] = TrackerProperty(name: "Расписание", callback: openSchedule)
+            trackerProperties[.schedule] = TrackerProperty(
+                name: "Расписание",
+                callback: { [weak self] in
+                    guard let self = self else {
+                        assertionFailure("open schedule callback: self is empty")
+                        return
+                    }
+                    
+                    let scheduleViewController = ScheduleViewController()
+                    scheduleViewController.delegate = self
+                    scheduleViewController.selectedSchedule = self.selectedSchedule
+                    scheduleViewController.modalPresentationStyle = .popover
+                    self.present(scheduleViewController, animated: true)
+                }
+            )
         }
         
         setupTitle()
         setupCollectionView()
+        
+        let tapGesture = UITapGestureRecognizer(target: self, action: #selector(hideKeyboard))
+        tapGesture.cancelsTouchesInView = false
+        self.view.addGestureRecognizer(tapGesture)
     }
     
     private func setupTitle() {
@@ -155,20 +190,6 @@ final class CreateEventViewController: UIViewController {
         ])
     }
     
-    private func openCategories() {
-        let categoriesViewController = ListCategoriesViewController()
-        categoriesViewController.delegate = self
-        categoriesViewController.modalPresentationStyle = .popover
-        self.present(categoriesViewController, animated: true)
-    }
-    
-    private func openSchedule() {
-        let scheduleViewController = ScheduleViewController()
-        scheduleViewController.delegate = self
-        scheduleViewController.modalPresentationStyle = .popover
-        self.present(scheduleViewController, animated: true)
-    }
-    
     func changeStateCreateButtonifNeedIt() {
         guard let delegate = delegate else {
             print("changeStateCreateButtonifNeedIt: delegate is empty")
@@ -178,17 +199,33 @@ final class CreateEventViewController: UIViewController {
         if
             let nameInputText = trackerName,
             !nameInputText.isEmpty,
-            selectCategory != nil,
-            let _ = selectEmojiIndexPath,
-            let _ = selectColorIndexPath
+            selectedCategory != nil,
+            let _ = selectedEmojiIndexPath,
+            let _ = selectedColorIndexPath
         {
-            if !isHabit || (isHabit && selectSchedule != nil) {
+            if !isHabit || (isHabit && selectedSchedule != nil) {
                 delegate.enableButton()
                 return
             }
         }
         
         delegate.disableButton()
+    }
+    
+    @objc private func hideKeyboard() {
+        self.view.endEditing(true)
+    }
+}
+
+extension CreateEventViewController: ListCategoriesViewControllerDelegate {
+    func selectCategory(_ category: TrackerCategory) {
+        self.selectedCategory = category
+    }
+}
+
+extension CreateEventViewController: ScheduleViewControllerDelegate {
+    func selectSchedule(_ schedule: Schedule) {
+        self.selectedSchedule = schedule
     }
 }
 
@@ -203,17 +240,17 @@ extension CreateEventViewController: TrackerActionProtocol {
             return
         }
         
-        guard let selectedEmojiIndex = selectEmojiIndexPath else {
+        guard let selectedEmojiIndex = selectedEmojiIndexPath else {
             print("create tracker: emoji is empty")
             return
         }
         
-        guard let selectedColorIndex = selectColorIndexPath else {
+        guard let selectedColorIndex = selectedColorIndexPath else {
             print("create tracker: color is empty")
             return
         }
         
-        guard let selectCategory = self.selectCategory else {
+        guard let selectCategory = self.selectedCategory else {
             print("create tracker: category is empty")
             return
         }
@@ -225,12 +262,13 @@ extension CreateEventViewController: TrackerActionProtocol {
         
         let newTracker: Tracker
         if isHabit {
-            guard let schedule = selectSchedule else {
+            guard let schedule = selectedSchedule else {
                 print("create habit: schedule is empty")
                 return
             }
             
             newTracker = Habit(
+                id: UUID(),
                 name: value,
                 category: selectCategory,
                 emoji: emojies[selectedEmojiIndex.row],
@@ -239,6 +277,7 @@ extension CreateEventViewController: TrackerActionProtocol {
             )
         } else {
             newTracker = Tracker(
+                id: UUID(),
                 name: value,
                 category: selectCategory,
                 emoji: emojies[selectedEmojiIndex.row],
@@ -256,21 +295,10 @@ extension CreateEventViewController: TrackerActionProtocol {
     }
 }
 
-extension CreateEventViewController: SetTrackerNameProtocol {
+// SetTrackerNameClosure for NameCollectionViewCell
+extension CreateEventViewController {
     func setTrackerName(name: String) {
         trackerName = name
-    }
-}
-
-extension CreateEventViewController: ScheduleViewControllerDelegateProtocol {
-    func saveSchedule(schedule: Schedule) {
-        self.selectSchedule = schedule
-    }
-}
-
-extension CreateEventViewController: ListCategoriesDelegateProtocol {
-    func saveCategory(category: TrackerCategory) {
-        self.selectCategory = category
     }
 }
 
@@ -308,7 +336,14 @@ extension CreateEventViewController: UICollectionViewDataSource {
         switch sectionType {
         case .name:
             let cell = collectionView.dequeueReusableCell(withReuseIdentifier: nameCellIdentifier, for: indexPath) as! NameCollectionViewCell
-            cell.delegate = self
+            cell.setTrackerNameClosure = { [weak self] name in
+                guard let self = self else {
+                    assertionFailure("set setTrackerNameClosure: self is empty")
+                    return
+                }
+                
+                self.setTrackerName(name: name)
+            }
             return cell
         case .properties:
             guard
@@ -344,7 +379,7 @@ extension CreateEventViewController: UICollectionViewDataSource {
             cell.configureCornersRadius(masks: cornerMasks)
             
             // Если количество свойств > 1, то у каждой нечетной ячейки сверху отрисовываем линию
-            if trackerProperties.count > 1 && indexPath.row % 2 == 1 {
+            if trackerProperties.count > 1 && indexPath.row >= 1 {
                 cell.showSeparator()
             }
             
@@ -467,7 +502,7 @@ extension CreateEventViewController: UICollectionViewDelegateFlowLayout {
             trackerProperty.callback()
         case .emoji, .color:
             
-            let oldSelectedIndexPath = sectionType == .emoji ? selectEmojiIndexPath : selectColorIndexPath
+            let oldSelectedIndexPath = sectionType == .emoji ? selectedEmojiIndexPath : selectedColorIndexPath
             
             // если ранее уже было выбрано эмодзи или цвет
             if let oldSelectedIndexPath = oldSelectedIndexPath {
@@ -491,9 +526,9 @@ extension CreateEventViewController: UICollectionViewDelegateFlowLayout {
             }
             
             if sectionType == .emoji {
-                selectEmojiIndexPath = indexPath
+                selectedEmojiIndexPath = indexPath
             } else {
-                selectColorIndexPath = indexPath
+                selectedColorIndexPath = indexPath
             }
             
             selectableCell.selectCell()

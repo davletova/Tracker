@@ -8,7 +8,12 @@
 import Foundation
 import UIKit
 
+protocol CreateCategoryViewControllerDelegate: AnyObject {
+    func createCategory(_ category: TrackerCategory) -> Void
+}
+
 final class CreateCategoryViewController: UIViewController {
+    var delegate: CreateCategoryViewControllerDelegate?
     
     private lazy var titleLabel: UILabel = {
         let title = UILabel()
@@ -51,7 +56,7 @@ final class CreateCategoryViewController: UIViewController {
         button.titleLabel?.font = UIFont.systemFont(ofSize: 16, weight: .medium)
         button.titleLabel?.textColor = UIColor.getAppColors(.whiteDay)
         button.titleLabel?.textAlignment = .center
-        button.addTarget(self, action: #selector(createCategory), for: .touchUpInside)
+        button.addTarget(self, action: #selector(didTapCreationButton), for: .touchUpInside)
         view.addSubview(button)
         
         return button
@@ -72,6 +77,10 @@ final class CreateCategoryViewController: UIViewController {
             createButton.isEnabled = false
             createButton.backgroundColor = UIColor.getAppColors(.gray)
         }
+        
+        let tapGesture = UITapGestureRecognizer(target: self, action: #selector(hideKeyboard))
+        tapGesture.cancelsTouchesInView = false
+        self.view.addGestureRecognizer(tapGesture)
     }
     
     func setConstraint() {
@@ -94,7 +103,7 @@ final class CreateCategoryViewController: UIViewController {
         
     }
     
-    @objc func textFieldDidChange(textField: UITextField) {
+    @objc private func textFieldDidChange(textField: UITextField) {
         if let nameInputText = nameInput.text,
            !nameInputText.isEmpty {
             createButton.isEnabled = true
@@ -106,5 +115,22 @@ final class CreateCategoryViewController: UIViewController {
         createButton.backgroundColor = UIColor.getAppColors(.gray)
     }
     
-    @objc func createCategory() {}
+    @objc private func didTapCreationButton() {
+        guard let delegate = delegate else {
+            assertionFailure("create category: delegate is empty")
+            return
+        }
+        if let nameInputText = nameInput.text,
+           !nameInputText.isEmpty
+        {
+            delegate.createCategory(TrackerCategory(id: UUID(), name: nameInputText))
+        } else {
+            print("create category: name is empty")
+        }
+        dismiss(animated: true, completion: nil)
+    }
+    
+    @objc private func hideKeyboard() {
+        self.view.endEditing(true)
+    }
 }

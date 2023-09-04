@@ -11,33 +11,41 @@ class SceneDelegate: UIResponder, UIWindowSceneDelegate {
     
     var window: UIWindow?
     
+    let defaults = UserDefaults.standard
+    
     func scene(_ scene: UIScene, willConnectTo session: UISceneSession, options connectionOptions: UIScene.ConnectionOptions) {
         guard let scene = (scene as? UIWindowScene) else { return }
         
         window = UIWindow(windowScene: scene)
+      
+        if !defaults.bool(forKey: isOnbordingShown) {
+            let onboarding = OnboardingViewController(transitionStyle: .scroll, navigationOrientation: .horizontal)
+            window?.rootViewController = onboarding
+        } else {
+            let tabBar = UITabBarController()
+
+            let lineView = UIView(frame: CGRect(x: 0, y: 0, width:tabBar.tabBar.frame.size.width, height: 1))
+            lineView.backgroundColor = UIColor.getAppColors(.tabBarBorder)
+            tabBar.tabBar.addSubview(lineView)
+
+            let navigationController = UINavigationController(rootViewController: TrackerCollectionView())
+            navigationController.tabBarItem = UITabBarItem(
+                title: "Трекеры",
+                image: UIImage(named: "record.circle.fill"),
+                tag: 0
+            )
+
+            let statisticsViewController = StatisticsViewController()
+            statisticsViewController.tabBarItem = UITabBarItem(
+                title: "Статистика",
+                image: UIImage(named: "hare.fill"),
+                tag: 1
+            )
+            tabBar.setViewControllers([navigationController, statisticsViewController], animated: true)
+
+            window?.rootViewController = tabBar
+        }
         
-        let tabBar = UITabBarController()
-        
-        let lineView = UIView(frame: CGRect(x: 0, y: 0, width:tabBar.tabBar.frame.size.width, height: 1))
-        lineView.backgroundColor = UIColor.getAppColors(.tabBarBorder)
-        tabBar.tabBar.addSubview(lineView)
-        
-        let navigationController = UINavigationController(rootViewController: TrackerCollectionView())
-        navigationController.tabBarItem = UITabBarItem(
-            title: "Трекеры",
-            image: UIImage(named: "record.circle.fill"),
-            tag: 0
-        )
-        
-        let statisticsViewController = StatisticsViewController()
-        statisticsViewController.tabBarItem = UITabBarItem(
-            title: "Статистика",
-            image: UIImage(named: "hare.fill"),
-            tag: 1
-        )
-        tabBar.setViewControllers([navigationController, statisticsViewController], animated: true)
-        
-        window?.rootViewController = tabBar
         window?.makeKeyAndVisible()
     }
     

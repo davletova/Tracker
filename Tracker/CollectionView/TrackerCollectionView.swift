@@ -142,18 +142,11 @@ final class TrackerCollectionView: UIViewController {
         super.viewDidLoad()
         
         NotificationCenter.default.addObserver(
-            forName: TrackerCollectionView.TrackerSavedNotification,
-            object: nil,
-            queue: OperationQueue.main
-        ) { [weak self] _ in
-            guard let self = self else {
-                assertionFailure("TrackerCollectionView, CreateEventNotification: self is empty")
-                return
-            }
-                        
-            self.visibleCategories = trackerStore.getTrackers(by: datePicker.date, withName: nil)
-            self.collectionView.reloadData()
-        }
+            self,
+            selector: #selector(updateVisibleCategories),
+            name: TrackerCollectionView.TrackerSavedNotification,
+            object: nil
+        )
                 
         visibleCategories = trackerStore.getTrackers(by: datePicker.date, withName:  nil)
         
@@ -163,6 +156,20 @@ final class TrackerCollectionView: UIViewController {
         view.backgroundColor = UIColor.getAppColors(.whiteDay)
         
         createNavigationBar()
+        
+        let tapGesture = UITapGestureRecognizer(target: self,
+                                                action: #selector(hideKeyboard))
+        tapGesture.cancelsTouchesInView = false
+        self.view.addGestureRecognizer(tapGesture)
+    }
+    
+    @objc func updateVisibleCategories() {
+        self.visibleCategories = trackerStore.getTrackers(by: datePicker.date, withName: nil)
+        self.collectionView.reloadData()
+    }
+    
+    @objc private func hideKeyboard() {
+        self.view.endEditing(true)
     }
     
     func showEmptyCollection() {
@@ -279,30 +286,24 @@ extension TrackerCollectionView: UISearchTextFieldDelegate {
 
 extension TrackerCollectionView: TrackEventProtocol {
     func trackEvent(indexPath: IndexPath) {
-        visibleCategories = trackerStore.getTrackers(by: datePicker.date, withName: nil)
         guard
             let category = visibleCategories.safetyAccessElement(at: indexPath.section),
             let cellTracker = category.trackers.safetyAccessElement(at: indexPath.row)
         else {
             return
         }
-
-        guard let trackerId = cellTracker.tracker.id else {
-            print("tracker id is empty")
-            return
-        }
         
         if cellTracker.tracked {
             do {
-                try trackerRecordStore.deleteRecord(TrackerRecord(eventID: trackerId, date: Calendar.current.startOfDay(for: datePicker.date)))
+                try trackerRecordStore.deleteRecord(TrackerRecord(eventID: cellTracker.tracker.id, date: Calendar.current.startOfDay(for: datePicker.date)))
             } catch {
-                print("failed to create new record")
+                print("failed to delete record with error: \(error)")
             }
         } else {
             do {
-                try trackerRecordStore.addNewRecord(TrackerRecord(eventID: trackerId, date: Calendar.current.startOfDay(for: datePicker.date)))
+                try trackerRecordStore.addNewRecord(TrackerRecord(eventID: cellTracker.tracker.id, date: Calendar.current.startOfDay(for: datePicker.date)))
             } catch {
-                print("failed to create new record")
+                print("failed to create new record with error \(error)")
             }
         }
         

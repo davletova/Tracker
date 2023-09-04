@@ -87,3 +87,5 @@ enum AppColor {
 
 let rowHeight: CGFloat = 75
 let buttonHeight: CGFloat = 60
+
+let isOnbordingShown = "isOnbordingShown"

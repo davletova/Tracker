@@ -8,6 +8,6 @@
 import Foundation
 
 struct TrackerCategory {
-    var id: String?
+    var id: UUID
     var name: String
 }

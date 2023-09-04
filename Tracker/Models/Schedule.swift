@@ -27,7 +27,11 @@ struct Schedule {
     }
     
     func getRepetitionString() -> String {
-        var repetitionString = repetition.map({ weekday in
+        var repetitionString = repetition
+            .sorted(by: { weekday1, weekday2 in
+                weekday1.rawValue < weekday2.rawValue
+            })
+            .map({ weekday in
             switch weekday {
             case .monday:
                 return "Пн"
