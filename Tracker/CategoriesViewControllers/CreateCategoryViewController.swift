@@ -9,7 +9,6 @@ import Foundation
 import UIKit
 
 final class CreateCategoryViewController: UIViewController {
-    
     private lazy var titleLabel: UILabel = {
         let title = UILabel()
         title.translatesAutoresizingMaskIntoConstraints = false
@@ -51,12 +50,24 @@ final class CreateCategoryViewController: UIViewController {
         button.titleLabel?.font = UIFont.systemFont(ofSize: 16, weight: .medium)
         button.titleLabel?.textColor = UIColor.getAppColors(.whiteDay)
         button.titleLabel?.textAlignment = .center
-        button.addTarget(self, action: #selector(createCategory), for: .touchUpInside)
+        button.addTarget(self, action: #selector(onCreateCategory), for: .touchUpInside)
         view.addSubview(button)
         
         return button
        
     }()
+    
+    var createCategory: (TrackerCategory) -> Void
+    
+    init(createCategory: @escaping (TrackerCategory) -> Void) {
+        self.createCategory = createCategory
+        
+        super.init(nibName: nil, bundle: nil)
+    }
+    
+    required init?(coder: NSCoder) {
+        fatalError("init(coder:) has not been implemented")
+    }
     
     override func viewDidLoad() {
         super.viewDidLoad()
@@ -106,5 +117,13 @@ final class CreateCategoryViewController: UIViewController {
         createButton.backgroundColor = UIColor.getAppColors(.gray)
     }
     
-    @objc func createCategory() {}
+    @objc func onCreateCategory() {
+        if let nameInputText = nameInput.text,
+           !nameInputText.isEmpty {
+            createCategory(TrackerCategory(name: nameInputText))
+        } else {
+            print("create category: name is empty")
+        }
+        dismiss(animated: true, completion: nil)
+    }
 }

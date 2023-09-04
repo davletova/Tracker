@@ -156,8 +156,9 @@ final class CreateEventViewController: UIViewController {
     }
     
     private func openCategories() {
-        let categoriesViewController = ListCategoriesViewController()
-        categoriesViewController.delegate = self
+        let categoriesViewController = ListCategoriesViewController{ category in
+            self.selectCategory = category
+        }
         categoriesViewController.modalPresentationStyle = .popover
         self.present(categoriesViewController, animated: true)
     }
@@ -268,12 +269,6 @@ extension CreateEventViewController: ScheduleViewControllerDelegateProtocol {
     }
 }
 
-extension CreateEventViewController: ListCategoriesDelegateProtocol {
-    func saveCategory(category: TrackerCategory) {
-        self.selectCategory = category
-    }
-}
-
 extension CreateEventViewController: UICollectionViewDataSource {
     func numberOfSections(in collectionView: UICollectionView) -> Int {
         5
@@ -344,7 +339,7 @@ extension CreateEventViewController: UICollectionViewDataSource {
             cell.configureCornersRadius(masks: cornerMasks)
             
             // Если количество свойств > 1, то у каждой нечетной ячейки сверху отрисовываем линию
-            if trackerProperties.count > 1 && indexPath.row % 2 == 1 {
+            if trackerProperties.count > 1 && indexPath.row >= 1 {
                 cell.showSeparator()
             }
             

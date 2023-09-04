@@ -9,11 +9,9 @@ import Foundation
 import UIKit
 
 final class ListCategoriesViewController: UIViewController {
-    private let trackerCategoriesStore = TrackerCategoryStore()
+    private let viewModel: ListCategoriesViewModel
     
-    private var listOfCategories = [TrackerCategory]()
     private let cellIdentifier = "cell"
-    private let buttonHeight: CGFloat = 60
     
     private let titleLabel: UILabel = {
         let title = UILabel()
@@ -31,9 +29,7 @@ final class ListCategoriesViewController: UIViewController {
         let table = UITableView()
         table.rowHeight = rowHeight
         table.translatesAutoresizingMaskIntoConstraints = false
-        table.backgroundColor = UIColor.getAppColors(.backgroundDay)
-        table.layer.cornerRadius = 16
-        table.separatorStyle = .singleLine
+        table.separatorStyle = .none
         
         return table
     }()
@@ -51,27 +47,52 @@ final class ListCategoriesViewController: UIViewController {
         return button
     }()
     
-    weak var delegate: ListCategoriesDelegateProtocol?
+    var selectCategory: (TrackerCategory) -> Void
+    
+    init(selectCategory: @escaping (TrackerCategory) -> Void) {
+        self.selectCategory = selectCategory
+        
+        viewModel = ListCategoriesViewModel()
+        
+        super.init(nibName: nil, bundle: nil)
+    }
+    
+    required init?(coder: NSCoder) {
+        fatalError("init(coder:) has not been implemented")
+    }
     
     override func viewDidLoad() {
         super.viewDidLoad()
         view.backgroundColor = UIColor.getAppColors(.whiteDay)
         
-        do {
-            listOfCategories = try trackerCategoriesStore.getCategories()
-        } catch {
-            print("failed to get list of categories")
-        }
-        
         setupTitle()
         setupTable()
         setupButton()
         
-        if listOfCategories.count == 0 {
+        if viewModel.listOfCategories.count == 0 {
             showEmptyCollection()
         }
+        
+        viewModel.$listOfCategories.bind { [weak self] _ in
+            guard let self = self else { return }
+            self.table.reloadData()
+        }
+        
+        viewModel.$selectedCategory.bind { [weak self] category in
+            guard let self = self else {
+                print("self is empty")
+                return
+            }
+
+            guard let category = category else {
+                print("selected category is empty")
+                return
+            }
+            
+            self.selectCategory(category)
+        }
     }
-    
+
     private func setupTitle() {
         view.addSubview(titleLabel)
         
@@ -87,7 +108,7 @@ final class ListCategoriesViewController: UIViewController {
         table.dataSource = self
         table.delegate = self
         
-        table.register(UITableViewCell.self, forCellReuseIdentifier: cellIdentifier)
+        table.register(ListCategoriesViewControllerCell.self, forCellReuseIdentifier: cellIdentifier)
        
         view.addSubview(table)
         
@@ -95,8 +116,9 @@ final class ListCategoriesViewController: UIViewController {
             table.topAnchor.constraint(equalTo: titleLabel.bottomAnchor, constant: 24),
             table.leadingAnchor.constraint(equalTo: view.leadingAnchor, constant: 10),
             table.trailingAnchor.constraint(equalTo: view.trailingAnchor, constant: -10),
-            table.heightAnchor.constraint(equalToConstant: rowHeight * CGFloat(listOfCategories.count)),
-            table.bottomAnchor.constraint(lessThanOrEqualTo: view.bottomAnchor, constant: -buttonHeight - CGFloat(44))
+//            table.heightAnchor.constraint(equalToConstant: rowHeight * CGFloat(viewModel.listOfCategories.count)),
+//            table.bottomAnchor.constraint(lessThanOrEqualTo: view.bottomAnchor, constant: -buttonHeight - CGFloat(44))
+            table.bottomAnchor.constraint(equalTo: view.bottomAnchor, constant: -buttonHeight - CGFloat(44))
         ])
     }
     
@@ -125,7 +147,9 @@ final class ListCategoriesViewController: UIViewController {
     }
     
     @objc func createCategory() {
-        let createCategoryVC = CreateCategoryViewController()
+        let createCategoryVC = CreateCategoryViewController { newCategory in
+            self.viewModel.addTrackerCategory(category: newCategory)
+        }
         
         createCategoryVC.modalPresentationStyle = .popover
         self.present(createCategoryVC, animated: true)
@@ -134,16 +158,34 @@ final class ListCategoriesViewController: UIViewController {
 
 extension ListCategoriesViewController: UITableViewDataSource {
     func tableView(_ tableView: UITableView, numberOfRowsInSection section: Int) -> Int {
-        return listOfCategories.count
+        return viewModel.listOfCategories.count
     }
     
     func tableView(_ tableView: UITableView, cellForRowAt indexPath: IndexPath) -> UITableViewCell {
-        let cell = tableView.dequeueReusableCell(withIdentifier: cellIdentifier, for: indexPath)
-        cell.textLabel?.text = listOfCategories[indexPath.row].name
-        cell.backgroundColor = UIColor.getAppColors(.backgroundDay)
+        let cell = tableView.dequeueReusableCell(withIdentifier: cellIdentifier, for: indexPath) as! ListCategoriesViewControllerCell
         
-        if indexPath.row == tableView.numberOfRows(inSection: indexPath.section) - 1 {
-            cell.separatorInset = UIEdgeInsets(top: 0, left: 0, bottom: 0, right: .greatestFiniteMagnitude)
+        guard let category = viewModel.listOfCategories.safetyAccessElement(at: indexPath.row) else {
+            assertionFailure("failed to get category from viewModel.listOfCategories by index \(indexPath)")
+            return UITableViewCell()
+        }
+        
+        cell.configure(title: category.name)
+        var cornerMasks = CACornerMask()
+        // Для первой (верхней) ячейки скругляем верхние углы
+        if indexPath.row == 0 {
+            cornerMasks.insert(.layerMinXMinYCorner)
+            cornerMasks.insert(.layerMaxXMinYCorner)
+        }
+        // для последней (нижней) ячейки скругляем нижние ячейки
+        if indexPath.row == viewModel.listOfCategories.count - 1 {
+            cornerMasks.insert(.layerMinXMaxYCorner)
+            cornerMasks.insert(.layerMaxXMaxYCorner)
+        }
+        cell.configureCornersRadius(masks: cornerMasks)
+        
+        // Если количество свойств > 1, то у каждой нечетной ячейки сверху отрисовываем линию
+        if viewModel.listOfCategories.count > 1 && indexPath.row >= 1 {
+            cell.showSeparator()
         }
         
         return cell
@@ -151,25 +193,12 @@ extension ListCategoriesViewController: UITableViewDataSource {
 }
 
 extension ListCategoriesViewController: UITableViewDelegate {
-    func tableView(_ tableView: UITableView, didSelectRowAt indexPath: IndexPath) {
-        guard let delegate = delegate else {
-            assertionFailure("save category: delegate is empty")
-            return
-        }
-        guard let category = listOfCategories.safetyAccessElement(at: indexPath.row) else  {
-            assertionFailure("failed to get categoty from listOfCategories")
-            return
-        }
-        
-        delegate.saveCategory(category: category)
-        dismiss(animated: true, completion: nil)
+    func tableView(_ tableView: UITableView, heightForRowAt indexPath: IndexPath) -> CGFloat {
+        return rowHeight
     }
     
-    func tableView(_ tableView: UITableView, willDisplay cell: UITableViewCell, forRowAt indexPath: IndexPath) {
-        if indexPath.row == tableView.numberOfRows(inSection: indexPath.section) - 1 {
-            cell.separatorInset = UIEdgeInsets(top: 0, left: 0, bottom: 0, right: .greatestFiniteMagnitude)
-        } else {
-            cell.separatorInset = UIEdgeInsets(top: 0, left: 16, bottom: 0, right: 16)
-        }
+    func tableView(_ tableView: UITableView, didSelectRowAt indexPath: IndexPath) {
+        viewModel.selectTrackerCategory(indexPath: indexPath)
+        dismiss(animated: true, completion: nil)
     }
 }

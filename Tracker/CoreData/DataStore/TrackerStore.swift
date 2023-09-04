@@ -54,7 +54,7 @@ final class TrackerStore: NSObject, TrackerStoreProtocol {
         super.init()
         
         self.fetchedResultsController.delegate = self
-        try? fetchedResultsController.performFetch()
+        try fetchedResultsController.performFetch()
     }
     
     func getTrackers(by date: Date, withName name: String? = nil) -> [TrackersByCategory] {
@@ -214,7 +214,7 @@ extension TrackerStore: NSFetchedResultsControllerDelegate {
     func controllerDidChangeContent(_ controller: NSFetchedResultsController<NSFetchRequestResult>) {
         NotificationCenter.default.post(
             name: TrackerCollectionView.TrackerSavedNotification,
-            object: self
+            object: nil
         )
     }
 }

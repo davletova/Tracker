@@ -142,18 +142,11 @@ final class TrackerCollectionView: UIViewController {
         super.viewDidLoad()
         
         NotificationCenter.default.addObserver(
-            forName: TrackerCollectionView.TrackerSavedNotification,
-            object: nil,
-            queue: OperationQueue.main
-        ) { [weak self] _ in
-            guard let self = self else {
-                assertionFailure("TrackerCollectionView, CreateEventNotification: self is empty")
-                return
-            }
-                        
-            self.visibleCategories = trackerStore.getTrackers(by: datePicker.date, withName: nil)
-            self.collectionView.reloadData()
-        }
+            self,
+            selector: #selector(updateVisibleCategories),
+            name: TrackerCollectionView.TrackerSavedNotification,
+            object: nil
+        )
                 
         visibleCategories = trackerStore.getTrackers(by: datePicker.date, withName:  nil)
         
@@ -163,6 +156,11 @@ final class TrackerCollectionView: UIViewController {
         view.backgroundColor = UIColor.getAppColors(.whiteDay)
         
         createNavigationBar()
+    }
+    
+    @objc func updateVisibleCategories() {
+        self.visibleCategories = trackerStore.getTrackers(by: datePicker.date, withName: nil)
+        self.collectionView.reloadData()
     }
     
     func showEmptyCollection() {

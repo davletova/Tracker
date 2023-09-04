@@ -49,9 +49,7 @@ final class PropertiesCollectionViewCell: UICollectionViewCell {
     lazy var titleYConstraint: NSLayoutConstraint = {
         return title.topAnchor.constraint(equalTo: contentView.topAnchor, constant: 15)
     }()
-    
-//    var subTitleText: String?
-    
+        
     override init(frame: CGRect) {
         super.init(frame: frame)
         

@@ -10,14 +10,29 @@ import CoreData
 import UIKit
 
 enum TrackerCategoryStoreError: Error {
-    case getCategoriesFailed
+    case getCategoryFailed
     case decodeCategoriesIdFailed
     case decodeCategoriesNameFailed
+    case generateURLError
+    case emptyCategoryID
 }
-
 
 final class TrackerCategoryStore: NSObject {
     private let context: NSManagedObjectContext
+    
+    private lazy var fetchedResultsController: NSFetchedResultsController<TrackerCategoryCoreData> = {
+        let fetchRequest = TrackerCategoryCoreData.fetchRequest()
+        fetchRequest.sortDescriptors = [
+            NSSortDescriptor(key: "name", ascending: true)
+        ]
+        
+        return NSFetchedResultsController(
+            fetchRequest: fetchRequest,
+            managedObjectContext: context,
+            sectionNameKeyPath: nil,
+            cacheName: nil
+        )
+    }()
     
     convenience override init() {
         let context = (UIApplication.shared.delegate as! AppDelegate).persistentContainer.viewContext
@@ -28,47 +43,9 @@ final class TrackerCategoryStore: NSObject {
         self.context = context
         super.init()
         
-        // Временный код для создания категорий
-        // пока не реализован контроллер для создания категорий
-        setupRecords(with: context)
-    }
-    
-    private func setupRecords(with context: NSManagedObjectContext) {
-        // Для того чтобы каждый раз не добавлять новые записи выполняем проверку
-        // существуют ли записи.
-        let checkRequest = TrackerCategoryCoreData.fetchRequest()
-        let result = try! context.fetch(checkRequest)
-        if result.count > 0 { return }
+        self.fetchedResultsController.delegate = self
         
-        let categories = [TrackerCategory(name: "category1"),
-                       TrackerCategory(name: "category2"),
-                       TrackerCategory(name: "category3"),
-                       TrackerCategory(name: "category4")]
-            .enumerated()
-            .map { _, category in
-                let categoryCoreData = TrackerCategoryCoreData(context: context)
-                categoryCoreData.name = category.name
-                return categoryCoreData
-        }
-    }
-    
-    func getCategories() throws -> [TrackerCategory]  {
-        let request = TrackerCategoryCoreData.fetchRequest()
-        request.returnsObjectsAsFaults = false
-        request.sortDescriptors = [NSSortDescriptor(key: "name", ascending: true)]
-        
-        guard let categories = try? context.fetch(request) else {
-            throw TrackerCategoryStoreError.getCategoriesFailed
-        }
-        
-        var trackerCategories = [TrackerCategory]()
-        for category in categories {
-            if let trackerCategory = try? makeTrackerCategory(from: category) {
-                trackerCategories.append(trackerCategory)
-            }
-        }
-        
-        return trackerCategories
+        try fetchedResultsController.performFetch()
     }
     
     private func makeTrackerCategory(from trackerCategoryCoreData: TrackerCategoryCoreData) throws -> TrackerCategory {
@@ -81,5 +58,47 @@ final class TrackerCategoryStore: NSObject {
         trackerCategory.id = categoryId
         
         return trackerCategory
+    }
+}
+
+extension TrackerCategoryStore: TrackerCategoryStoreProtocol {
+    func getCategories() throws -> [TrackerCategoryCoreData]  {
+        let request = TrackerCategoryCoreData.fetchRequest()
+        request.returnsObjectsAsFaults = false
+        request.sortDescriptors = [NSSortDescriptor(key: "name", ascending: true)]
+      
+        return try context.fetch(request)
+    }
+    
+    func addNewCategory(_ category: TrackerCategory) throws {
+        let trackerCategoryCoreData = TrackerCategoryCoreData(context: context)
+        trackerCategoryCoreData.name = category.name
+        
+        context.safeSave()
+    }
+    
+    func deleteCategory(_ categoryID: String) throws {
+        guard let idString = URL(string: categoryID) else {
+            throw TrackerCategoryStoreError.generateURLError
+        }
+        
+        guard let objectId = context.persistentStoreCoordinator?.managedObjectID(forURIRepresentation: idString) else {
+            throw TrackerCategoryStoreError.getCategoryFailed
+        }
+        
+        guard let category = try context.existingObject(with: objectId) as? TrackerCategoryCoreData else {
+            throw TrackerCategoryStoreError.decodeCategoriesIdFailed
+        }
+        
+        context.delete(category)
+    }
+}
+
+extension TrackerCategoryStore: NSFetchedResultsControllerDelegate {
+    func controllerDidChangeContent(_ controller: NSFetchedResultsController<NSFetchRequestResult>) {
+        NotificationCenter.default.post(
+            name: ListCategoriesViewModel.TrackerCategorySavedNotification,
+            object: self
+        )
     }
 }
