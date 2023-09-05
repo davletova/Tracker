@@ -30,7 +30,6 @@ class PageViewController: UIViewController {
         button.backgroundColor = UIColor.getAppColors(.blackDay)
         button.setTitle("Вот это технологии!", for: .normal)
         button.setTitleColor(UIColor.getAppColors(.whiteDay), for: .normal)
-        button.addTarget(self, action: #selector(goToTrackersView), for: .touchUpInside)
         
         return button
     }()
@@ -67,27 +66,29 @@ class PageViewController: UIViewController {
     }
     
     func setupTitle() {
-        backgroundView.addSubview(titleLabel)
+        view.addSubview(titleLabel)
         
         NSLayoutConstraint.activate([
-            titleLabel.leadingAnchor.constraint(equalTo: backgroundView.leadingAnchor, constant: 16),
-            titleLabel.trailingAnchor.constraint(equalTo: backgroundView.trailingAnchor, constant: -16),
-            titleLabel.bottomAnchor.constraint(equalTo: backgroundView.topAnchor, constant: 2 * view.frame.height / 3),
+            titleLabel.leadingAnchor.constraint(equalTo: view.leadingAnchor, constant: 16),
+            titleLabel.trailingAnchor.constraint(equalTo: view.trailingAnchor, constant: -16),
+            titleLabel.bottomAnchor.constraint(equalTo: view.topAnchor, constant: 2 * view.frame.height / 3),
         ])
     }
     
     func setupButton() {
-        backgroundView.addSubview(button)
+        view.addSubview(button)
+        button.addTarget(self, action: #selector(goToTrackersView), for: .touchUpInside)
         
         NSLayoutConstraint.activate([
-            button.leadingAnchor.constraint(equalTo: backgroundView.leadingAnchor, constant: 20),
-            button.trailingAnchor.constraint(equalTo: backgroundView.trailingAnchor, constant: -20),
-            button.bottomAnchor.constraint(equalTo: backgroundView.safeAreaLayoutGuide.bottomAnchor, constant: -34),
+            button.leadingAnchor.constraint(equalTo: view.leadingAnchor, constant: 20),
+            button.trailingAnchor.constraint(equalTo: view.trailingAnchor, constant: -20),
+            button.bottomAnchor.constraint(equalTo: view.safeAreaLayoutGuide.bottomAnchor, constant: -34),
             button.heightAnchor.constraint(equalToConstant: buttonHeight),
         ])
     }
     
     @objc func goToTrackersView() {
+        print("dasfsf")
         let tabBar = UITabBarController()
 
         let lineView = UIView(frame: CGRect(x: 0, y: 0, width:tabBar.tabBar.frame.size.width, height: 1))
