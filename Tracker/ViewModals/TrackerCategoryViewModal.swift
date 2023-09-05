@@ -8,6 +8,6 @@
 import Foundation
 
 struct TrackerCategoryViewModal {
-    let id: String
+    let id: UUID
     let name: String
 }

@@ -18,6 +18,8 @@ final class ListCategoriesViewModel {
     
     private let store: TrackerCategoryStoreProtocol
     
+    var hideEmptyView: (() -> Void)?
+    
     init() {
         store = TrackerCategoryStore()
         
@@ -33,6 +35,11 @@ final class ListCategoriesViewModel {
     
     @objc func updateListOfCategories() {
         listOfCategories = getTrackerCategories()
+        
+        if  listOfCategories.count > 0,
+            let hideEmptyView = hideEmptyView {
+            hideEmptyView()
+        }
     }
     
     func addTrackerCategory(category: TrackerCategory) {
@@ -44,13 +51,8 @@ final class ListCategoriesViewModel {
     }
 
     func deleteTrackerCategory(category: TrackerCategory) {
-        guard let categoryID = category.id else {
-            print("delete category: categoryID is empty")
-            return
-        }
-        
         do {
-            try store.deleteCategory(categoryID)
+            try store.deleteCategory(category.id)
         } catch {
             print("delete category failed with error \(error)")
         }
@@ -69,10 +71,10 @@ final class ListCategoriesViewModel {
             print("failed to get catgories from store")
             return [TrackerCategoryViewModal]()
         }
-        
+                
         return categoriesCoreData.map{
             TrackerCategoryViewModal(
-                id: $0.objectID.uriRepresentation().absoluteString,
+                id: $0.categoryID ?? UUID(),
                 name: $0.name ?? ""
             )
         }

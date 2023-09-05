@@ -31,7 +31,6 @@
 		4D6923FA2A9E484000B9261F /* PropertiesCollectionViewCell.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4D6923F92A9E484000B9261F /* PropertiesCollectionViewCell.swift */; };
 		4D6923FC2A9E4A1A00B9261F /* ButtonCollectionsViewCell.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4D6923FB2A9E4A1A00B9261F /* ButtonCollectionsViewCell.swift */; };
 		4D6923FE2A9E7B2500B9261F /* TrackerActionProtocol.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4D6923FD2A9E7B2500B9261F /* TrackerActionProtocol.swift */; };
-		4D6924002A9E7D2E00B9261F /* SetTrackerNameProtocol.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4D6923FF2A9E7D2E00B9261F /* SetTrackerNameProtocol.swift */; };
 		4D6924022A9F23B500B9261F /* ChangeButtonStateProtocol.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4D6924012A9F23B500B9261F /* ChangeButtonStateProtocol.swift */; };
 		4D6924042A9F2CF300B9261F /* SelectableCellProtocol.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4D6924032A9F2CF300B9261F /* SelectableCellProtocol.swift */; };
 		4D6B34C42A8B85BB00C1902C /* Statistics.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4D6B34C32A8B85BB00C1902C /* Statistics.swift */; };
@@ -40,7 +39,6 @@
 		4D8460912AA39A600041BED7 /* Observable.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4D8460902AA39A600041BED7 /* Observable.swift */; };
 		4D8460932AA39C460041BED7 /* ListCategoriesViewModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4D8460922AA39C460041BED7 /* ListCategoriesViewModel.swift */; };
 		4D8460952AA39CEE0041BED7 /* TrackerCategoryStoreProtocol.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4D8460942AA39CEE0041BED7 /* TrackerCategoryStoreProtocol.swift */; };
-		4D8460972AA3A0F40041BED7 /* TrackerCategoryStoreDelegate.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4D8460962AA3A0F40041BED7 /* TrackerCategoryStoreDelegate.swift */; };
 		4D84609A2AA3AEAB0041BED7 /* TrackerCategoryViewModal.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4D8460992AA3AEAB0041BED7 /* TrackerCategoryViewModal.swift */; };
 		4D84609C2AA4DEC70041BED7 /* ListCategoriesViewControllerCell.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4D84609B2AA4DEC70041BED7 /* ListCategoriesViewControllerCell.swift */; };
 		4DA3CC452A90A23700DB13C7 /* TrackerRecord.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4DA3CC442A90A23700DB13C7 /* TrackerRecord.swift */; };
@@ -52,8 +50,6 @@
 		4DA5C9802A84CD650046C149 /* ScheduleViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4DA5C97F2A84CD650046C149 /* ScheduleViewController.swift */; };
 		4DA970302A9BA390006CED88 /* Context.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4DA9702F2A9BA390006CED88 /* Context.swift */; };
 		4DDC8E0D2A96026900F85E5D /* TrackersByCategory.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4DDC8E0C2A96026900F85E5D /* TrackersByCategory.swift */; };
-		4DDC8E0F2A96039900F85E5D /* ListCategoriesDelegateProtocol.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4DDC8E0E2A96039900F85E5D /* ListCategoriesDelegateProtocol.swift */; };
-		4DDC8E112A960A4B00F85E5D /* ScheduleViewControllerDelegateProtocol.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4DDC8E102A960A4B00F85E5D /* ScheduleViewControllerDelegateProtocol.swift */; };
 		4DDC8E132A960F2E00F85E5D /* DailySchedule.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4DDC8E122A960F2E00F85E5D /* DailySchedule.swift */; };
 		4DDC8E1D2A989C7400F85E5D /* Constants.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4DDC8E1C2A989C7400F85E5D /* Constants.swift */; };
 		4DDC8E212A98B15100F85E5D /* Model.xcdatamodeld in Sources */ = {isa = PBXBuildFile; fileRef = 4DDC8E1F2A98B15100F85E5D /* Model.xcdatamodeld */; };
@@ -89,7 +85,6 @@
 		4D6923F92A9E484000B9261F /* PropertiesCollectionViewCell.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PropertiesCollectionViewCell.swift; sourceTree = "<group>"; };
 		4D6923FB2A9E4A1A00B9261F /* ButtonCollectionsViewCell.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ButtonCollectionsViewCell.swift; sourceTree = "<group>"; };
 		4D6923FD2A9E7B2500B9261F /* TrackerActionProtocol.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TrackerActionProtocol.swift; sourceTree = "<group>"; };
-		4D6923FF2A9E7D2E00B9261F /* SetTrackerNameProtocol.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SetTrackerNameProtocol.swift; sourceTree = "<group>"; };
 		4D6924012A9F23B500B9261F /* ChangeButtonStateProtocol.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ChangeButtonStateProtocol.swift; sourceTree = "<group>"; };
 		4D6924032A9F2CF300B9261F /* SelectableCellProtocol.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SelectableCellProtocol.swift; sourceTree = "<group>"; };
 		4D6B34C32A8B85BB00C1902C /* Statistics.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Statistics.swift; sourceTree = "<group>"; };
@@ -98,7 +93,6 @@
 		4D8460902AA39A600041BED7 /* Observable.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Observable.swift; sourceTree = "<group>"; };
 		4D8460922AA39C460041BED7 /* ListCategoriesViewModel.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ListCategoriesViewModel.swift; sourceTree = "<group>"; };
 		4D8460942AA39CEE0041BED7 /* TrackerCategoryStoreProtocol.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TrackerCategoryStoreProtocol.swift; sourceTree = "<group>"; };
-		4D8460962AA3A0F40041BED7 /* TrackerCategoryStoreDelegate.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TrackerCategoryStoreDelegate.swift; sourceTree = "<group>"; };
 		4D8460992AA3AEAB0041BED7 /* TrackerCategoryViewModal.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TrackerCategoryViewModal.swift; sourceTree = "<group>"; };
 		4D84609B2AA4DEC70041BED7 /* ListCategoriesViewControllerCell.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ListCategoriesViewControllerCell.swift; sourceTree = "<group>"; };
 		4DA3CC442A90A23700DB13C7 /* TrackerRecord.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TrackerRecord.swift; sourceTree = "<group>"; };
@@ -110,8 +104,6 @@
 		4DA5C97F2A84CD650046C149 /* ScheduleViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ScheduleViewController.swift; sourceTree = "<group>"; };
 		4DA9702F2A9BA390006CED88 /* Context.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Context.swift; sourceTree = "<group>"; };
 		4DDC8E0C2A96026900F85E5D /* TrackersByCategory.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TrackersByCategory.swift; sourceTree = "<group>"; };
-		4DDC8E0E2A96039900F85E5D /* ListCategoriesDelegateProtocol.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ListCategoriesDelegateProtocol.swift; sourceTree = "<group>"; };
-		4DDC8E102A960A4B00F85E5D /* ScheduleViewControllerDelegateProtocol.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ScheduleViewControllerDelegateProtocol.swift; sourceTree = "<group>"; };
 		4DDC8E122A960F2E00F85E5D /* DailySchedule.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DailySchedule.swift; sourceTree = "<group>"; };
 		4DDC8E1C2A989C7400F85E5D /* Constants.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Constants.swift; sourceTree = "<group>"; };
 		4DDC8E202A98B15100F85E5D /* Model.xcdatamodel */ = {isa = PBXFileReference; lastKnownFileType = wrapper.xcdatamodel; path = Model.xcdatamodel; sourceTree = "<group>"; };
@@ -159,16 +151,12 @@
 		4D0817D42A797AF0003724B5 /* Services */ = {
 			isa = PBXGroup;
 			children = (
-				4DDC8E0E2A96039900F85E5D /* ListCategoriesDelegateProtocol.swift */,
-				4DDC8E102A960A4B00F85E5D /* ScheduleViewControllerDelegateProtocol.swift */,
 				4D6923EF2A9D0FD200B9261F /* TrackerStoreProtocol.swift */,
 				4D6923F12A9D10FD00B9261F /* TrackerRecordStoreProtocol.swift */,
 				4D6923FD2A9E7B2500B9261F /* TrackerActionProtocol.swift */,
-				4D6923FF2A9E7D2E00B9261F /* SetTrackerNameProtocol.swift */,
 				4D6924012A9F23B500B9261F /* ChangeButtonStateProtocol.swift */,
 				4D6924032A9F2CF300B9261F /* SelectableCellProtocol.swift */,
 				4D8460942AA39CEE0041BED7 /* TrackerCategoryStoreProtocol.swift */,
-				4D8460962AA3A0F40041BED7 /* TrackerCategoryStoreDelegate.swift */,
 			);
 			path = Services;
 			sourceTree = "<group>";
@@ -390,13 +378,11 @@
 				4DA970302A9BA390006CED88 /* Context.swift in Sources */,
 				4DA5C9802A84CD650046C149 /* ScheduleViewController.swift in Sources */,
 				4D0817C72A796681003724B5 /* Habit.swift in Sources */,
-				4DDC8E0F2A96039900F85E5D /* ListCategoriesDelegateProtocol.swift in Sources */,
 				4D2706EB2A77AE0900F106CA /* TrackerCollectionViewCell.swift in Sources */,
 				4DDC8E1D2A989C7400F85E5D /* Constants.swift in Sources */,
 				4DA5C97A2A838F6B0046C149 /* EmojiCollectionViewCell.swift in Sources */,
 				4D6923F62A9E00F900B9261F /* Color.swift in Sources */,
 				4DA5C9742A82A9CB0046C149 /* CreateCategoryViewController.swift in Sources */,
-				4D6924002A9E7D2E00B9261F /* SetTrackerNameProtocol.swift in Sources */,
 				4D1A3D2D2A7B87EB003026E6 /* SupplementaryView.swift in Sources */,
 				4D6924022A9F23B500B9261F /* ChangeButtonStateProtocol.swift in Sources */,
 				4DA5C9722A82313B0046C149 /* ListCategoriesViewController.swift in Sources */,
@@ -405,7 +391,6 @@
 				4D6923FC2A9E4A1A00B9261F /* ButtonCollectionsViewCell.swift in Sources */,
 				4D17AA462A9C6C3700BC5999 /* TrackerCategoryStore.swift in Sources */,
 				4D1A3D3E2A814F69003026E6 /* TypeSelectionViewController.swift in Sources */,
-				4D8460972AA3A0F40041BED7 /* TrackerCategoryStoreDelegate.swift in Sources */,
 				4DDC8E262A98C6FB00F85E5D /* TrackerStore.swift in Sources */,
 				4D84609A2AA3AEAB0041BED7 /* TrackerCategoryViewModal.swift in Sources */,
 				4D8460912AA39A600041BED7 /* Observable.swift in Sources */,
@@ -421,7 +406,6 @@
 				4D84608B2AA1DA060041BED7 /* OnboardingViewController.swift in Sources */,
 				4DDC8E132A960F2E00F85E5D /* DailySchedule.swift in Sources */,
 				4D84609C2AA4DEC70041BED7 /* ListCategoriesViewControllerCell.swift in Sources */,
-				4DDC8E112A960A4B00F85E5D /* ScheduleViewControllerDelegateProtocol.swift in Sources */,
 				4D0817CB2A796D56003724B5 /* Schedule.swift in Sources */,
 				4D6923F42A9D1A4F00B9261F /* TrackerViewModel.swift in Sources */,
 				4DA3CC452A90A23700DB13C7 /* TrackerRecord.swift in Sources */,

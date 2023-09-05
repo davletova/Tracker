@@ -21,7 +21,7 @@ final class NameCollectionViewCell: UICollectionViewCell {
         return eventNameInput
     }()
     
-    weak var delegate: SetTrackerNameProtocol?
+    var setTrackerNameClosure: ((_ name: String) -> Void)?
     
     override init(frame: CGRect) {
         super.init(frame: frame)
@@ -44,7 +44,11 @@ final class NameCollectionViewCell: UICollectionViewCell {
     
     @objc func textFieldDidChange(textField: UITextField) {
         if let nameInputText = trackerNameInput.text {
-            delegate?.setTrackerName(name: nameInputText)
+            guard let setTrackerName = setTrackerNameClosure else {
+                print("NameCollectionViewCell: setTrackerNameClosure is empty")
+                return
+            }
+            setTrackerName(nameInputText)
         }
     }
        

@@ -49,13 +49,14 @@ final class TrackerCategoryStore: NSObject {
     }
     
     private func makeTrackerCategory(from trackerCategoryCoreData: TrackerCategoryCoreData) throws -> TrackerCategory {
-        let categoryId = trackerCategoryCoreData.objectID.uriRepresentation().absoluteString
         guard let categoryName = trackerCategoryCoreData.name else {
             throw TrackerCategoryStoreError.decodeCategoriesNameFailed
         }
+        guard let categoryID = trackerCategoryCoreData.categoryID else {
+            throw TrackerCategoryStoreError.decodeCategoriesIdFailed
+        }
         
-        var trackerCategory = TrackerCategory(name: categoryName)
-        trackerCategory.id = categoryId
+        var trackerCategory = TrackerCategory(id: categoryID, name: categoryName)
         
         return trackerCategory
     }
@@ -73,24 +74,24 @@ extension TrackerCategoryStore: TrackerCategoryStoreProtocol {
     func addNewCategory(_ category: TrackerCategory) throws {
         let trackerCategoryCoreData = TrackerCategoryCoreData(context: context)
         trackerCategoryCoreData.name = category.name
+        trackerCategoryCoreData.categoryID = category.id
         
         context.safeSave()
     }
     
-    func deleteCategory(_ categoryID: String) throws {
-        guard let idString = URL(string: categoryID) else {
-            throw TrackerCategoryStoreError.generateURLError
-        }
+    func deleteCategory(_ categoryID: UUID) throws {
+        let request = TrackerCategoryCoreData.fetchRequest()
+        request.returnsObjectsAsFaults = false
         
-        guard let objectId = context.persistentStoreCoordinator?.managedObjectID(forURIRepresentation: idString) else {
+        request.predicate = NSPredicate(format: "%K == %@", #keyPath(TrackerCategoryCoreData.categoryID), categoryID.uuidString)
+        guard let categories = try? context.fetch(request) else {
+            throw TrackerCategoryStoreError.getCategoryFailed
+        }
+        if categories.count < 1 || categories.count > 1 {
             throw TrackerCategoryStoreError.getCategoryFailed
         }
         
-        guard let category = try context.existingObject(with: objectId) as? TrackerCategoryCoreData else {
-            throw TrackerCategoryStoreError.decodeCategoriesIdFailed
-        }
-        
-        context.delete(category)
+        context.delete(categories[0])
     }
 }
 

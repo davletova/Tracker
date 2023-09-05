@@ -11,8 +11,6 @@ import UIKit
 
 enum TrackerRecordStoreError: Error {
     case getTrackerError
-    case getTrackerIDError
-    case trackerNotFound
     case getRecordError
     case recordNotFound
     case generateURLError
@@ -39,57 +37,52 @@ final class TrackerRecordStore: NSObject, TrackerRecordStoreProtocol {
     }
     
     func addNewRecord(_ trackerRecord: TrackerRecord) throws {
-        guard let id = URL(string: trackerRecord.eventID) else {
-            throw TrackerRecordStoreError.generateURLError
-        }
+        let request = TrackerCoreData.fetchRequest()
         
-        guard let objectId = context.persistentStoreCoordinator?.managedObjectID(forURIRepresentation: id) else {
-            throw TrackerRecordStoreError.getTrackerIDError
-        }
-        
-        guard let tracker = try? context.existingObject(with: objectId) else {
+        request.predicate = NSPredicate(format: "%K == %@", #keyPath(TrackerCoreData.trackerID), trackerRecord.eventID.uuidString)
+        guard let trackers = try? context.fetch(request) else {
             throw TrackerRecordStoreError.getTrackerError
         }
-        guard let trackerCoreData = tracker as? TrackerCoreData else {
-            throw TrackerRecordStoreError.decodeTrackerError
+        if trackers.count < 1 || trackers.count > 1 {
+            throw TrackerRecordStoreError.getTrackerError
         }
         
         let trackerRecordCoreData = TrackerRecordCoreData(context: context)
         trackerRecordCoreData.date = trackerRecord.date
-        trackerRecordCoreData.tracker = trackerCoreData
-        
+        trackerRecordCoreData.tracker = trackers[0]
+
         context.safeSave()
     }
     
     func deleteRecord(_ trackerRecord: TrackerRecord) throws {
-        guard let id = URL(string: trackerRecord.eventID) else {
-            throw TrackerRecordStoreError.generateURLError
-        }
+        let request = TrackerCoreData.fetchRequest()
+        request.returnsObjectsAsFaults = false
         
-        guard let objectId = context.persistentStoreCoordinator?.managedObjectID(forURIRepresentation: id) else {
-            throw TrackerRecordStoreError.getTrackerIDError
+        request.predicate = NSPredicate(format: "%K == %@", #keyPath(TrackerCoreData.trackerID), trackerRecord.eventID.uuidString)
+        guard let trackers = try? context.fetch(request) else {
+            throw TrackerRecordStoreError.getTrackerError
         }
-        
-        guard let tracker = try context.existingObject(with: objectId) as? TrackerCoreData else {
+        if trackers.count < 1 || trackers.count > 1 {
             throw TrackerRecordStoreError.getTrackerError
         }
         
-        guard let records = tracker.records else {
-            print("failed to get records for tracker \(tracker.name)")
+        guard let records = trackers[0].records else {
+            print("failed to get records for tracker \(String(describing: trackers[0].name))")
             throw TrackerRecordStoreError.getRecordError
         }
         
         let dateEqualPredicate = NSPredicate(format: "%K == %@", #keyPath(TrackerRecordCoreData.date), Calendar.current.startOfDay(for: trackerRecord.date) as NSDate)
-        var record = records.filtered(using: dateEqualPredicate)
+        var filteredRecords = records.filtered(using: dateEqualPredicate)
         
-        if record.isEmpty {
-            throw TrackerRecordStoreError.recordNotFound
+        if filteredRecords.count < 1 || filteredRecords.count > 1 {
+            throw TrackerRecordStoreError.getRecordError
         }
-        guard let trackerRecordCoreData = record.popFirst() as? TrackerRecordCoreData else {
+        guard let trackerRecordCoreData = filteredRecords.first as? TrackerRecordCoreData else {
             throw TrackerRecordStoreError.decodeRecordError
         }
         
         context.delete(trackerRecordCoreData)
+        context.safeSave()
     }
 }
 

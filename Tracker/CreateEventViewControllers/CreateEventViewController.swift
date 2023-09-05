@@ -90,32 +90,32 @@ final class CreateEventViewController: UIViewController {
     
     private var trackerName: String? { didSet { changeStateCreateButtonifNeedIt() } }
     
-    private var selectSchedule: Schedule? {
+    private var selectedSchedule: Schedule? {
         didSet {
             guard var _ = trackerProperties[.schedule] else {
                 return
             }
-            trackerProperties[.schedule]!.selectedValue = selectSchedule?.getRepetitionString()
+            trackerProperties[.schedule]!.selectedValue = selectedSchedule?.getRepetitionString()
             collectionView.reloadItems(at: [IndexPath(row: PropertyType.schedule.rawValue, section: CollectionSectionType.properties.rawValue)])
             changeStateCreateButtonifNeedIt()
         }
     }
     
-    private var selectCategory: TrackerCategory?  {
+    private var selectedCategory: TrackerCategory?  {
         didSet {
             guard var _ = trackerProperties[.category] else {
                 assertionFailure("failed to get property category")
                 return
             }
-            trackerProperties[.category]!.selectedValue = selectCategory?.name
+            trackerProperties[.category]!.selectedValue = selectedCategory?.name
             collectionView.reloadItems(at: [IndexPath(row: PropertyType.category.rawValue, section: CollectionSectionType.properties.rawValue)])
             changeStateCreateButtonifNeedIt()
         }
     }
     
-    private var selectEmojiIndexPath: IndexPath? { didSet { changeStateCreateButtonifNeedIt() } }
+    private var selectedEmojiIndexPath: IndexPath? { didSet { changeStateCreateButtonifNeedIt() } }
     
-    private var selectColorIndexPath: IndexPath? { didSet { changeStateCreateButtonifNeedIt() } }
+    private var selectedColorIndexPath: IndexPath? { didSet { changeStateCreateButtonifNeedIt() } }
     
     override func viewDidLoad() {
         super.viewDidLoad()
@@ -157,15 +157,18 @@ final class CreateEventViewController: UIViewController {
     
     private func openCategories() {
         let categoriesViewController = ListCategoriesViewController{ category in
-            self.selectCategory = category
+            self.selectedCategory = category
         }
+        categoriesViewController.selectedCategory = self.selectedCategory
         categoriesViewController.modalPresentationStyle = .popover
         self.present(categoriesViewController, animated: true)
     }
     
     private func openSchedule() {
-        let scheduleViewController = ScheduleViewController()
-        scheduleViewController.delegate = self
+        let scheduleViewController = ScheduleViewController{ schedule in
+            self.selectedSchedule = schedule
+        }
+        scheduleViewController.selectedSchedule = self.selectedSchedule
         scheduleViewController.modalPresentationStyle = .popover
         self.present(scheduleViewController, animated: true)
     }
@@ -179,11 +182,11 @@ final class CreateEventViewController: UIViewController {
         if
             let nameInputText = trackerName,
             !nameInputText.isEmpty,
-            selectCategory != nil,
-            let _ = selectEmojiIndexPath,
-            let _ = selectColorIndexPath
+            selectedCategory != nil,
+            let _ = selectedEmojiIndexPath,
+            let _ = selectedColorIndexPath
         {
-            if !isHabit || (isHabit && selectSchedule != nil) {
+            if !isHabit || (isHabit && selectedSchedule != nil) {
                 delegate.enableButton()
                 return
             }
@@ -204,17 +207,17 @@ extension CreateEventViewController: TrackerActionProtocol {
             return
         }
         
-        guard let selectedEmojiIndex = selectEmojiIndexPath else {
+        guard let selectedEmojiIndex = selectedEmojiIndexPath else {
             print("create tracker: emoji is empty")
             return
         }
         
-        guard let selectedColorIndex = selectColorIndexPath else {
+        guard let selectedColorIndex = selectedColorIndexPath else {
             print("create tracker: color is empty")
             return
         }
         
-        guard let selectCategory = self.selectCategory else {
+        guard let selectCategory = self.selectedCategory else {
             print("create tracker: category is empty")
             return
         }
@@ -226,12 +229,13 @@ extension CreateEventViewController: TrackerActionProtocol {
         
         let newTracker: Tracker
         if isHabit {
-            guard let schedule = selectSchedule else {
+            guard let schedule = selectedSchedule else {
                 print("create habit: schedule is empty")
                 return
             }
             
             newTracker = Habit(
+                id: UUID(),
                 name: value,
                 category: selectCategory,
                 emoji: emojies[selectedEmojiIndex.row],
@@ -240,6 +244,7 @@ extension CreateEventViewController: TrackerActionProtocol {
             )
         } else {
             newTracker = Tracker(
+                id: UUID(),
                 name: value,
                 category: selectCategory,
                 emoji: emojies[selectedEmojiIndex.row],
@@ -257,15 +262,10 @@ extension CreateEventViewController: TrackerActionProtocol {
     }
 }
 
-extension CreateEventViewController: SetTrackerNameProtocol {
+// SetTrackerNameClosure for NameCollectionViewCell
+extension CreateEventViewController {
     func setTrackerName(name: String) {
         trackerName = name
-    }
-}
-
-extension CreateEventViewController: ScheduleViewControllerDelegateProtocol {
-    func saveSchedule(schedule: Schedule) {
-        self.selectSchedule = schedule
     }
 }
 
@@ -303,7 +303,7 @@ extension CreateEventViewController: UICollectionViewDataSource {
         switch sectionType {
         case .name:
             let cell = collectionView.dequeueReusableCell(withReuseIdentifier: nameCellIdentifier, for: indexPath) as! NameCollectionViewCell
-            cell.delegate = self
+            cell.setTrackerNameClosure = setTrackerName
             return cell
         case .properties:
             guard
@@ -462,7 +462,7 @@ extension CreateEventViewController: UICollectionViewDelegateFlowLayout {
             trackerProperty.callback()
         case .emoji, .color:
             
-            let oldSelectedIndexPath = sectionType == .emoji ? selectEmojiIndexPath : selectColorIndexPath
+            let oldSelectedIndexPath = sectionType == .emoji ? selectedEmojiIndexPath : selectedColorIndexPath
             
             // если ранее уже было выбрано эмодзи или цвет
             if let oldSelectedIndexPath = oldSelectedIndexPath {
@@ -486,9 +486,9 @@ extension CreateEventViewController: UICollectionViewDelegateFlowLayout {
             }
             
             if sectionType == .emoji {
-                selectEmojiIndexPath = indexPath
+                selectedEmojiIndexPath = indexPath
             } else {
-                selectColorIndexPath = indexPath
+                selectedColorIndexPath = indexPath
             }
             
             selectableCell.selectCell()

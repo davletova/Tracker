@@ -82,7 +82,7 @@ final class TrackerStore: NSObject, TrackerStoreProtocol {
         request.predicate = requestPredicate
         
         guard let trackers = try? context.fetch(request) else {
-            print("")
+            print("trackerStore: getTrackers request failed")
             return [TrackersByCategory]()
         }
         let trackersByCategoryDictionary = Dictionary(grouping: trackers) { (tracker) -> String in
@@ -104,24 +104,21 @@ final class TrackerStore: NSObject, TrackerStoreProtocol {
     }
     
     func addNewTracker(_ tracker: Tracker) throws {
-        guard
-            let id = tracker.category.id,
-            let idString = URL(string: id)
-        else {
-            throw TrackerStoreError.generateURLError
-        }
+        let request = TrackerCategoryCoreData.fetchRequest()
+        request.returnsObjectsAsFaults = false
         
-        guard let objectId = context.persistentStoreCoordinator?.managedObjectID(forURIRepresentation: idString) else {
+        request.predicate = NSPredicate(format: "%K == %@", #keyPath(TrackerCategoryCoreData.categoryID), tracker.category.id.uuidString)
+        guard let categories = try? context.fetch(request) else {
+            throw TrackerStoreError.categoryNotFound
+        }
+        if categories.count < 1 {
             throw TrackerStoreError.categoryNotFound
         }
         
-        guard let category = try context.existingObject(with: objectId) as? TrackerCategoryCoreData else {
-            throw TrackerStoreError.decodingErrorInvalidCategory
-        }
-        
         let trackerCoreData = TrackerCoreData(context: context)
+        trackerCoreData.trackerID = tracker.id
         trackerCoreData.name = tracker.name
-        trackerCoreData.category = category
+        trackerCoreData.category = categories[0]
         trackerCoreData.createDate = Date()
         trackerCoreData.emoji = tracker.emoji
         trackerCoreData.colorHex = uiColorMarshalling.hexString(from: tracker.color)
@@ -161,14 +158,11 @@ final class TrackerStore: NSObject, TrackerStoreProtocol {
     }
         
     private func makeTracker(from trackerCoreData: TrackerCoreData, date: Date) throws -> TrackerViewModel {
+        guard let trackerID = trackerCoreData.trackerID else {
+            throw TrackerStoreError.decodingErrorInvalidId
+        }
         guard let trackerName = trackerCoreData.name else {
             throw TrackerStoreError.decodingErrorInvalidName
-        }
-        guard
-            let trackerCategoryCoreData = trackerCoreData.category,
-            let trackerCategory = try? makeTrackerCategory(from: trackerCategoryCoreData)
-        else {
-            throw TrackerStoreError.decodingErrorInvalidCategory
         }
         guard let trackerEmoji = trackerCoreData.emoji else {
             throw TrackerStoreError.decodingErrorInvalidEmojies
@@ -176,13 +170,21 @@ final class TrackerStore: NSObject, TrackerStoreProtocol {
         guard let trackerColorHex = trackerCoreData.colorHex else {
             throw TrackerStoreError.decodingErrorInvalidColorHex
         }
+        guard
+            let categoryCoreData = trackerCoreData.category,
+            let categoryID = categoryCoreData.categoryID,
+            let categoryName = categoryCoreData.name
+        else {
+            throw TrackerStoreError.decodingErrorInvalidCategory
+        }
+        
         let tracker = Tracker(
+            id: trackerID,
             name: trackerName,
-            category: trackerCategory,
+            category: TrackerCategory(id: categoryID, name: categoryName),
             emoji: trackerEmoji,
             color: uiColorMarshalling.color(from: trackerColorHex)
         )
-        tracker.id = trackerCoreData.objectID.uriRepresentation().absoluteString
         
         guard let records = trackerCoreData.records else {
             return TrackerViewModel(event: tracker, trackedDaysCount: 0, tracked: false)
@@ -200,13 +202,6 @@ final class TrackerStore: NSObject, TrackerStoreProtocol {
         }
         
         return TrackerViewModel(event: tracker, trackedDaysCount: records.count, tracked: tracked)
-    }
-    
-    private func makeTrackerCategory(from categoryCoreData: TrackerCategoryCoreData) throws -> TrackerCategory {
-        guard let categoryName = categoryCoreData.name else {
-            throw TrackerStoreError.decodingErrorInvalidCategoryName
-        }
-        return TrackerCategory(name: categoryName)
     }
 }
 

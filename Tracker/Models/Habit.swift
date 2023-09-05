@@ -17,6 +17,7 @@ final class Habit: Tracker {
     var schedule: Schedule
     
     init(
+        id: UUID,
         name: String,
         category: TrackerCategory,
         emoji: String,
@@ -24,7 +25,7 @@ final class Habit: Tracker {
         schedule: Schedule
     ) {
         self.schedule = schedule
-        super.init(name: name, category: category, emoji: emoji, color: color)
+        super.init(id: id, name: name, category: category, emoji: emoji, color: color)
     }
 }
 

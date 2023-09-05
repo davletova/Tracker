@@ -47,7 +47,35 @@ final class ListCategoriesViewController: UIViewController {
         return button
     }()
     
+    private lazy var emptyCollectionView: UIView = {
+        let view = UIView()
+        let imageView = UIImageView(image: UIImage(named: "star"))
+        let label = UILabel()
+        label.text = "Привычки и события\nможно объединить по смыслу"
+        label.numberOfLines = 2
+        label.textAlignment = .center
+        label.font = UIFont.systemFont(ofSize: 12, weight: .medium)
+        
+        view.translatesAutoresizingMaskIntoConstraints = false
+        imageView.translatesAutoresizingMaskIntoConstraints = false
+        label.translatesAutoresizingMaskIntoConstraints = false
+        
+        view.addSubview(imageView)
+        view.addSubview(label)
+        
+        NSLayoutConstraint.activate([
+            imageView.topAnchor.constraint(equalTo: view.topAnchor),
+            imageView.centerXAnchor.constraint(equalTo: view.centerXAnchor),
+            label.topAnchor.constraint(equalTo: imageView.bottomAnchor, constant: 10),
+            label.centerXAnchor.constraint(equalTo: view.centerXAnchor)
+        ])
+        
+        return view
+    }()
+    
     var selectCategory: (TrackerCategory) -> Void
+    
+    var selectedCategory: TrackerCategory?
     
     init(selectCategory: @escaping (TrackerCategory) -> Void) {
         self.selectCategory = selectCategory
@@ -69,8 +97,9 @@ final class ListCategoriesViewController: UIViewController {
         setupTable()
         setupButton()
         
+        viewModel.hideEmptyView = hideEmptyView
         if viewModel.listOfCategories.count == 0 {
-            showEmptyCollection()
+            showEmptyView()
         }
         
         viewModel.$listOfCategories.bind { [weak self] _ in
@@ -116,8 +145,6 @@ final class ListCategoriesViewController: UIViewController {
             table.topAnchor.constraint(equalTo: titleLabel.bottomAnchor, constant: 24),
             table.leadingAnchor.constraint(equalTo: view.leadingAnchor, constant: 10),
             table.trailingAnchor.constraint(equalTo: view.trailingAnchor, constant: -10),
-//            table.heightAnchor.constraint(equalToConstant: rowHeight * CGFloat(viewModel.listOfCategories.count)),
-//            table.bottomAnchor.constraint(lessThanOrEqualTo: view.bottomAnchor, constant: -buttonHeight - CGFloat(44))
             table.bottomAnchor.constraint(equalTo: view.bottomAnchor, constant: -buttonHeight - CGFloat(44))
         ])
     }
@@ -136,16 +163,6 @@ final class ListCategoriesViewController: UIViewController {
         ])
     }
     
-    private func showEmptyCollection() {
-        let imageView = UIImageView(image: UIImage(named: "star"))
-        imageView.translatesAutoresizingMaskIntoConstraints = false
-        
-        view.addSubview(imageView)
-        
-        imageView.centerXAnchor.constraint(equalTo: view.centerXAnchor).isActive = true
-        imageView.centerYAnchor.constraint(equalTo: view.centerYAnchor).isActive = true
-    }
-    
     @objc func createCategory() {
         let createCategoryVC = CreateCategoryViewController { newCategory in
             self.viewModel.addTrackerCategory(category: newCategory)
@@ -153,6 +170,19 @@ final class ListCategoriesViewController: UIViewController {
         
         createCategoryVC.modalPresentationStyle = .popover
         self.present(createCategoryVC, animated: true)
+    }
+    
+    private func showEmptyView() {
+        view.addSubview(emptyCollectionView)
+        
+        NSLayoutConstraint.activate([
+            emptyCollectionView.centerXAnchor.constraint(equalTo: view.centerXAnchor),
+            emptyCollectionView.centerYAnchor.constraint(equalTo: table.centerYAnchor)
+        ])
+    }
+    
+    private func hideEmptyView() {
+        emptyCollectionView.removeFromSuperview()
     }
 }
 
@@ -170,6 +200,14 @@ extension ListCategoriesViewController: UITableViewDataSource {
         }
         
         cell.configure(title: category.name)
+
+        
+        if let selectedCategory = selectedCategory,
+           category.id == selectedCategory.id
+        {
+            cell.selectRow()
+        }
+        
         var cornerMasks = CACornerMask()
         // Для первой (верхней) ячейки скругляем верхние углы
         if indexPath.row == 0 {

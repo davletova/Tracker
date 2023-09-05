@@ -53,15 +53,35 @@ final class ScheduleViewController: UIViewController {
         return daysTable
     }()
     
-    private var scheduleDays = Weekday.allCases.map { weekday in
-        DailySchedule(dayOfWeek: weekday, isScheduled: false)
+    private var scheduleDays: [DailySchedule]
+    
+    var saveScheduleClosure: (_ schedule: Schedule) -> Void
+    
+    var selectedSchedule: Schedule?
+    
+    init(saveShedule: @escaping (Schedule) -> Void) {
+        self.saveScheduleClosure = saveShedule
+        
+        scheduleDays = Weekday.allCases.map { weekday in
+            DailySchedule(dayOfWeek: weekday, isScheduled: false)
+        }
+        
+        super.init(nibName: nil, bundle: nil)
     }
     
-    weak var delegate: ScheduleViewControllerDelegateProtocol?
+    required init?(coder: NSCoder) {
+        fatalError("init(coder:) has not been implemented")
+    }
     
     override func viewDidLoad() {
         super.viewDidLoad()
         view.backgroundColor = UIColor.getAppColors(.whiteDay)
+        
+        if let selectedSchedule = selectedSchedule {
+            scheduleDays = Weekday.allCases.map { weekday in
+                DailySchedule(dayOfWeek: weekday, isScheduled: selectedSchedule.repetition.contains(weekday))
+            }
+        }
         
         setConstraint()
     }
@@ -86,12 +106,7 @@ final class ScheduleViewController: UIViewController {
     }
     
     @objc func saveSchedule() {
-        guard let delegate = delegate else {
-            print("save schedule: delegate is empty")
-            return
-        }
-        
-        delegate.saveSchedule(schedule: convertScheduleDaysToSchedule(scheduleDays: scheduleDays))
+        saveScheduleClosure(convertScheduleDaysToSchedule(scheduleDays: scheduleDays))
         
         dismiss(animated: true, completion: nil)
     }
@@ -115,20 +130,21 @@ extension ScheduleViewController: UITableViewDataSource {
     }
     
     func tableView(_ tableView: UITableView, cellForRowAt indexPath: IndexPath) -> UITableViewCell {
-        let weekdayIndex = (indexPath.row + 1) % 7
-        
         let dateFormatter = DateFormatter()
         dateFormatter.locale = Locale(identifier: "ru_RU")
         
         let switcher = UISwitch(frame: CGRect(x: 0, y: 0, width: 51, height: 31))
         switcher.onTintColor = UIColor.getAppColors(.blue)
         switcher.tintColor = UIColor.getAppColors(.backgroundDay)
-        switcher.setOn(scheduleDays[weekdayIndex].isScheduled, animated: true)
+        switcher.setOn(scheduleDays[indexPath.row].isScheduled, animated: true)
         switcher.tag = indexPath.row
         switcher.addTarget(self, action: #selector(weekDaySwitcherValueChanged), for: .valueChanged)
         
         let cell = tableView.dequeueReusableCell(withIdentifier: cellIdentifier, for: indexPath)
         
+        // смещаем индекс дня недели на 1, так как по умолчанию нулевой день недели - воскресенье
+        // а мы хотим отобразить неделю с понедельника
+        let weekdayIndex = (indexPath.row + 1) % 7
         cell.textLabel?.text = dateFormatter.standaloneWeekdaySymbols?[weekdayIndex].localizedCapitalized
         cell.backgroundColor = UIColor.getAppColors(.backgroundDay)
         cell.accessoryView = switcher

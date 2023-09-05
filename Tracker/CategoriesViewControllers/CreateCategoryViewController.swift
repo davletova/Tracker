@@ -120,7 +120,7 @@ final class CreateCategoryViewController: UIViewController {
     @objc func onCreateCategory() {
         if let nameInputText = nameInput.text,
            !nameInputText.isEmpty {
-            createCategory(TrackerCategory(name: nameInputText))
+            createCategory(TrackerCategory(id: UUID(), name: nameInputText))
         } else {
             print("create category: name is empty")
         }

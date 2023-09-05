@@ -9,6 +9,8 @@ import Foundation
 import UIKit
 
 class PageViewController: UIViewController {
+    private let backgroundView: UIImageView
+    
     private let titleLabel: UILabel = {
         let title = UILabel()
         title.translatesAutoresizingMaskIntoConstraints = false
@@ -33,11 +35,9 @@ class PageViewController: UIViewController {
         return button
     }()
     
-    private let backgroundImage: UIImage
-    
     init(title: String, backgroundImage: UIImage) {
         titleLabel.text = title
-        self.backgroundImage = backgroundImage
+        backgroundView = UIImageView(image: backgroundImage)
         
         super.init(nibName: nil, bundle: nil)
     }
@@ -49,29 +49,40 @@ class PageViewController: UIViewController {
     override func viewDidLoad() {
         super.viewDidLoad()
         
-        view.backgroundColor = UIColor(patternImage: backgroundImage)
-        
+        setupBackgroundView()
         setupTitle()
         setupButton()
     }
     
-    func setupTitle() {
-        view.addSubview(titleLabel)
+    func setupBackgroundView() {
+        backgroundView.translatesAutoresizingMaskIntoConstraints = false
+        view.addSubview(backgroundView)
         
         NSLayoutConstraint.activate([
-            titleLabel.leadingAnchor.constraint(equalTo: view.leadingAnchor, constant: 16),
-            titleLabel.trailingAnchor.constraint(equalTo: view.trailingAnchor, constant: -16),
-            titleLabel.bottomAnchor.constraint(equalTo: view.topAnchor, constant: 2 * view.frame.height / 3),
+            backgroundView.topAnchor.constraint(equalTo: view.topAnchor),
+            backgroundView.bottomAnchor.constraint(equalTo: view.bottomAnchor),
+            backgroundView.leadingAnchor.constraint(equalTo: view.leadingAnchor),
+            backgroundView.trailingAnchor.constraint(equalTo: view.trailingAnchor),
+        ])
+    }
+    
+    func setupTitle() {
+        backgroundView.addSubview(titleLabel)
+        
+        NSLayoutConstraint.activate([
+            titleLabel.leadingAnchor.constraint(equalTo: backgroundView.leadingAnchor, constant: 16),
+            titleLabel.trailingAnchor.constraint(equalTo: backgroundView.trailingAnchor, constant: -16),
+            titleLabel.bottomAnchor.constraint(equalTo: backgroundView.topAnchor, constant: 2 * view.frame.height / 3),
         ])
     }
     
     func setupButton() {
-        view.addSubview(button)
+        backgroundView.addSubview(button)
         
         NSLayoutConstraint.activate([
-            button.leadingAnchor.constraint(equalTo: view.leadingAnchor, constant: 20),
-            button.trailingAnchor.constraint(equalTo: view.trailingAnchor, constant: -20),
-            button.bottomAnchor.constraint(equalTo: view.safeAreaLayoutGuide.bottomAnchor, constant: -34),
+            button.leadingAnchor.constraint(equalTo: backgroundView.leadingAnchor, constant: 20),
+            button.trailingAnchor.constraint(equalTo: backgroundView.trailingAnchor, constant: -20),
+            button.bottomAnchor.constraint(equalTo: backgroundView.safeAreaLayoutGuide.bottomAnchor, constant: -34),
             button.heightAnchor.constraint(equalToConstant: buttonHeight),
         ])
     }

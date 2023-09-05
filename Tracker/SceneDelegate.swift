@@ -17,6 +17,9 @@ class SceneDelegate: UIResponder, UIWindowSceneDelegate {
         guard let scene = (scene as? UIWindowScene) else { return }
         
         window = UIWindow(windowScene: scene)
+      
+        let onboarding = OnboardingViewController(transitionStyle: .scroll, navigationOrientation: .horizontal)
+        window?.rootViewController = onboarding
         
         if !defaults.bool(forKey: isOnbordingShown) {
             let onboarding = OnboardingViewController(transitionStyle: .scroll, navigationOrientation: .horizontal)

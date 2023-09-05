@@ -28,11 +28,20 @@ final class ListCategoriesViewControllerCell: UITableViewCell {
         return uiView
     }()
     
+    private let selectesRow: UIImageView = {
+        let image = UIImageView(image: UIImage(named: "row.done"))
+        image.translatesAutoresizingMaskIntoConstraints = false
+        image.isHidden = true
+        
+        return image
+    }()
+    
     func configure(title: String) {
         titleLabel.text = title
         contentView.backgroundColor = UIColor.getAppColors(.backgroundDay)
         contentView.addSubview(titleLabel)
         contentView.addSubview(lineView)
+        contentView.addSubview(selectesRow)
         
         NSLayoutConstraint.activate([
             titleLabel.leadingAnchor.constraint(equalTo: contentView.leadingAnchor, constant: 10),
@@ -41,8 +50,11 @@ final class ListCategoriesViewControllerCell: UITableViewCell {
             lineView.leadingAnchor.constraint(equalTo: contentView.leadingAnchor, constant: 16),
             lineView.trailingAnchor.constraint(equalTo: contentView.trailingAnchor, constant: -16),
             lineView.heightAnchor.constraint(equalToConstant: 0.5),
+            selectesRow.centerYAnchor.constraint(equalTo: contentView.centerYAnchor),
+            selectesRow.trailingAnchor.constraint(equalTo: contentView.trailingAnchor, constant: -15),
+            selectesRow.widthAnchor.constraint(equalToConstant: 24),
+            selectesRow.heightAnchor.constraint(equalToConstant: 24),
         ])
-
     }
     
    func configureCornersRadius(masks: CACornerMask) {
@@ -54,6 +66,10 @@ final class ListCategoriesViewControllerCell: UITableViewCell {
         lineView.isHidden = false
     }
         
+    func selectRow() {
+        selectesRow.isHidden = false
+    }
+    
     override func prepareForReuse() {
         super.prepareForReuse()
         lineView.isHidden = true
