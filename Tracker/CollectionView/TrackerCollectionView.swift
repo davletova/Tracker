@@ -277,7 +277,6 @@ extension TrackerCollectionView: UISearchTextFieldDelegate {
 
 extension TrackerCollectionView: TrackEventProtocol {
     func trackEvent(indexPath: IndexPath) {
-        visibleCategories = trackerStore.getTrackers(by: datePicker.date, withName: nil)
         guard
             let category = visibleCategories.safetyAccessElement(at: indexPath.section),
             let cellTracker = category.trackers.safetyAccessElement(at: indexPath.row)

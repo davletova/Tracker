@@ -171,7 +171,6 @@
 				4D6923F72A9E437400B9261F /* NameCollectionViewCell.swift */,
 				4D6923F92A9E484000B9261F /* PropertiesCollectionViewCell.swift */,
 				4D6923FB2A9E4A1A00B9261F /* ButtonCollectionsViewCell.swift */,
-				4D8460902AA39A600041BED7 /* Observable.swift */,
 			);
 			path = CreateEventViewControllers;
 			sourceTree = "<group>";
@@ -234,6 +233,7 @@
 				4DA5C9732A82A9CB0046C149 /* CreateCategoryViewController.swift */,
 				4D8460922AA39C460041BED7 /* ListCategoriesViewModel.swift */,
 				4D84609B2AA4DEC70041BED7 /* ListCategoriesViewControllerCell.swift */,
+				4D8460902AA39A600041BED7 /* Observable.swift */,
 			);
 			path = CategoriesViewControllers;
 			sourceTree = "<group>";

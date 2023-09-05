@@ -57,7 +57,7 @@ final class TrackerStore: NSObject, TrackerStoreProtocol {
         try fetchedResultsController.performFetch()
     }
     
-    func getTrackers(by date: Date, withName name: String? = nil) -> [TrackersByCategory] {
+    func getTrackers(by date: Date, withName name: String?) -> [TrackersByCategory] {
         let request = TrackerCoreData.fetchRequest()
         request.returnsObjectsAsFaults = false
         request.sortDescriptors = [NSSortDescriptor(key: "createDate", ascending: true)]
@@ -85,9 +85,17 @@ final class TrackerStore: NSObject, TrackerStoreProtocol {
             print("trackerStore: getTrackers request failed")
             return [TrackersByCategory]()
         }
+        
         let trackersByCategoryDictionary = Dictionary(grouping: trackers) { (tracker) -> String in
+            guard
+                let category = tracker.category,
+                let categoryName = category.name
+            else {
+                assertionFailure("failed to get category name of tarcker \(tracker.id)")
+                return ""
+            }
             
-            return tracker.category!.name!
+            return categoryName
         }
         
        return trackersByCategoryDictionary.map { (categoryName: String, trackersManaged: [TrackerCoreData]) in
