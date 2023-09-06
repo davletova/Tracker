@@ -103,22 +103,26 @@ final class TrackerCollectionViewCell: UICollectionViewCell {
         NSLayoutConstraint.activate([
             eventNameView.topAnchor.constraint(equalTo: contentView.topAnchor),
             eventNameView.leadingAnchor.constraint(equalTo: contentView.leadingAnchor),
-            eventNameView.widthAnchor.constraint(equalToConstant: frame.width),
+            eventNameView.trailingAnchor.constraint(equalTo: contentView.trailingAnchor),
             eventNameView.heightAnchor.constraint(equalToConstant: 90),
-            nameLabel.widthAnchor.constraint(equalTo: eventNameView.widthAnchor),
+            
+            nameLabel.bottomAnchor.constraint(equalTo: eventNameView.bottomAnchor, constant: -10),
+            nameLabel.leadingAnchor.constraint(equalTo: contentView.leadingAnchor, constant: 12),
+            nameLabel.trailingAnchor.constraint(equalTo: contentView.trailingAnchor, constant: -12),
+            
             emogiLabel.leadingAnchor.constraint(equalTo: contentView.leadingAnchor, constant: 10),
             emogiLabel.topAnchor.constraint(equalTo: eventNameView.topAnchor, constant: 10),
             emogiLabel.widthAnchor.constraint(equalToConstant: 30),
             emogiLabel.heightAnchor.constraint(equalToConstant: 30),
-            nameLabel.bottomAnchor.constraint(equalTo: eventNameView.bottomAnchor, constant: -10),
-            nameLabel.leadingAnchor.constraint(equalTo: contentView.leadingAnchor, constant: 12),
             
             trackView.topAnchor.constraint(equalTo: eventNameView.bottomAnchor),
             trackView.leadingAnchor.constraint(equalTo: contentView.leadingAnchor),
             trackView.widthAnchor.constraint(equalToConstant: frame.width),
             trackView.heightAnchor.constraint(equalToConstant: 58),
+            
             trackedDaysLabel.centerYAnchor.constraint(equalTo: trackView.centerYAnchor),
             trackedDaysLabel.leadingAnchor.constraint(equalTo: contentView.leadingAnchor, constant: 10),
+            
             trackButton.centerYAnchor.constraint(equalTo: trackView.centerYAnchor),
             trackButton.trailingAnchor.constraint(equalTo: contentView.trailingAnchor, constant: -10),
             trackButton.widthAnchor.constraint(equalToConstant: 40),
