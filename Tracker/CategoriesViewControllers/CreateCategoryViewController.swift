@@ -63,14 +63,6 @@ final class CreateCategoryViewController: UIViewController {
        
     }()
     
-    init() {
-        super.init(nibName: nil, bundle: nil)
-    }
-    
-    required init?(coder: NSCoder) {
-        fatalError("init(coder:) has not been implemented")
-    }
-    
     override func viewDidLoad() {
         super.viewDidLoad()
 
@@ -128,7 +120,6 @@ final class CreateCategoryViewController: UIViewController {
             assertionFailure("create category: delegate is empty")
             return
         }
-        
         if let nameInputText = nameInput.text,
            !nameInputText.isEmpty
         {
@@ -136,7 +127,6 @@ final class CreateCategoryViewController: UIViewController {
         } else {
             print("create category: name is empty")
         }
-        
         dismiss(animated: true, completion: nil)
     }
     
