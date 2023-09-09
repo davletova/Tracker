@@ -156,11 +156,20 @@ final class TrackerCollectionView: UIViewController {
         view.backgroundColor = UIColor.getAppColors(.whiteDay)
         
         createNavigationBar()
+        
+        let tapGesture = UITapGestureRecognizer(target: self,
+                                                action: #selector(hideKeyboard))
+        tapGesture.cancelsTouchesInView = false
+        self.view.addGestureRecognizer(tapGesture)
     }
     
     @objc func updateVisibleCategories() {
         self.visibleCategories = trackerStore.getTrackers(by: datePicker.date, withName: nil)
         self.collectionView.reloadData()
+    }
+    
+    @objc private func hideKeyboard() {
+        self.view.endEditing(true)
     }
     
     func showEmptyCollection() {

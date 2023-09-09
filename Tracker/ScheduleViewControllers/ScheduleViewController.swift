@@ -8,7 +8,13 @@
 import Foundation
 import UIKit
 
+protocol ScheduleViewControllerDelegate: AnyObject {
+    func selectSchedule(_ schedule: Schedule) -> Void
+}
+
 final class ScheduleViewController: UIViewController {
+    weak var delegate: ScheduleViewControllerDelegate?
+    
     private lazy var titleLabel: UILabel = {
         let titleLabel = UILabel()
         titleLabel.translatesAutoresizingMaskIntoConstraints = false
@@ -29,7 +35,7 @@ final class ScheduleViewController: UIViewController {
         doneButton.layer.cornerRadius = 16
         doneButton.backgroundColor = UIColor.getAppColors(.blackDay)
         doneButton.setTitle("Готово", for: .normal)
-        doneButton.addTarget(self, action: #selector(saveSchedule), for: .touchUpInside)
+        doneButton.addTarget(self, action: #selector(selectSchedule), for: .touchUpInside)
         
         view.addSubview(doneButton)
         
@@ -54,14 +60,10 @@ final class ScheduleViewController: UIViewController {
     }()
     
     private var scheduleDays: [DailySchedule]
-    
-    var saveScheduleClosure: (_ schedule: Schedule) -> Void
-    
+        
     var selectedSchedule: Schedule?
     
-    init(saveShedule: @escaping (Schedule) -> Void) {
-        self.saveScheduleClosure = saveShedule
-        
+    init() {
         scheduleDays = Weekday.allCases.map { weekday in
             DailySchedule(dayOfWeek: weekday, isScheduled: false)
         }
@@ -105,8 +107,12 @@ final class ScheduleViewController: UIViewController {
         ])
     }
     
-    @objc func saveSchedule() {
-        saveScheduleClosure(convertScheduleDaysToSchedule(scheduleDays: scheduleDays))
+    @objc func selectSchedule() {
+        guard let delegate = delegate else {
+            assertionFailure("select schedule: delegate is empty")
+            return
+        }
+        delegate.selectSchedule(convertScheduleDaysToSchedule(scheduleDays: scheduleDays))
         
         dismiss(animated: true, completion: nil)
     }

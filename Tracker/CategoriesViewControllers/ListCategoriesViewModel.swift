@@ -18,8 +18,6 @@ final class ListCategoriesViewModel {
     
     private let store: TrackerCategoryStoreProtocol
     
-    var hideEmptyView: (() -> Void)?
-    
     init() {
         store = TrackerCategoryStore()
         
@@ -35,11 +33,6 @@ final class ListCategoriesViewModel {
     
     @objc func updateListOfCategories() {
         listOfCategories = getTrackerCategories()
-        
-        if  listOfCategories.count > 0,
-            let hideEmptyView = hideEmptyView {
-            hideEmptyView()
-        }
     }
     
     func addTrackerCategory(category: TrackerCategory) {

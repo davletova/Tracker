@@ -7,7 +7,7 @@
 
 import Foundation
 
-protocol ChangeButtonStateProtocol {
+protocol ChangeButtonStateProtocol: AnyObject {
     func enableButton()
     func disableButton()
 }

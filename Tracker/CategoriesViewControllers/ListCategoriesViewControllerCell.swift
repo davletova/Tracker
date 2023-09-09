@@ -73,5 +73,6 @@ final class ListCategoriesViewControllerCell: UITableViewCell {
     override func prepareForReuse() {
         super.prepareForReuse()
         lineView.isHidden = true
+        selectesRow.isHidden = true
     }
 }

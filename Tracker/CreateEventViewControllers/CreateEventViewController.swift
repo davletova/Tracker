@@ -82,7 +82,7 @@ final class CreateEventViewController: UIViewController {
         return collectionView
     }()
     
-    var delegate: ChangeButtonStateProtocol?
+    weak var delegate: ChangeButtonStateProtocol?
     
     var isHabit: Bool = false
     
@@ -94,7 +94,9 @@ final class CreateEventViewController: UIViewController {
                 return
             }
             trackerProperties[.schedule]!.selectedValue = selectedSchedule?.getRepetitionString()
-            collectionView.reloadItems(at: [IndexPath(row: PropertyType.schedule.rawValue, section: CollectionSectionType.properties.rawValue)])
+            UIView.performWithoutAnimation {
+                collectionView.reloadItems(at: [IndexPath(row: PropertyType.schedule.rawValue, section: CollectionSectionType.properties.rawValue)])
+            }
             changeStateCreateButtonifNeedIt()
         }
     }
@@ -106,7 +108,9 @@ final class CreateEventViewController: UIViewController {
                 return
             }
             trackerProperties[.category]!.selectedValue = selectedCategory?.name
-            collectionView.reloadItems(at: [IndexPath(row: PropertyType.category.rawValue, section: CollectionSectionType.properties.rawValue)])
+            UIView.performWithoutAnimation {
+                collectionView.reloadItems(at: [IndexPath(row: PropertyType.category.rawValue, section: CollectionSectionType.properties.rawValue)])
+            }
             changeStateCreateButtonifNeedIt()
         }
     }
@@ -119,13 +123,46 @@ final class CreateEventViewController: UIViewController {
         super.viewDidLoad()
         view.backgroundColor = UIColor.getAppColors(.whiteDay)
         
-        trackerProperties[.category] = TrackerProperty(name: "Категория", callback: openCategories)
+        trackerProperties[.category] = TrackerProperty(
+            name: "Категория",
+            callback: { [weak self] in
+                guard let self = self else {
+                    assertionFailure("open list of category callback: self is empty")
+                    return
+                }
+                
+                let categoriesViewModel = ListCategoriesViewModel()
+                let categoriesViewController = ListCategoriesViewController(categoriesViewModel)
+                categoriesViewController.delegate = self
+                categoriesViewController.selectedCategory = self.selectedCategory
+                categoriesViewController.modalPresentationStyle = .popover
+                self.present(categoriesViewController, animated: true)
+            }
+        )
         if isHabit {
-            trackerProperties[.schedule] = TrackerProperty(name: "Расписание", callback: openSchedule)
+            trackerProperties[.schedule] = TrackerProperty(
+                name: "Расписание",
+                callback: { [weak self] in
+                    guard let self = self else {
+                        assertionFailure("open schedule callback: self is empty")
+                        return
+                    }
+                    
+                    let scheduleViewController = ScheduleViewController()
+                    scheduleViewController.delegate = self
+                    scheduleViewController.selectedSchedule = self.selectedSchedule
+                    scheduleViewController.modalPresentationStyle = .popover
+                    self.present(scheduleViewController, animated: true)
+                }
+            )
         }
         
         setupTitle()
         setupCollectionView()
+        
+        let tapGesture = UITapGestureRecognizer(target: self, action: #selector(hideKeyboard))
+        tapGesture.cancelsTouchesInView = false
+        self.view.addGestureRecognizer(tapGesture)
     }
     
     private func setupTitle() {
@@ -153,24 +190,6 @@ final class CreateEventViewController: UIViewController {
         ])
     }
     
-    private func openCategories() {
-        let categoriesViewController = ListCategoriesViewController{ category in
-            self.selectedCategory = category
-        }
-        categoriesViewController.selectedCategory = self.selectedCategory
-        categoriesViewController.modalPresentationStyle = .popover
-        self.present(categoriesViewController, animated: true)
-    }
-    
-    private func openSchedule() {
-        let scheduleViewController = ScheduleViewController{ schedule in
-            self.selectedSchedule = schedule
-        }
-        scheduleViewController.selectedSchedule = self.selectedSchedule
-        scheduleViewController.modalPresentationStyle = .popover
-        self.present(scheduleViewController, animated: true)
-    }
-    
     func changeStateCreateButtonifNeedIt() {
         guard let delegate = delegate else {
             print("changeStateCreateButtonifNeedIt: delegate is empty")
@@ -191,6 +210,22 @@ final class CreateEventViewController: UIViewController {
         }
         
         delegate.disableButton()
+    }
+    
+    @objc private func hideKeyboard() {
+        self.view.endEditing(true)
+    }
+}
+
+extension CreateEventViewController: ListCategoriesViewControllerDelegate {
+    func selectCategory(_ category: TrackerCategory) {
+        self.selectedCategory = category
+    }
+}
+
+extension CreateEventViewController: ScheduleViewControllerDelegate {
+    func selectSchedule(_ schedule: Schedule) {
+        self.selectedSchedule = schedule
     }
 }
 
@@ -301,7 +336,14 @@ extension CreateEventViewController: UICollectionViewDataSource {
         switch sectionType {
         case .name:
             let cell = collectionView.dequeueReusableCell(withReuseIdentifier: nameCellIdentifier, for: indexPath) as! NameCollectionViewCell
-            cell.setTrackerNameClosure = setTrackerName
+            cell.setTrackerNameClosure = { [weak self] name in
+                guard let self = self else {
+                    assertionFailure("set setTrackerNameClosure: self is empty")
+                    return
+                }
+                
+                self.setTrackerName(name: name)
+            }
             return cell
         case .properties:
             guard

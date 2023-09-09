@@ -8,8 +8,13 @@
 import Foundation
 import UIKit
 
+protocol ListCategoriesViewControllerDelegate: AnyObject {
+    func selectCategory(_ category: TrackerCategory) -> Void
+}
+
 final class ListCategoriesViewController: UIViewController {
     private let viewModel: ListCategoriesViewModel
+    weak var delegate: ListCategoriesViewControllerDelegate?
     
     private let cellIdentifier = "cell"
     
@@ -73,15 +78,10 @@ final class ListCategoriesViewController: UIViewController {
         return view
     }()
     
-    var selectCategory: (TrackerCategory) -> Void
-    
     var selectedCategory: TrackerCategory?
     
-    init(selectCategory: @escaping (TrackerCategory) -> Void) {
-        self.selectCategory = selectCategory
-        
-        viewModel = ListCategoriesViewModel()
-        
+    init(_ viewModel: ListCategoriesViewModel) {
+        self.viewModel = viewModel
         super.init(nibName: nil, bundle: nil)
     }
     
@@ -97,7 +97,6 @@ final class ListCategoriesViewController: UIViewController {
         setupTable()
         setupButton()
         
-        viewModel.hideEmptyView = hideEmptyView
         if viewModel.listOfCategories.count == 0 {
             showEmptyView()
         }
@@ -109,16 +108,21 @@ final class ListCategoriesViewController: UIViewController {
         
         viewModel.$selectedCategory.bind { [weak self] category in
             guard let self = self else {
-                print("self is empty")
+                assertionFailure("self is empty")
                 return
             }
 
             guard let category = category else {
-                print("selected category is empty")
+                assertionFailure("selected category is empty")
                 return
             }
             
-            self.selectCategory(category)
+            guard let delegate = delegate else {
+                assertionFailure("select category: delegate is empty")
+                return
+            }
+            
+            delegate.selectCategory(category)
         }
     }
 
@@ -152,7 +156,7 @@ final class ListCategoriesViewController: UIViewController {
     private func setupButton() {
         view.addSubview(createButton)
       
-        createButton.addTarget(self, action: #selector(createCategory), for: .touchUpInside)
+        createButton.addTarget(self, action: #selector(didTapCreationButton), for: .touchUpInside)
         
         NSLayoutConstraint.activate([
             createButton.heightAnchor.constraint(equalToConstant: buttonHeight),
@@ -163,11 +167,9 @@ final class ListCategoriesViewController: UIViewController {
         ])
     }
     
-    @objc func createCategory() {
-        let createCategoryVC = CreateCategoryViewController { newCategory in
-            self.viewModel.addTrackerCategory(category: newCategory)
-        }
-        
+    @objc func didTapCreationButton() {
+        let createCategoryVC = CreateCategoryViewController()
+        createCategoryVC.delegate = self
         createCategoryVC.modalPresentationStyle = .popover
         self.present(createCategoryVC, animated: true)
     }
@@ -180,9 +182,11 @@ final class ListCategoriesViewController: UIViewController {
             emptyCollectionView.centerYAnchor.constraint(equalTo: table.centerYAnchor)
         ])
     }
-    
-    private func hideEmptyView() {
-        emptyCollectionView.removeFromSuperview()
+}
+
+extension ListCategoriesViewController: CreateCategoryViewControllerDelegate {
+    func createCategory(_ category: TrackerCategory) {
+        viewModel.addTrackerCategory(category: category)
     }
 }
 
@@ -201,7 +205,6 @@ extension ListCategoriesViewController: UITableViewDataSource {
         
         cell.configure(title: category.name)
 
-        
         if let selectedCategory = selectedCategory,
            category.id == selectedCategory.id
         {
