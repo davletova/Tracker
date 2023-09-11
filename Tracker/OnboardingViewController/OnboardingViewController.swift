@@ -17,14 +17,14 @@ final class OnboardingViewController: UIPageViewController {
             assertionFailure("Onboarding: failed t get background image")
             return [UIViewController]()
         }
-        let title1 = "Отслеживайте только то, что хотите"
+        let title1 = NSLocalizedString("onboarding.page1", comment: "текст на первой онбординг странице")
         let bluePage = PageViewController(title: title1, backgroundImage: backgroundImage1)
         
         guard let backgroundImage2 = UIImage(named: "background2") else {
             assertionFailure("Onboarding: failed t get background image")
             return [UIViewController]()
         }
-        let title2 = "Даже если это\nне литры воды и йога"
+        let title2 =  NSLocalizedString("onboarding.page2", comment: "текст на второй онбординг странице")
         let redPage = PageViewController(title: title2, backgroundImage: backgroundImage2)
         
         return [bluePage, redPage]

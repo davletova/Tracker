@@ -137,7 +137,10 @@ final class TrackerCollectionViewCell: UICollectionViewCell {
         
         nameLabel.lineBreakMode = .byWordWrapping
         nameLabel.numberOfLines = 0
-        trackedDaysLabel.text = formatTrackedDays(days: cellTracker.trackedDaysCount)
+        trackedDaysLabel.text = String.localizedStringWithFormat(
+            NSLocalizedString("trackedDays", comment: "Число затреканных дней"),
+            cellTracker.trackedDaysCount
+        )
         eventNameView.backgroundColor = cellTracker.tracker.color
         emogiLabel.backgroundColor = .white.withAlphaComponent(0.3)
         trackButton.backgroundColor = cellTracker.tracker.color

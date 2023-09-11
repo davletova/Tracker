@@ -21,7 +21,7 @@ final class ListCategoriesViewController: UIViewController {
     private let titleLabel: UILabel = {
         let title = UILabel()
         title.translatesAutoresizingMaskIntoConstraints = false
-        title.text = "Категория"
+        title.text = NSLocalizedString("category", comment: "заголовок страницы со списком категорий")
         title.textAlignment = .center
         
         title.font = UIFont.systemFont(ofSize: 16, weight: .medium)
@@ -44,7 +44,10 @@ final class ListCategoriesViewController: UIViewController {
         button.backgroundColor = UIColor.getAppColors(.blackDay)
         button.translatesAutoresizingMaskIntoConstraints = false
         button.layer.cornerRadius = 16
-        button.setTitle("Добавить категорию", for: .normal)
+        button.setTitle(
+            NSLocalizedString("add.category", comment: "текст кнопки с созданием категории"),
+            for: .normal
+        )
         button.titleLabel?.font = UIFont.systemFont(ofSize: 16, weight: .medium)
         button.titleLabel?.textColor = UIColor.getAppColors(.whiteDay)
         button.titleLabel?.textAlignment = .center
@@ -56,7 +59,7 @@ final class ListCategoriesViewController: UIViewController {
         let view = UIView()
         let imageView = UIImageView(image: UIImage(named: "star"))
         let label = UILabel()
-        label.text = "Привычки и события\nможно объединить по смыслу"
+        label.text = NSLocalizedString("empty.list.of.categories", comment: "текст для пустого списка категорий") 
         label.numberOfLines = 2
         label.textAlignment = .center
         label.font = UIFont.systemFont(ofSize: 12, weight: .medium)

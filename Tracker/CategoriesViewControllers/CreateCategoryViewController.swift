@@ -18,7 +18,7 @@ final class CreateCategoryViewController: UIViewController {
     private lazy var titleLabel: UILabel = {
         let title = UILabel()
         title.translatesAutoresizingMaskIntoConstraints = false
-        title.text = "Новая категория"
+        title.text = NSLocalizedString("new.category", comment: "заголовок страницы с созданием категории")
         title.textAlignment = .center
         
         title.font = UIFont.systemFont(ofSize: 16, weight: .medium)
@@ -52,7 +52,10 @@ final class CreateCategoryViewController: UIViewController {
         button.backgroundColor = UIColor.getAppColors(.blackDay)
         button.translatesAutoresizingMaskIntoConstraints = false
         button.layer.cornerRadius = 16
-        button.setTitle("Добавить категорию", for: .normal)
+        button.setTitle(
+            NSLocalizedString("add.category", comment: "текст кнопки с созданием категории"),
+            for: .normal
+        )
         button.titleLabel?.font = UIFont.systemFont(ofSize: 16, weight: .medium)
         button.titleLabel?.textColor = UIColor.getAppColors(.whiteDay)
         button.titleLabel?.textAlignment = .center

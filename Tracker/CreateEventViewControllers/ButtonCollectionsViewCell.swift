@@ -14,7 +14,10 @@ final class ButtonCollectionViewCell: UICollectionViewCell {
         cancelButton.translatesAutoresizingMaskIntoConstraints = false
         cancelButton.backgroundColor = UIColor.getAppColors(.whiteDay)
         cancelButton.layer.cornerRadius = 16
-        cancelButton.setTitle("Отменить", for: .normal)
+        cancelButton.setTitle(
+            NSLocalizedString("cancel", comment: "текст кнопки с отменой действия"),
+            for: .normal
+        )
         cancelButton.titleLabel?.font = UIFont.systemFont(ofSize: 16, weight: .medium)
         cancelButton.setTitleColor(UIColor.getAppColors(.red), for: .normal)
         cancelButton.layer.borderColor = UIColor.getAppColors(.red).cgColor
@@ -30,7 +33,10 @@ final class ButtonCollectionViewCell: UICollectionViewCell {
         createEventButton.backgroundColor = UIColor.getAppColors(.blackDay)
         createEventButton.translatesAutoresizingMaskIntoConstraints = false
         createEventButton.layer.cornerRadius = 16
-        createEventButton.setTitle("Создать", for: .normal)
+        createEventButton.setTitle(
+            NSLocalizedString("to.create", comment: "текст кнопки Создать"),
+            for: .normal
+        )
         createEventButton.titleLabel?.font = UIFont.systemFont(ofSize: 16, weight: .medium)
         createEventButton.setTitleColor(UIColor.getAppColors(.whiteDay), for: .normal)
         createEventButton.titleLabel?.textAlignment = .center

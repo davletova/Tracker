@@ -82,7 +82,7 @@ final class TrackerCollectionView: UIViewController {
         let view = UIView()
         let imageView = UIImageView(image: UIImage(named: "star"))
         let label = UILabel()
-        label.text = "Что будем отслеживать?"
+        label.text = NSLocalizedString("empty.list.of.trackers", comment: "текст на месте пустого списока трекеров")
         label.textAlignment = .center
         label.font = UIFont.systemFont(ofSize: 12, weight: .medium)
         
@@ -107,7 +107,7 @@ final class TrackerCollectionView: UIViewController {
         let view = UIView()
         let imageView = UIImageView(image: UIImage(named: "error"))
         let label = UILabel()
-        label.text = "Ничего не найдено"
+        label.text = NSLocalizedString("no.trackers.found", comment: "Empty list of filtered trackers") 
         label.textAlignment = .center
         label.font = UIFont.systemFont(ofSize: 12, weight: .medium)
         
@@ -219,7 +219,7 @@ final class TrackerCollectionView: UIViewController {
                 NSAttributedString.Key.font: UIFont.systemFont(ofSize: 34, weight: UIFont.Weight.bold),
                 NSAttributedString.Key.paragraphStyle: paragraphStyle
             ] as [NSAttributedString.Key : Any]
-            navigationItem.title = "Трекеры"
+            navigationItem.title =  NSLocalizedString("trackers", comment: "заголовок списка трекеров") 
             
             navigationBar.prefersLargeTitles = true
         }

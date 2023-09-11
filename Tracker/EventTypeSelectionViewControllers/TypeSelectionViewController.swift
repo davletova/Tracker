@@ -13,7 +13,7 @@ final class TypeSelectionViewController: UIViewController {
     private lazy var titleLabel: UILabel = {
         let titleLabel = UILabel()
         titleLabel.translatesAutoresizingMaskIntoConstraints = false
-        titleLabel.text = "Создание трекера"
+        titleLabel.text = NSLocalizedString("tracker.creation.title", comment: "заголовок страницы с выбором типа создаваемого трекера")
         titleLabel.textAlignment = .center
         titleLabel.font = UIFont.systemFont(ofSize: 16, weight: .medium)
         titleLabel.textColor = UIColor.getAppColors(.blackDay)
@@ -28,7 +28,10 @@ final class TypeSelectionViewController: UIViewController {
         habitButton.backgroundColor = UIColor.getAppColors(.blackDay)
         habitButton.translatesAutoresizingMaskIntoConstraints = false
         habitButton.layer.cornerRadius = 16
-        habitButton.setTitle("Привычка", for: .normal)
+        habitButton.setTitle(
+            NSLocalizedString("habit", comment: "кнопка с выбором привычки"),
+            for: .normal
+        )
         habitButton.titleLabel?.font = UIFont.systemFont(ofSize: 16)
         habitButton.titleLabel?.textColor = UIColor.getAppColors(.whiteDay)
         habitButton.titleLabel?.textAlignment = .center
@@ -41,7 +44,10 @@ final class TypeSelectionViewController: UIViewController {
         eventButton.backgroundColor = UIColor.getAppColors(.blackDay)
         eventButton.translatesAutoresizingMaskIntoConstraints = false
         eventButton.layer.cornerRadius = 16
-        eventButton.setTitle("Нерегулярное событие", for: .normal)
+        eventButton.setTitle(
+            NSLocalizedString("irregular.event", comment: "кнопка с выбором нерегулярного события"),
+            for: .normal
+        )
         eventButton.titleLabel?.font = UIFont.systemFont(ofSize: 16)
         eventButton.titleLabel?.textColor = UIColor.getAppColors(.whiteDay)
         eventButton.titleLabel?.textAlignment = .center

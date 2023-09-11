@@ -28,7 +28,8 @@ class PageViewController: UIViewController {
         button.titleLabel?.font = UIFont.systemFont(ofSize: 16, weight: .medium)
         button.layer.cornerRadius = 16
         button.backgroundColor = UIColor.getAppColors(.blackDay)
-        button.setTitle("Вот это технологии!", for: .normal)
+        let title = NSLocalizedString("onboarding.button", comment: "buttn title on he onboarding page")
+        button.setTitle(title, for: .normal)
         button.setTitleColor(UIColor.getAppColors(.whiteDay), for: .normal)
         
         return button
@@ -97,14 +98,14 @@ class PageViewController: UIViewController {
 
         let navigationController = UINavigationController(rootViewController: TrackerCollectionView())
         navigationController.tabBarItem = UITabBarItem(
-            title: "Трекеры",
+            title: NSLocalizedString("trackers", comment: "trackers page title"),
             image: UIImage(named: "record.circle.fill"),
             tag: 0
         )
 
         let statisticsViewController = StatisticsViewController()
         statisticsViewController.tabBarItem = UITabBarItem(
-            title: "Статистика",
+            title: NSLocalizedString("statistic", comment: "statistic page title"),
             image: UIImage(named: "hare.fill"),
             tag: 1
         )

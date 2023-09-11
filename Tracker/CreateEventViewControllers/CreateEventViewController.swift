@@ -124,7 +124,7 @@ final class CreateEventViewController: UIViewController {
         view.backgroundColor = UIColor.getAppColors(.whiteDay)
         
         trackerProperties[.category] = TrackerProperty(
-            name: "Категория",
+            name: NSLocalizedString("category", comment: "кнопка с выбором категории на странице создания трекера"),
             callback: { [weak self] in
                 guard let self = self else {
                     assertionFailure("open list of category callback: self is empty")
@@ -141,7 +141,7 @@ final class CreateEventViewController: UIViewController {
         )
         if isHabit {
             trackerProperties[.schedule] = TrackerProperty(
-                name: "Расписание",
+                name: NSLocalizedString("schedule", comment: "кнопка с выбором расписания на странице создания трекера"),
                 callback: { [weak self] in
                     guard let self = self else {
                         assertionFailure("open schedule callback: self is empty")
@@ -167,7 +167,8 @@ final class CreateEventViewController: UIViewController {
     
     private func setupTitle() {
         view.addSubview(titleLabel)
-        titleLabel.text = isHabit ? "Новая привычка" : "Новое нерегулярное событие"
+        let localizeTitlekey = isHabit ? "new.habit" : "new.event"
+        titleLabel.text = NSLocalizedString(localizeTitlekey, comment: "заголовок страницы с созданием трекера")
         
         NSLayoutConstraint.activate([
             titleLabel.heightAnchor.constraint(equalToConstant: 32),
@@ -422,9 +423,9 @@ extension CreateEventViewController: UICollectionViewDataSource {
         
         switch indexPath.section {
         case 2:
-            view.titleLabel.text = "Emoji"
+            view.titleLabel.text = NSLocalizedString("emoji", comment: "заголовок раздела с выбором emoji")
         case 3:
-            view.titleLabel.text = "Цвет"
+            view.titleLabel.text = NSLocalizedString("color", comment: "заголовок раздела с выбором цвета")
         default:
             return view
         }

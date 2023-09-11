@@ -1,0 +1,31 @@
+/* 
+  Localizable.strings
+  Tracker
+
+  Created by Алия Давлетова on 11.09.2023.
+  
+*/
+
+"onboarding.page1" = "Only track what you want";
+"onboarding.page2" = "Even if it's not liters of water and yoga";
+"onboarding.button" = "That's technology";
+"trackers" = "Trackers";
+"statistic" = "Statistic";
+"tracker.creation.title" = "Tracker creation";
+"habit" = "Habit";
+"irregular.event" = "Irregular event";
+"category" = "Category";
+"emoji" = "Emoji";
+"color" = "Color";
+"to.create" = "Create";
+"cancel" = "Cancel";
+"new.habit" = "New habit";
+"new.event" = "New event";
+"empty.list.of.trackers" = "What are we tracking?";
+"no.trackers.found" = "Nothing found";
+"categories" = "Categories";
+"schedule" = "Schedule";
+"empty.list.of.categories" = "Habits and events can be linked by meaning";
+"new.category" = "New category";
+"add.category" = "Add a category";
+"done" = "Done";

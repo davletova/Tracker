@@ -30,14 +30,14 @@ class SceneDelegate: UIResponder, UIWindowSceneDelegate {
 
             let navigationController = UINavigationController(rootViewController: TrackerCollectionView())
             navigationController.tabBarItem = UITabBarItem(
-                title: "Трекеры",
+                title: NSLocalizedString("trackers", comment: "кнопка перехода на список трекеров"),
                 image: UIImage(named: "record.circle.fill"),
                 tag: 0
             )
 
             let statisticsViewController = StatisticsViewController()
             statisticsViewController.tabBarItem = UITabBarItem(
-                title: "Статистика",
+                title: NSLocalizedString("statistic", comment: "кнопка перехода на статистику"),
                 image: UIImage(named: "hare.fill"),
                 tag: 1
             )

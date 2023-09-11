@@ -1,0 +1,30 @@
+/* 
+  Localizable.strings
+  Tracker
+
+  Created by Алия Давлетова on 11.09.2023.
+  
+*/
+
+"onboarding.page1" = "Отслеживайте только то, что хотите";
+"onboarding.page2" = "Даже если это не литры воды или йога";
+"onboarding.button" = "Вот это технологии";
+"trackers" = "Трекеры";
+"statistic" = "Статистика";
+"tracker.creation.title" = "Создание нового трекера";
+"habit" = "Привычка";
+"irregular.event" = "Нерегулярное событие";
+"category" = "Категория";
+"emoji" = "Emoji";
+"color" = "Цвет";
+"to.create" = "Создать";
+"cancel" = "Отмена";
+"new.habit" = "Новая привычка";
+"new.event" = "Новое нерегулярное событие";
+"empty.list.of.trackers" = "Что будем отслеживать?";
+"no.trackers.found" = "Ничего не найдено";
+"schedule" = "Расписание";
+"empty.list.of.categories" = "Привычки и события можно объединить по смыслу";
+"new.category" = "Новая категория";
+"add.category" = "Добавить категорию";
+"done" = "Готово";
