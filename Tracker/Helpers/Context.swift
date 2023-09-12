@@ -14,7 +14,7 @@ extension NSManagedObjectContext {
             do {
                 try self.save()
             } catch {
-                print("failed to save context")
+                print("failed to save context: \(error)")
                 self.rollback()
             }
         }

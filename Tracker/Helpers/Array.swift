@@ -8,11 +8,11 @@
 import Foundation
 
 extension Array {
-    func safetyAccessElement(at index: Int) -> Element? {
-        guard (0..<count).contains(index) else {
+    public subscript(at index: Int) -> Element? {
+        guard index >= 0, index < endIndex else {
             return nil
         }
-        
+
         return self[index]
     }
 }

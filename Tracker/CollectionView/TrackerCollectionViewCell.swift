@@ -8,24 +8,26 @@
 import Foundation
 import UIKit
 
-
 protocol TrackEventProtocol: AnyObject {
     func trackEvent(indexPath: IndexPath)
+    func pinTracker(indexPath: IndexPath, pinned: Bool)
+    func editTracker(indexPath: IndexPath)
+    func deleteTracker(indexPath: IndexPath)
 }
 
 final class TrackerCollectionViewCell: UICollectionViewCell {
     static let TrackerRecordSavedNotification = Notification.Name(rawValue: "CreateRecord")
     
     private let emogiLabel: UILabel = {
-        var emogiLabel = UILabel()
-        emogiLabel.frame = CGRect(x: 0, y: 0, width: 30, height: 30)
-        emogiLabel.translatesAutoresizingMaskIntoConstraints = false
-        emogiLabel.layer.masksToBounds = true
-        emogiLabel.layer.cornerRadius = emogiLabel.frame.height / 2
-        emogiLabel.textAlignment = .center
-        emogiLabel.font = UIFont.systemFont(ofSize: 16)
+        var emojiLabel = UILabel()
+        emojiLabel.frame = CGRect(x: 0, y: 0, width: 30, height: 30)
+        emojiLabel.translatesAutoresizingMaskIntoConstraints = false
+        emojiLabel.layer.masksToBounds = true
+        emojiLabel.layer.cornerRadius = emojiLabel.frame.height / 2
+        emojiLabel.textAlignment = .center
+        emojiLabel.font = UIFont.systemFont(ofSize: 16)
         
-        return emogiLabel
+        return emojiLabel
     }()
     
     private let nameLabel: UILabel = {
@@ -74,6 +76,7 @@ final class TrackerCollectionViewCell: UICollectionViewCell {
     }()
     
     var indexPath: IndexPath?
+    var pinned = false
     
     weak var delegate: TrackEventProtocol?
     
@@ -91,6 +94,9 @@ final class TrackerCollectionViewCell: UICollectionViewCell {
         trackView.addSubview(trackedDaysLabel)
         trackView.addSubview(trackButton)
         contentView.addSubview(trackView)
+        
+        let interaction = UIContextMenuInteraction(delegate: self)
+        eventNameView.addInteraction(interaction)
         
         setConstraint()
     }
@@ -131,6 +137,7 @@ final class TrackerCollectionViewCell: UICollectionViewCell {
     }
 
     func configureCell(cellTracker: TrackerViewModel) {
+        pinned = cellTracker.tracker.pinned
         emogiLabel.text = cellTracker.tracker.emoji
         
         nameLabel.text = cellTracker.tracker.name
@@ -187,5 +194,40 @@ final class TrackerCollectionViewCell: UICollectionViewCell {
         default:
             return "\(days) дней"
         }
+    }
+}
+
+extension TrackerCollectionViewCell: UIContextMenuInteractionDelegate {
+    func contextMenuInteraction(_ interaction: UIContextMenuInteraction,
+                                configurationForMenuAtLocation location: CGPoint) -> UIContextMenuConfiguration? {
+        return UIContextMenuConfiguration(identifier: nil,
+                                          previewProvider: nil,
+                                          actionProvider: { [weak self] suggestedActions in
+            guard let self = self else {
+                assertionFailure("this should be never happen!")
+                return UIMenu()
+            }
+            let pinAction =
+            UIAction(title: NSLocalizedString(self.pinned ? "Открепить" : "Закрепить", comment: ""),
+                         image: UIImage(systemName: "arrow.up.square")) { action in
+                
+                self.delegate?.pinTracker(indexPath: self.indexPath!, pinned: !self.pinned)
+                }
+                
+            let editAction =
+                UIAction(title: NSLocalizedString("Редактировать", comment: ""),
+                         image: UIImage(systemName: "plus.square.on.square")) { action in
+                    self.delegate?.editTracker(indexPath: self.indexPath!)
+                }
+                
+            let deleteAction =
+                UIAction(title: NSLocalizedString("Удалить", comment: ""),
+                         image: UIImage(systemName: "trash"),
+                         attributes: .destructive) { action in
+                    self.delegate?.deleteTracker(indexPath: self.indexPath!)
+                }
+                                            
+            return UIMenu(title: "", children: [pinAction, editAction, deleteAction])
+        })
     }
 }

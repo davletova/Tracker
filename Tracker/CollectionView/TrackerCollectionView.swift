@@ -140,7 +140,7 @@ final class TrackerCollectionView: UIViewController {
     
     override func viewDidLoad() {
         super.viewDidLoad()
-        
+                
         NotificationCenter.default.addObserver(
             self,
             selector: #selector(updateVisibleCategories),
@@ -285,10 +285,44 @@ extension TrackerCollectionView: UISearchTextFieldDelegate {
 }
 
 extension TrackerCollectionView: TrackEventProtocol {
+    func pinTracker(indexPath: IndexPath, pinned: Bool) {
+        guard
+            let category = visibleCategories[at: indexPath.section],
+            let trackerVM = category.trackers[at: indexPath.row]
+        else {
+            return
+        }
+        
+        do {
+            let tracker = trackerVM.tracker
+            tracker.pinned = pinned
+            
+            try trackerStore.updateTracker(trackerVM.tracker)
+        } catch {
+            print("failed to pin tracker \(error)")
+        }
+    }
+    
+    func editTracker(indexPath: IndexPath) {
+        print("not implemented")
+    }
+    
+    func deleteTracker(indexPath: IndexPath) {
+        guard
+            let category = visibleCategories[at: indexPath.section],
+            let trackerVM = category.trackers[at: indexPath.row]
+        else {
+            return
+        }
+        
+        try! trackerStore.deleteTracker(trackerVM.tracker)
+    }
+    
+    
     func trackEvent(indexPath: IndexPath) {
         guard
-            let category = visibleCategories.safetyAccessElement(at: indexPath.section),
-            let cellTracker = category.trackers.safetyAccessElement(at: indexPath.row)
+            let category = visibleCategories[at: indexPath.section],
+            let cellTracker = category.trackers[at: indexPath.row]
         else {
             return
         }
@@ -323,7 +357,7 @@ extension TrackerCollectionView: UICollectionViewDataSource {
     }
     
     func collectionView(_ collectionView: UICollectionView, numberOfItemsInSection section: Int) -> Int {
-        guard let section = visibleCategories.safetyAccessElement(at: section) else {
+        guard let section = visibleCategories[at: section] else {
             print("failed to get section from collection by index \(section)")
             return 0
         }
@@ -337,12 +371,12 @@ extension TrackerCollectionView: UICollectionViewDataSource {
             return UICollectionViewCell()
         }
         
-        guard let section = visibleCategories.safetyAccessElement(at: indexPath.section) else {
+        guard let section = visibleCategories[at: indexPath.section] else {
             print("failed to get section from collection by index \(indexPath.section)")
             return UICollectionViewCell()
         }
         
-        guard let trackerCell = section.trackers.safetyAccessElement(at: indexPath.row) else {
+        guard let trackerCell = section.trackers[at: indexPath.row] else {
             print("failed to get element from section: \(section.categoryName) by index \(indexPath.row)")
             return UICollectionViewCell()
         }

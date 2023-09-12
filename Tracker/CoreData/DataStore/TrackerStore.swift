@@ -18,6 +18,7 @@ enum TrackerStoreError: Error {
     case decodingErrorInvalidColorHex
     case categoryNotFound
     case generateURLError
+    case getTrackerError
 }
 
 struct TrackerStoreUpdate {
@@ -89,7 +90,7 @@ final class TrackerStore: NSObject, TrackerStoreProtocol {
         let trackersByCategoryDictionary = Dictionary(grouping: trackers) { (tracker) -> String in
             guard
                 let category = tracker.category,
-                let categoryName = category.name
+                let categoryName = tracker.pinned ? "Закреп" : category.name
             else {
                 assertionFailure("failed to get category name of tarcker \(tracker.id)")
                 return ""
@@ -108,7 +109,17 @@ final class TrackerStore: NSObject, TrackerStoreProtocol {
                 trackers.append(tracker)
             }
             return TrackersByCategory(categoryName: categoryName, trackers: trackers)
-        }.sorted(by: {$0.categoryName < $1.categoryName } )
+       }.sorted { cat1, cat2 in
+           if cat1.categoryName == "Закреп" {
+               return true
+           }
+           
+           if cat2.categoryName == "Закреп" {
+               return false
+           }
+           
+           return cat1.categoryName < cat2.categoryName
+       }
     }
     
     func addNewTracker(_ tracker: Tracker) throws {
@@ -116,20 +127,21 @@ final class TrackerStore: NSObject, TrackerStoreProtocol {
         request.returnsObjectsAsFaults = false
         
         request.predicate = NSPredicate(format: "%K == %@", #keyPath(TrackerCategoryCoreData.categoryID), tracker.category.id.uuidString)
-        guard let categories = try? context.fetch(request) else {
-            throw TrackerStoreError.categoryNotFound
-        }
-        if categories.count < 1 {
+        guard
+            let categories = try? context.fetch(request),
+            let category = categories.first
+        else {
             throw TrackerStoreError.categoryNotFound
         }
         
         let trackerCoreData = TrackerCoreData(context: context)
         trackerCoreData.trackerID = tracker.id
         trackerCoreData.name = tracker.name
-        trackerCoreData.category = categories[0]
+        trackerCoreData.category = category
         trackerCoreData.createDate = Date()
         trackerCoreData.emoji = tracker.emoji
         trackerCoreData.colorHex = uiColorMarshalling.hexString(from: tracker.color)
+        trackerCoreData.pinned = tracker.pinned
         
         if let habit = tracker as? Timetable {
             let trackerScheduleCoreData = TrackerScheduleCoreData(context: context)
@@ -164,6 +176,52 @@ final class TrackerStore: NSObject, TrackerStoreProtocol {
         
         context.safeSave()
     }
+    private func fetchTracker(_ trackerID: UUID) throws -> TrackerCoreData  {
+        let request = TrackerCoreData.fetchRequest()
+        request.returnsObjectsAsFaults = false
+        request.predicate = NSPredicate(format: "%K == %@", #keyPath(TrackerCoreData.trackerID), trackerID.uuidString)
+        
+        guard let trackers = try? context.fetch(request) else {
+            throw TrackerStoreError.getTrackerError
+        }
+        
+        if trackers.count != 1 {
+            throw TrackerStoreError.getTrackerError
+        }
+        
+        return trackers[0]
+    }
+    
+    func deleteTracker(_ tracker: Tracker) throws {
+        context.delete(try fetchTracker(tracker.id))
+        context.safeSave()
+    }
+    
+    func updateTracker(_ trackerUpdate: Tracker) throws {
+        let trackerCoreData = try fetchTracker(trackerUpdate.id)
+        trackerCoreData.name = trackerUpdate.name
+        trackerCoreData.emoji = trackerUpdate.emoji
+        trackerCoreData.colorHex = uiColorMarshalling.hexString(from: trackerUpdate.color)
+        trackerCoreData.pinned = trackerUpdate.pinned
+
+        if let category = trackerCoreData.category, category.categoryID != trackerUpdate.category.id {
+            let request = TrackerCategoryCoreData.fetchRequest()
+            request.returnsObjectsAsFaults = false
+            request.predicate = NSPredicate(format: "%K == %@", #keyPath(TrackerCategoryCoreData.categoryID), trackerUpdate.category.id.uuidString)
+            
+            guard let categories = try? context.fetch(request) else {
+                throw TrackerStoreError.categoryNotFound
+            }
+            
+            if categories.count < 1 || categories.count > 1 {
+                throw TrackerStoreError.categoryNotFound
+            }
+            
+            trackerCoreData.category = categories[0]
+        }
+        
+        context.safeSave()
+    }
         
     private func makeTracker(from trackerCoreData: TrackerCoreData, date: Date) throws -> TrackerViewModel {
         guard let trackerID = trackerCoreData.trackerID else {
@@ -191,9 +249,10 @@ final class TrackerStore: NSObject, TrackerStoreProtocol {
             name: trackerName,
             category: TrackerCategory(id: categoryID, name: categoryName),
             emoji: trackerEmoji,
-            color: uiColorMarshalling.color(from: trackerColorHex)
+            color: uiColorMarshalling.color(from: trackerColorHex),
+            pinned: trackerCoreData.pinned
         )
-        
+                
         guard let records = trackerCoreData.records else {
             return TrackerViewModel(event: tracker, trackedDaysCount: 0, tracked: false)
         }

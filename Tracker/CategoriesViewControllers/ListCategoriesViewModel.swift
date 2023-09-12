@@ -52,7 +52,7 @@ final class ListCategoriesViewModel {
     }
     
     func selectTrackerCategory(indexPath: IndexPath) {
-        guard let category = listOfCategories.safetyAccessElement(at: indexPath.row) else {
+        guard let category = listOfCategories[at: indexPath.row] else {
             assertionFailure("failed to get category from viewModel.listOfCategories by index \(indexPath)")
             return
         }

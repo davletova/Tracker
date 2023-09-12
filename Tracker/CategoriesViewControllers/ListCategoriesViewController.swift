@@ -201,7 +201,7 @@ extension ListCategoriesViewController: UITableViewDataSource {
     func tableView(_ tableView: UITableView, cellForRowAt indexPath: IndexPath) -> UITableViewCell {
         let cell = tableView.dequeueReusableCell(withIdentifier: cellIdentifier, for: indexPath) as! ListCategoriesViewControllerCell
         
-        guard let category = viewModel.listOfCategories.safetyAccessElement(at: indexPath.row) else {
+        guard let category = viewModel.listOfCategories[at: indexPath.row] else {
             assertionFailure("failed to get category from viewModel.listOfCategories by index \(indexPath)")
             return UITableViewCell()
         }
