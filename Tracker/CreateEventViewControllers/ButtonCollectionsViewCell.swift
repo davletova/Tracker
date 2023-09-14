@@ -33,10 +33,7 @@ final class ButtonCollectionViewCell: UICollectionViewCell {
         createEventButton.backgroundColor = UIColor.getAppColors(.blackDay)
         createEventButton.translatesAutoresizingMaskIntoConstraints = false
         createEventButton.layer.cornerRadius = 16
-        createEventButton.setTitle(
-            NSLocalizedString("to.create", comment: "текст кнопки Создать"),
-            for: .normal
-        )
+        
         createEventButton.titleLabel?.font = UIFont.systemFont(ofSize: 16, weight: .medium)
         createEventButton.setTitleColor(UIColor.getAppColors(.whiteDay), for: .normal)
         createEventButton.titleLabel?.textAlignment = .center
@@ -51,12 +48,8 @@ final class ButtonCollectionViewCell: UICollectionViewCell {
     override init(frame: CGRect) {
         super.init(frame: frame)
         
-        
         contentView.addSubview(cancelButton)
         contentView.addSubview(createEventButton)
-        
-        contentView.backgroundColor = UIColor.getAppColors(.whiteDay)
-        contentView.layer.cornerRadius = 16
         
         NSLayoutConstraint.activate([
            cancelButton.bottomAnchor.constraint(equalTo: contentView.bottomAnchor),
@@ -89,6 +82,10 @@ final class ButtonCollectionViewCell: UICollectionViewCell {
             return
         }
         delegate.createEvent()
+    }
+    
+    func setTitle(text: String) {
+        createEventButton.setTitle(text,  for: .normal)
     }
 }
 
