@@ -47,6 +47,7 @@
 		4D84609C2AA4DEC70041BED7 /* ListCategoriesViewControllerCell.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4D84609B2AA4DEC70041BED7 /* ListCategoriesViewControllerCell.swift */; };
 		4D8F668A2AB2E9CD00B42FA7 /* TabBarViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4D8F66892AB2E9CD00B42FA7 /* TabBarViewController.swift */; };
 		4D8F668D2AB2ED1700B42FA7 /* UIColorMarshalling.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4D8F668C2AB2ED1700B42FA7 /* UIColorMarshalling.swift */; };
+		4D8F66952AB32D3E00B42FA7 /* TrackerTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4D8F66942AB32D3E00B42FA7 /* TrackerTests.swift */; };
 		4DA3CC452A90A23700DB13C7 /* TrackerRecord.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4DA3CC442A90A23700DB13C7 /* TrackerRecord.swift */; };
 		4DA5C9722A82313B0046C149 /* ListCategoriesViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4DA5C9712A82313B0046C149 /* ListCategoriesViewController.swift */; };
 		4DA5C9742A82A9CB0046C149 /* CreateCategoryViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4DA5C9732A82A9CB0046C149 /* CreateCategoryViewController.swift */; };
@@ -62,6 +63,16 @@
 		4DDC8E242A98C45B00F85E5D /* TrackerRecordStore.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4DDC8E232A98C45B00F85E5D /* TrackerRecordStore.swift */; };
 		4DDC8E262A98C6FB00F85E5D /* TrackerStore.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4DDC8E252A98C6FB00F85E5D /* TrackerStore.swift */; };
 /* End PBXBuildFile section */
+
+/* Begin PBXContainerItemProxy section */
+		4D8F66962AB32D3E00B42FA7 /* PBXContainerItemProxy */ = {
+			isa = PBXContainerItemProxy;
+			containerPortal = 4D1A9BF22A726B4C007E527A /* Project object */;
+			proxyType = 1;
+			remoteGlobalIDString = 4D1A9BF92A726B4C007E527A;
+			remoteInfo = Tracker;
+		};
+/* End PBXContainerItemProxy section */
 
 /* Begin PBXFileReference section */
 		4D0817C62A796681003724B5 /* Habit.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Habit.swift; sourceTree = "<group>"; };
@@ -106,6 +117,8 @@
 		4D84609B2AA4DEC70041BED7 /* ListCategoriesViewControllerCell.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ListCategoriesViewControllerCell.swift; sourceTree = "<group>"; };
 		4D8F66892AB2E9CD00B42FA7 /* TabBarViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TabBarViewController.swift; sourceTree = "<group>"; };
 		4D8F668C2AB2ED1700B42FA7 /* UIColorMarshalling.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = UIColorMarshalling.swift; sourceTree = "<group>"; };
+		4D8F66922AB32D3E00B42FA7 /* TrackerTests.xctest */ = {isa = PBXFileReference; explicitFileType = wrapper.cfbundle; includeInIndex = 0; path = TrackerTests.xctest; sourceTree = BUILT_PRODUCTS_DIR; };
+		4D8F66942AB32D3E00B42FA7 /* TrackerTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TrackerTests.swift; sourceTree = "<group>"; };
 		4DA3CC442A90A23700DB13C7 /* TrackerRecord.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TrackerRecord.swift; sourceTree = "<group>"; };
 		4DA5C9712A82313B0046C149 /* ListCategoriesViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ListCategoriesViewController.swift; sourceTree = "<group>"; };
 		4DA5C9732A82A9CB0046C149 /* CreateCategoryViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CreateCategoryViewController.swift; sourceTree = "<group>"; };
@@ -124,6 +137,13 @@
 
 /* Begin PBXFrameworksBuildPhase section */
 		4D1A9BF72A726B4C007E527A /* Frameworks */ = {
+			isa = PBXFrameworksBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+		4D8F668F2AB32D3E00B42FA7 /* Frameworks */ = {
 			isa = PBXFrameworksBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
@@ -189,6 +209,7 @@
 			isa = PBXGroup;
 			children = (
 				4D1A9BFC2A726B4C007E527A /* Tracker */,
+				4D8F66932AB32D3E00B42FA7 /* TrackerTests */,
 				4D1A9BFB2A726B4C007E527A /* Products */,
 			);
 			sourceTree = "<group>";
@@ -197,6 +218,7 @@
 			isa = PBXGroup;
 			children = (
 				4D1A9BFA2A726B4C007E527A /* Tracker.app */,
+				4D8F66922AB32D3E00B42FA7 /* TrackerTests.xctest */,
 			);
 			name = Products;
 			sourceTree = "<group>";
@@ -336,6 +358,14 @@
 			path = UIColorMarshalling;
 			sourceTree = "<group>";
 		};
+		4D8F66932AB32D3E00B42FA7 /* TrackerTests */ = {
+			isa = PBXGroup;
+			children = (
+				4D8F66942AB32D3E00B42FA7 /* TrackerTests.swift */,
+			);
+			path = TrackerTests;
+			sourceTree = "<group>";
+		};
 		4DDC8E1E2A98B13E00F85E5D /* CoreData */ = {
 			isa = PBXGroup;
 			children = (
@@ -375,6 +405,24 @@
 			productReference = 4D1A9BFA2A726B4C007E527A /* Tracker.app */;
 			productType = "com.apple.product-type.application";
 		};
+		4D8F66912AB32D3E00B42FA7 /* TrackerTests */ = {
+			isa = PBXNativeTarget;
+			buildConfigurationList = 4D8F66982AB32D3E00B42FA7 /* Build configuration list for PBXNativeTarget "TrackerTests" */;
+			buildPhases = (
+				4D8F668E2AB32D3E00B42FA7 /* Sources */,
+				4D8F668F2AB32D3E00B42FA7 /* Frameworks */,
+				4D8F66902AB32D3E00B42FA7 /* Resources */,
+			);
+			buildRules = (
+			);
+			dependencies = (
+				4D8F66972AB32D3E00B42FA7 /* PBXTargetDependency */,
+			);
+			name = TrackerTests;
+			productName = TrackerTests;
+			productReference = 4D8F66922AB32D3E00B42FA7 /* TrackerTests.xctest */;
+			productType = "com.apple.product-type.bundle.unit-test";
+		};
 /* End PBXNativeTarget section */
 
 /* Begin PBXProject section */
@@ -387,6 +435,10 @@
 				TargetAttributes = {
 					4D1A9BF92A726B4C007E527A = {
 						CreatedOnToolsVersion = 14.3.1;
+					};
+					4D8F66912AB32D3E00B42FA7 = {
+						CreatedOnToolsVersion = 14.3.1;
+						TestTargetID = 4D1A9BF92A726B4C007E527A;
 					};
 				};
 			};
@@ -405,6 +457,7 @@
 			projectRoot = "";
 			targets = (
 				4D1A9BF92A726B4C007E527A /* Tracker */,
+				4D8F66912AB32D3E00B42FA7 /* TrackerTests */,
 			);
 		};
 /* End PBXProject section */
@@ -420,6 +473,13 @@
 				4D83A1252AAE43A700A7F55D /* Localizable.strings in Resources */,
 				4D1A9C072A726B50007E527A /* Assets.xcassets in Resources */,
 				4D83A1282AAE43A900A7F55D /* Localizable.stringsdict in Resources */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+		4D8F66902AB32D3E00B42FA7 /* Resources */ = {
+			isa = PBXResourcesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -481,7 +541,23 @@
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
+		4D8F668E2AB32D3E00B42FA7 /* Sources */ = {
+			isa = PBXSourcesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+				4D8F66952AB32D3E00B42FA7 /* TrackerTests.swift in Sources */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
 /* End PBXSourcesBuildPhase section */
+
+/* Begin PBXTargetDependency section */
+		4D8F66972AB32D3E00B42FA7 /* PBXTargetDependency */ = {
+			isa = PBXTargetDependency;
+			target = 4D1A9BF92A726B4C007E527A /* Tracker */;
+			targetProxy = 4D8F66962AB32D3E00B42FA7 /* PBXContainerItemProxy */;
+		};
+/* End PBXTargetDependency section */
 
 /* Begin PBXVariantGroup section */
 		4D1A9C082A726B50007E527A /* LaunchScreen.storyboard */ = {
@@ -711,6 +787,42 @@
 			};
 			name = Release;
 		};
+		4D8F66992AB32D3E00B42FA7 /* Debug */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				BUNDLE_LOADER = "$(TEST_HOST)";
+				CODE_SIGN_STYLE = Automatic;
+				CURRENT_PROJECT_VERSION = 1;
+				DEVELOPMENT_TEAM = 5MJ8XFZB7W;
+				GENERATE_INFOPLIST_FILE = YES;
+				MARKETING_VERSION = 1.0;
+				PRODUCT_BUNDLE_IDENTIFIER = com.github.davletova.TrackerTests;
+				PRODUCT_NAME = "$(TARGET_NAME)";
+				SWIFT_EMIT_LOC_STRINGS = NO;
+				SWIFT_VERSION = 5.0;
+				TARGETED_DEVICE_FAMILY = "1,2";
+				TEST_HOST = "$(BUILT_PRODUCTS_DIR)/Tracker.app/$(BUNDLE_EXECUTABLE_FOLDER_PATH)/Tracker";
+			};
+			name = Debug;
+		};
+		4D8F669A2AB32D3E00B42FA7 /* Release */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				BUNDLE_LOADER = "$(TEST_HOST)";
+				CODE_SIGN_STYLE = Automatic;
+				CURRENT_PROJECT_VERSION = 1;
+				DEVELOPMENT_TEAM = 5MJ8XFZB7W;
+				GENERATE_INFOPLIST_FILE = YES;
+				MARKETING_VERSION = 1.0;
+				PRODUCT_BUNDLE_IDENTIFIER = com.github.davletova.TrackerTests;
+				PRODUCT_NAME = "$(TARGET_NAME)";
+				SWIFT_EMIT_LOC_STRINGS = NO;
+				SWIFT_VERSION = 5.0;
+				TARGETED_DEVICE_FAMILY = "1,2";
+				TEST_HOST = "$(BUILT_PRODUCTS_DIR)/Tracker.app/$(BUNDLE_EXECUTABLE_FOLDER_PATH)/Tracker";
+			};
+			name = Release;
+		};
 /* End XCBuildConfiguration section */
 
 /* Begin XCConfigurationList section */
@@ -728,6 +840,15 @@
 			buildConfigurations = (
 				4D1A9C0F2A726B50007E527A /* Debug */,
 				4D1A9C102A726B50007E527A /* Release */,
+			);
+			defaultConfigurationIsVisible = 0;
+			defaultConfigurationName = Release;
+		};
+		4D8F66982AB32D3E00B42FA7 /* Build configuration list for PBXNativeTarget "TrackerTests" */ = {
+			isa = XCConfigurationList;
+			buildConfigurations = (
+				4D8F66992AB32D3E00B42FA7 /* Debug */,
+				4D8F669A2AB32D3E00B42FA7 /* Release */,
 			);
 			defaultConfigurationIsVisible = 0;
 			defaultConfigurationName = Release;
