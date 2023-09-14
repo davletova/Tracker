@@ -28,7 +28,6 @@ struct TrackerStoreUpdate {
 }
 
 final class TrackerStore: NSObject, TrackerStoreProtocol {
-    private let uiColorMarshalling = UIColorMarshalling()
     private let context: NSManagedObjectContext
     
     private lazy var fetchedResultsController: NSFetchedResultsController<TrackerCoreData> = {
@@ -140,7 +139,7 @@ final class TrackerStore: NSObject, TrackerStoreProtocol {
         trackerCoreData.category = category
         trackerCoreData.createDate = Date()
         trackerCoreData.emoji = tracker.emoji
-        trackerCoreData.colorHex = uiColorMarshalling.hexString(from: tracker.color)
+        trackerCoreData.colorHex = UIColorMarshalling.hexString(from: tracker.color)
         trackerCoreData.pinned = tracker.pinned
         
         if let habit = tracker as? Timetable {
@@ -201,7 +200,7 @@ final class TrackerStore: NSObject, TrackerStoreProtocol {
         let trackerCoreData = try fetchTracker(trackerUpdate.id)
         trackerCoreData.name = trackerUpdate.name
         trackerCoreData.emoji = trackerUpdate.emoji
-        trackerCoreData.colorHex = uiColorMarshalling.hexString(from: trackerUpdate.color)
+        trackerCoreData.colorHex = UIColorMarshalling.hexString(from: trackerUpdate.color)
         trackerCoreData.pinned = trackerUpdate.pinned
 
         if let category = trackerCoreData.category, category.categoryID != trackerUpdate.category.id {
@@ -249,7 +248,7 @@ final class TrackerStore: NSObject, TrackerStoreProtocol {
             name: trackerName,
             category: TrackerCategory(id: categoryID, name: categoryName),
             emoji: trackerEmoji,
-            color: uiColorMarshalling.color(from: trackerColorHex),
+            color: UIColorMarshalling.color(from: trackerColorHex),
             pinned: trackerCoreData.pinned
         )
                 

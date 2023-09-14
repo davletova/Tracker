@@ -290,6 +290,7 @@ extension TrackerCollectionView: TrackEventProtocol {
             let category = visibleCategories[at: indexPath.section],
             let trackerVM = category.trackers[at: indexPath.row]
         else {
+            assertionFailure("pinTracker failed")
             return
         }
         
@@ -304,18 +305,46 @@ extension TrackerCollectionView: TrackEventProtocol {
     }
     
     func editTracker(indexPath: IndexPath) {
-        print("not implemented")
-    }
-    
-    func deleteTracker(indexPath: IndexPath) {
         guard
             let category = visibleCategories[at: indexPath.section],
             let trackerVM = category.trackers[at: indexPath.row]
         else {
+            assertionFailure("editTracker failed")
             return
         }
         
-        try! trackerStore.deleteTracker(trackerVM.tracker)
+        let editTrackerVC = CreateEventViewController()
+        editTrackerVC.updateTracker = trackerVM.tracker
+        if let _ = trackerVM.tracker as? Timetable {
+            editTrackerVC.isHabit = true
+        } else {
+            editTrackerVC.isHabit = false
+        }
+            
+        self.present(editTrackerVC, animated: true)
+    }
+    
+    func deleteTracker(indexPath: IndexPath) {
+        let destroyAction = UIAlertAction(title: "Delete", style: .destructive) { [weak self] (action) in
+            guard
+                let category = self!.visibleCategories[at: indexPath.section],
+                let trackerVM = category.trackers[at: indexPath.row]
+            else {
+                return
+            }
+            
+            try! self!.trackerStore.deleteTracker(trackerVM.tracker)
+           }
+        
+        let cancelAction = UIAlertAction(title: "Cancel", style: .cancel)
+        
+        let alert = UIAlertController(title: "Delete the image?",
+                       message: "",
+                       preferredStyle: .actionSheet)
+        alert.addAction(destroyAction)
+        alert.addAction(cancelAction)
+        
+        self.present(alert, animated: true) 
     }
     
     

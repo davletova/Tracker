@@ -119,6 +119,8 @@ final class CreateEventViewController: UIViewController {
     
     private var selectedColorIndexPath: IndexPath? { didSet { changeStateCreateButtonifNeedIt() } }
     
+    var updateTracker: Tracker?
+    
     override func viewDidLoad() {
         super.viewDidLoad()
         view.backgroundColor = UIColor.getAppColors(.whiteDay)
@@ -157,6 +159,29 @@ final class CreateEventViewController: UIViewController {
             )
         }
         
+        if let updateTracker = updateTracker {
+            if let habit = updateTracker as? Timetable {
+                selectedSchedule = habit.getSchedule()
+            }
+            trackerName = updateTracker.name
+            selectedCategory = updateTracker.category
+            
+            guard let emojiIndex = emojies.firstIndex(of: updateTracker.emoji) else {
+                assertionFailure("emoji not found")
+                return
+            }
+            selectedEmojiIndexPath = IndexPath(row: emojiIndex, section: CollectionSectionType.emoji.rawValue)
+            
+            //TODO: убрать force unwrapp
+            guard let colorIndex = colors.firstIndex(where: { color in
+                UIColorMarshalling.hexString(from: color!) == UIColorMarshalling.hexString(from: updateTracker.color)
+            }) else {
+                assertionFailure("color not found")
+                return
+            }
+            selectedColorIndexPath = IndexPath(row: colorIndex, section: CollectionSectionType.color.rawValue)
+        }
+        
         setupTitle()
         setupCollectionView()
         
@@ -167,8 +192,14 @@ final class CreateEventViewController: UIViewController {
     
     private func setupTitle() {
         view.addSubview(titleLabel)
-        let localizeTitlekey = isHabit ? "new.habit" : "new.event"
-        titleLabel.text = NSLocalizedString(localizeTitlekey, comment: "заголовок страницы с созданием трекера")
+        
+        if let _ = updateTracker {
+         //TODO: локализовать заголовки
+            titleLabel.text = "Редактирование"
+        } else {
+            let localizeTitlekey = isHabit ? "new.habit" : "new.event"
+            titleLabel.text = NSLocalizedString(localizeTitlekey, comment: "заголовок страницы с созданием трекера")
+        }
         
         NSLayoutConstraint.activate([
             titleLabel.heightAnchor.constraint(equalToConstant: 32),
@@ -287,9 +318,14 @@ extension CreateEventViewController: TrackerActionProtocol {
         }
         
         do {
-            try trackerStore.addNewTracker(newTracker)
+            if let updateTracker = updateTracker {
+                newTracker.id = updateTracker.id
+                try trackerStore.updateTracker(newTracker)
+            } else {
+                try trackerStore.addNewTracker(newTracker)
+            }
         } catch {
-            print("failed to create tracker")
+            print("failed to create tracker: \(error)")
         }
         
         self.view.window?.rootViewController?.dismiss(animated: true, completion: nil)
@@ -337,7 +373,7 @@ extension CreateEventViewController: UICollectionViewDataSource {
         switch sectionType {
         case .name:
             let cell = collectionView.dequeueReusableCell(withReuseIdentifier: nameCellIdentifier, for: indexPath) as! NameCollectionViewCell
-            cell.setTrackerNameClosure = { [weak self] name in
+            cell.configure(name: trackerName) { [weak self] name in
                 guard let self = self else {
                     assertionFailure("set setTrackerNameClosure: self is empty")
                     return
@@ -345,6 +381,7 @@ extension CreateEventViewController: UICollectionViewDataSource {
                 
                 self.setTrackerName(name: name)
             }
+            
             return cell
         case .properties:
             guard
@@ -388,15 +425,29 @@ extension CreateEventViewController: UICollectionViewDataSource {
         case .emoji:
             let cell = collectionView.dequeueReusableCell(withReuseIdentifier: emojiCellIdentifier, for: indexPath) as! EmojiCollectionViewCell
             cell.titleLabel.text = emojies[indexPath.row]
+            
+            if let index = selectedEmojiIndexPath, index.row == indexPath.row {
+                cell.selectCell()
+            }
+            
             return cell
         case .color:
             let cell = collectionView.dequeueReusableCell(withReuseIdentifier: colorCellIdentifier, for: indexPath) as! ColorCollectionViewCell
             cell.view.backgroundColor = colors[indexPath.row]
             cell.view.layer.cornerRadius = 8
             cell.cellColor = colors[indexPath.row]
+            
+            if let index = selectedColorIndexPath, index.row == indexPath.row {
+                cell.selectCell()
+            }
+            
             return cell
         case .buttons:
             let cell = collectionView.dequeueReusableCell(withReuseIdentifier: buttonsCellIdentifier, for: indexPath) as! ButtonCollectionViewCell
+            if updateTracker != nil {
+                cell.state = State.update
+            }
+            
             self.delegate = cell
             cell.delegate = self
             changeStateCreateButtonifNeedIt()
@@ -502,7 +553,6 @@ extension CreateEventViewController: UICollectionViewDelegateFlowLayout {
             
             trackerProperty.callback()
         case .emoji, .color:
-            
             let oldSelectedIndexPath = sectionType == .emoji ? selectedEmojiIndexPath : selectedColorIndexPath
             
             // если ранее уже было выбрано эмодзи или цвет

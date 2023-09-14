@@ -8,6 +8,11 @@
 import Foundation
 import UIKit
 
+enum State: String {
+    case create
+    case update
+}
+
 final class ButtonCollectionViewCell: UICollectionViewCell {
     private lazy var cancelButton: UIButton = {
         let cancelButton = UIButton()
@@ -33,10 +38,7 @@ final class ButtonCollectionViewCell: UICollectionViewCell {
         createEventButton.backgroundColor = UIColor.getAppColors(.blackDay)
         createEventButton.translatesAutoresizingMaskIntoConstraints = false
         createEventButton.layer.cornerRadius = 16
-        createEventButton.setTitle(
-            NSLocalizedString("to.create", comment: "текст кнопки Создать"),
-            for: .normal
-        )
+        
         createEventButton.titleLabel?.font = UIFont.systemFont(ofSize: 16, weight: .medium)
         createEventButton.setTitleColor(UIColor.getAppColors(.whiteDay), for: .normal)
         createEventButton.titleLabel?.textAlignment = .center
@@ -48,15 +50,23 @@ final class ButtonCollectionViewCell: UICollectionViewCell {
     
     weak var delegate: TrackerActionProtocol?
     
+    var state: State = State.create
+    
     override init(frame: CGRect) {
         super.init(frame: frame)
         
+        if state == State.create {
+            createEventButton.setTitle(
+                NSLocalizedString("to.create", comment: "текст кнопки Создать"),
+                for: .normal
+            )
+        } else {
+            //TODO: добавить локализацию
+            createEventButton.setTitle("Save", for: .normal)
+        }
         
         contentView.addSubview(cancelButton)
         contentView.addSubview(createEventButton)
-        
-        contentView.backgroundColor = UIColor.getAppColors(.whiteDay)
-        contentView.layer.cornerRadius = 16
         
         NSLayoutConstraint.activate([
            cancelButton.bottomAnchor.constraint(equalTo: contentView.bottomAnchor),
