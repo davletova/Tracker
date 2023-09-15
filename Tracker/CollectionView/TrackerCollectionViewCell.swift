@@ -163,6 +163,8 @@ final class TrackerCollectionViewCell: UICollectionViewCell {
     }
     
     @objc private func trackEvent() {
+//        AnalyticsService.sendEvent(event: "click", screen: "Main", item: "track")
+        
         guard let indexPath = indexPath else {
             print("TrackerCollectionViewCell: indexPath is empty")
             return
@@ -200,6 +202,7 @@ final class TrackerCollectionViewCell: UICollectionViewCell {
 extension TrackerCollectionViewCell: UIContextMenuInteractionDelegate {
     func contextMenuInteraction(_ interaction: UIContextMenuInteraction,
                                 configurationForMenuAtLocation location: CGPoint) -> UIContextMenuConfiguration? {
+        //TODO: убрать иконки на действиях
         return UIContextMenuConfiguration(identifier: nil,
                                           previewProvider: nil,
                                           actionProvider: { [weak self] suggestedActions in
@@ -217,6 +220,8 @@ extension TrackerCollectionViewCell: UIContextMenuInteractionDelegate {
             let editAction =
                 UIAction(title: NSLocalizedString("Редактировать", comment: ""),
                          image: UIImage(systemName: "plus.square.on.square")) { action in
+                    AnalyticsService.sendEvent(event: "click", screen: "Main", item: "edit")
+                                        
                     self.delegate?.editTracker(indexPath: self.indexPath!)
                 }
                 
@@ -224,6 +229,8 @@ extension TrackerCollectionViewCell: UIContextMenuInteractionDelegate {
                 UIAction(title: NSLocalizedString("Удалить", comment: ""),
                          image: UIImage(systemName: "trash"),
                          attributes: .destructive) { action in
+                    AnalyticsService.sendEvent(event: "click", screen: "Main", item: "delete")
+                    
                     self.delegate?.deleteTracker(indexPath: self.indexPath!)
                 }
                                             

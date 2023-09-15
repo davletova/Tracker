@@ -161,6 +161,12 @@ final class TrackerCollectionView: UIViewController {
                                                 action: #selector(hideKeyboard))
         tapGesture.cancelsTouchesInView = false
         self.view.addGestureRecognizer(tapGesture)
+        
+        AnalyticsService.sendEvent(event: "open", screen: "Main")
+    }
+    
+    deinit {
+        AnalyticsService.sendEvent(event: "close", screen: "Main")
     }
     
     @objc func updateVisibleCategories() {
@@ -252,6 +258,8 @@ final class TrackerCollectionView: UIViewController {
     }
     
     @objc func clickButtonCreateEvent() {
+        AnalyticsService.sendEvent(event: "click", screen: "Main", item: "add_track")
+        
         let typeSelectionViewController = TypeSelectionViewController()
         typeSelectionViewController.modalPresentationStyle = .popover
         self.present(typeSelectionViewController, animated: true)
