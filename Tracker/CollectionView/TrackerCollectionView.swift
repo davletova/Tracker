@@ -366,12 +366,17 @@ extension TrackerCollectionView: TrackEventProtocol {
         
         if cellTracker.tracked {
             do {
+                print("=============== delete ===============")
+                print("tracker.id \(cellTracker.tracker.id)   date \( Calendar.current.startOfDay(for: datePicker.date))")
                 try trackerRecordStore.deleteRecord(TrackerRecord(eventID: cellTracker.tracker.id, date: Calendar.current.startOfDay(for: datePicker.date)))
             } catch {
                 print("failed to delete record with error: \(error)")
             }
         } else {
             do {
+                print("=============== create ===============")
+                print("tracker.id \(cellTracker.tracker.id)   date \( Calendar.current.startOfDay(for: datePicker.date))")
+                
                 try trackerRecordStore.addNewRecord(TrackerRecord(eventID: cellTracker.tracker.id, date: Calendar.current.startOfDay(for: datePicker.date)))
             } catch {
                 print("failed to create new record with error \(error)")

@@ -56,7 +56,7 @@ final class TrackerCategoryStore: NSObject {
             throw TrackerCategoryStoreError.decodeCategoriesIdFailed
         }
         
-        var trackerCategory = TrackerCategory(id: categoryID, name: categoryName)
+        let trackerCategory = TrackerCategory(id: categoryID, name: categoryName)
         
         return trackerCategory
     }

@@ -27,7 +27,7 @@ struct Schedule {
     }
     
     func getRepetitionString() -> String {
-        var repetitionString = repetition
+        let repetitionString = repetition
             .sorted(by: { weekday1, weekday2 in
                 weekday1.rawValue < weekday2.rawValue
             })

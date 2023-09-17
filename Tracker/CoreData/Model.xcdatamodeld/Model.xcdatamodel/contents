@@ -12,13 +12,13 @@
         <attribute name="name" attributeType="String"/>
         <attribute name="pinned" attributeType="Boolean" defaultValueString="NO" usesScalarValueType="YES"/>
         <attribute name="trackerID" attributeType="UUID" usesScalarValueType="NO"/>
-        <relationship name="category" maxCount="1" deletionRule="No Action" destinationEntity="TrackerCategoryCoreData" inverseName="trackers" inverseEntity="TrackerCategoryCoreData"/>
+        <relationship name="category" maxCount="1" deletionRule="Nullify" destinationEntity="TrackerCategoryCoreData" inverseName="trackers" inverseEntity="TrackerCategoryCoreData"/>
         <relationship name="records" optional="YES" toMany="YES" deletionRule="Cascade" destinationEntity="TrackerRecordCoreData" inverseName="tracker" inverseEntity="TrackerRecordCoreData"/>
         <relationship name="schedule" optional="YES" maxCount="1" deletionRule="Cascade" destinationEntity="TrackerScheduleCoreData" inverseName="tracker" inverseEntity="TrackerScheduleCoreData"/>
     </entity>
     <entity name="TrackerRecordCoreData" representedClassName="TrackerRecordCoreData" syncable="YES" codeGenerationType="class">
         <attribute name="date" attributeType="Date" usesScalarValueType="NO"/>
-        <relationship name="tracker" maxCount="1" deletionRule="No Action" destinationEntity="TrackerCoreData" inverseName="records" inverseEntity="TrackerCoreData"/>
+        <relationship name="tracker" maxCount="1" deletionRule="Nullify" destinationEntity="TrackerCoreData" inverseName="records" inverseEntity="TrackerCoreData"/>
     </entity>
     <entity name="TrackerScheduleCoreData" representedClassName="TrackerScheduleCoreData" syncable="YES" codeGenerationType="class">
         <attribute name="friday" attributeType="Boolean" defaultValueString="NO" usesScalarValueType="YES"/>

@@ -8,6 +8,7 @@
 import Foundation
 import UIKit
 
+private let daysCellIdentifier = ""
 private let nameCellIdentifier = "nameCell"
 private let propertyCellIdentifier = "propertyCell"
 private let emojiCellIdentifier = "emojiCell"
@@ -15,11 +16,12 @@ private let colorCellIdentifier = "colorCell"
 private let buttonsCellIdentifier = "buttonCell"
 
 enum CollectionSectionType: Int {
-    case name = 0
-    case properties = 1
-    case emoji = 2
-    case color = 3
-    case buttons = 4
+    case days = 0
+    case name = 1
+    case properties = 2
+    case emoji = 3
+    case color = 4
+    case buttons = 5
 }
 
 enum PropertyType: Int, Hashable {
@@ -51,6 +53,17 @@ final class CreateEventViewController: UIViewController {
         titleLabel.textAlignment = .center
         titleLabel.font = UIFont.systemFont(ofSize: 16, weight: .medium)
         titleLabel.textColor = UIColor.getAppColors(.blackDay)
+        
+        return titleLabel
+    }()
+    
+    private let trackedDaysTitle: UILabel = {
+        let titleLabel = UILabel()
+        titleLabel.translatesAutoresizingMaskIntoConstraints = false
+        titleLabel.textAlignment = .center
+        titleLabel.font = UIFont.systemFont(ofSize: 32, weight: .bold)
+        titleLabel.textColor = UIColor.getAppColors(.blackDay)
+        titleLabel.isHidden = true
         
         return titleLabel
     }()
@@ -351,6 +364,11 @@ extension CreateEventViewController: UICollectionViewDataSource {
         }
         
         switch sectionType {
+        case .days:
+            if updateTracker == 0 {
+                return 0
+            }
+            return 1
         case .name:
             return 1
         case .properties:
@@ -371,6 +389,11 @@ extension CreateEventViewController: UICollectionViewDataSource {
         }
         
         switch sectionType {
+        case .days:
+            if updateTracker == nil {
+                return UICollectionViewCell()
+            }
+            let cell = collectionView.dequeueReusableCell(withReuseIdentifier: , for: <#T##IndexPath#>)
         case .name:
             let cell = collectionView.dequeueReusableCell(withReuseIdentifier: nameCellIdentifier, for: indexPath) as! NameCollectionViewCell
             cell.configure(name: trackerName) { [weak self] name in

@@ -163,7 +163,7 @@ final class TrackerCollectionViewCell: UICollectionViewCell {
     }
     
     @objc private func trackEvent() {
-//        AnalyticsService.sendEvent(event: "click", screen: "Main", item: "track")
+        AnalyticsService.sendEvent(event: "click", screen: "Main", item: "track")
         
         guard let indexPath = indexPath else {
             print("TrackerCollectionViewCell: indexPath is empty")

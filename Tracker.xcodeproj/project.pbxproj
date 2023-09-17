@@ -24,6 +24,8 @@
 		4D1A9C0A2A726B50007E527A /* LaunchScreen.storyboard in Resources */ = {isa = PBXBuildFile; fileRef = 4D1A9C082A726B50007E527A /* LaunchScreen.storyboard */; };
 		4D2706EB2A77AE0900F106CA /* TrackerCollectionViewCell.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4D2706EA2A77AE0900F106CA /* TrackerCollectionViewCell.swift */; };
 		4D3BD0DD2AB440AB00CACF66 /* AnalyticsService.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4D3BD0DC2AB440AB00CACF66 /* AnalyticsService.swift */; };
+		4D68390E2AB607BA0041AF1B /* View.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4D68390D2AB607BA0041AF1B /* View.swift */; };
+		4D6839102AB70BC30041AF1B /* GradientView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4D68390F2AB70BC30041AF1B /* GradientView.swift */; };
 		4D6923F02A9D0FD200B9261F /* TrackerStoreProtocol.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4D6923EF2A9D0FD200B9261F /* TrackerStoreProtocol.swift */; };
 		4D6923F22A9D10FD00B9261F /* TrackerRecordStoreProtocol.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4D6923F12A9D10FD00B9261F /* TrackerRecordStoreProtocol.swift */; };
 		4D6923F42A9D1A4F00B9261F /* TrackerViewModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4D6923F32A9D1A4F00B9261F /* TrackerViewModel.swift */; };
@@ -97,6 +99,8 @@
 		4D1A9C0B2A726B50007E527A /* Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = Info.plist; sourceTree = "<group>"; };
 		4D2706EA2A77AE0900F106CA /* TrackerCollectionViewCell.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TrackerCollectionViewCell.swift; sourceTree = "<group>"; };
 		4D3BD0DC2AB440AB00CACF66 /* AnalyticsService.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AnalyticsService.swift; sourceTree = "<group>"; };
+		4D68390D2AB607BA0041AF1B /* View.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = View.swift; sourceTree = "<group>"; };
+		4D68390F2AB70BC30041AF1B /* GradientView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = GradientView.swift; sourceTree = "<group>"; };
 		4D6923EF2A9D0FD200B9261F /* TrackerStoreProtocol.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TrackerStoreProtocol.swift; sourceTree = "<group>"; };
 		4D6923F12A9D10FD00B9261F /* TrackerRecordStoreProtocol.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TrackerRecordStoreProtocol.swift; sourceTree = "<group>"; };
 		4D6923F32A9D1A4F00B9261F /* TrackerViewModel.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TrackerViewModel.swift; sourceTree = "<group>"; };
@@ -181,6 +185,7 @@
 				4D1A3D2E2A7B8D53003026E6 /* Array.swift */,
 				4DA9702F2A9BA390006CED88 /* Context.swift */,
 				4D6923F52A9E00F900B9261F /* Color.swift */,
+				4D68390D2AB607BA0041AF1B /* View.swift */,
 			);
 			path = Helpers;
 			sourceTree = "<group>";
@@ -311,6 +316,7 @@
 			isa = PBXGroup;
 			children = (
 				4D6B34C32A8B85BB00C1902C /* Statistics.swift */,
+				4D68390F2AB70BC30041AF1B /* GradientView.swift */,
 			);
 			path = Statistics;
 			sourceTree = "<group>";
@@ -591,12 +597,14 @@
 				4D6923FC2A9E4A1A00B9261F /* ButtonCollectionsViewCell.swift in Sources */,
 				4D8F668D2AB2ED1700B42FA7 /* UIColorMarshalling.swift in Sources */,
 				4D17AA462A9C6C3700BC5999 /* TrackerCategoryStore.swift in Sources */,
+				4D68390E2AB607BA0041AF1B /* View.swift in Sources */,
 				4D1A3D3E2A814F69003026E6 /* TypeSelectionViewController.swift in Sources */,
 				4DDC8E262A98C6FB00F85E5D /* TrackerStore.swift in Sources */,
 				4D84609A2AA3AEAB0041BED7 /* TrackerCategoryViewModal.swift in Sources */,
 				4D8460912AA39A600041BED7 /* Observable.swift in Sources */,
 				4D3BD0DD2AB440AB00CACF66 /* AnalyticsService.swift in Sources */,
 				4D1A3D402A8167D6003026E6 /* CreateEventViewController.swift in Sources */,
+				4D6839102AB70BC30041AF1B /* GradientView.swift in Sources */,
 				4D1A9BFE2A726B4C007E527A /* AppDelegate.swift in Sources */,
 				4D1A9C002A726B4C007E527A /* SceneDelegate.swift in Sources */,
 				4D6923FA2A9E484000B9261F /* PropertiesCollectionViewCell.swift in Sources */,
