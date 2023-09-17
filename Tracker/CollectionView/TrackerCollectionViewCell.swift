@@ -180,23 +180,6 @@ final class TrackerCollectionViewCell: UICollectionViewCell {
     func disableTrackButton() { trackButton.isEnabled = false }
     
     func enableTrackButton() { trackButton.isEnabled = true }
-    
-    private func formatTrackedDays(days: Int) -> String {
-        if days >= 11 && days <= 14 {
-            return "\(days) дней"
-        }
-        
-        switch Double(days).remainder(dividingBy: 10) {
-        case 0, 5, 6, 7, 8, 9:
-            return "\(days) дней"
-        case 1:
-            return "\(days) день"
-        case 2, 3, 4:
-            return "\(days) дня"
-        default:
-            return "\(days) дней"
-        }
-    }
 }
 
 extension TrackerCollectionViewCell: UIContextMenuInteractionDelegate {

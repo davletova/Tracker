@@ -62,8 +62,8 @@
             filePath = "Tracker/CoreData/DataStore/TrackerRecordStore.swift"
             startingColumnNumber = "9223372036854775807"
             endingColumnNumber = "9223372036854775807"
-            startingLineNumber = "50"
-            endingLineNumber = "50"
+            startingLineNumber = "170"
+            endingLineNumber = "170"
             landmarkName = "addNewRecord(_:)"
             landmarkType = "7">
             <Locations>
@@ -140,8 +140,8 @@
             filePath = "Tracker/CoreData/DataStore/TrackerRecordStore.swift"
             startingColumnNumber = "9223372036854775807"
             endingColumnNumber = "9223372036854775807"
-            startingLineNumber = "40"
-            endingLineNumber = "40"
+            startingLineNumber = "160"
+            endingLineNumber = "160"
             landmarkName = "addNewRecord(_:)"
             landmarkType = "7">
             <Locations>
@@ -219,8 +219,8 @@
             filePath = "Tracker/CoreData/DataStore/TrackerRecordStore.swift"
             startingColumnNumber = "9223372036854775807"
             endingColumnNumber = "9223372036854775807"
-            startingLineNumber = "57"
-            endingLineNumber = "57"
+            startingLineNumber = "177"
+            endingLineNumber = "177"
             landmarkName = "deleteRecord(_:)"
             landmarkType = "7">
             <Locations>
@@ -410,8 +410,8 @@
             filePath = "Tracker/CoreData/DataStore/TrackerRecordStore.swift"
             startingColumnNumber = "9223372036854775807"
             endingColumnNumber = "9223372036854775807"
-            startingLineNumber = "39"
-            endingLineNumber = "39"
+            startingLineNumber = "159"
+            endingLineNumber = "159"
             landmarkName = "addNewRecord(_:)"
             landmarkType = "7">
             <Locations>
@@ -630,8 +630,8 @@
             filePath = "Tracker/CoreData/DataStore/TrackerRecordStore.swift"
             startingColumnNumber = "9223372036854775807"
             endingColumnNumber = "9223372036854775807"
-            startingLineNumber = "47"
-            endingLineNumber = "47"
+            startingLineNumber = "167"
+            endingLineNumber = "167"
             landmarkName = "addNewRecord(_:)"
             landmarkType = "7">
          </BreakpointContent>
@@ -772,8 +772,8 @@
             filePath = "Tracker/CreateEventViewControllers/CreateEventViewController.swift"
             startingColumnNumber = "9223372036854775807"
             endingColumnNumber = "9223372036854775807"
-            startingLineNumber = "469"
-            endingLineNumber = "469"
+            startingLineNumber = "450"
+            endingLineNumber = "450"
             landmarkName = "collectionView(_:cellForItemAt:)"
             landmarkType = "7">
             <Locations>
@@ -820,8 +820,8 @@
             filePath = "Tracker/CreateEventViewControllers/CreateEventViewController.swift"
             startingColumnNumber = "9223372036854775807"
             endingColumnNumber = "9223372036854775807"
-            startingLineNumber = "470"
-            endingLineNumber = "470"
+            startingLineNumber = "451"
+            endingLineNumber = "451"
             landmarkName = "collectionView(_:cellForItemAt:)"
             landmarkType = "7">
          </BreakpointContent>

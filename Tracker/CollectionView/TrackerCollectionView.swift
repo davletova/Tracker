@@ -322,7 +322,7 @@ extension TrackerCollectionView: TrackEventProtocol {
         }
         
         let editTrackerVC = CreateEventViewController()
-        editTrackerVC.updateTracker = trackerVM.tracker
+        editTrackerVC.updateTrackerVM = trackerVM
         if let _ = trackerVM.tracker as? Timetable {
             editTrackerVC.isHabit = true
         } else {

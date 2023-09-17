@@ -12,7 +12,6 @@ class CreateEventSupplementaryView: UICollectionReusableView {
     let titleLabel: UILabel = {
         let titleLabel = UILabel()
         titleLabel.translatesAutoresizingMaskIntoConstraints = false
-        titleLabel.font = UIFont.systemFont(ofSize: 19, weight: UIFont.Weight.bold)
         
         return titleLabel
     }()
@@ -26,6 +25,7 @@ class CreateEventSupplementaryView: UICollectionReusableView {
             titleLabel.leadingAnchor.constraint(equalTo: leadingAnchor, constant: 12),
             titleLabel.topAnchor.constraint(equalTo: topAnchor),
             titleLabel.bottomAnchor.constraint(equalTo: bottomAnchor),
+            titleLabel.trailingAnchor.constraint(equalTo: trailingAnchor, constant: -12),
         ])
     }
     

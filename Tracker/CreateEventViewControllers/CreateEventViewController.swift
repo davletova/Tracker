@@ -8,7 +8,6 @@
 import Foundation
 import UIKit
 
-private let daysCellIdentifier = ""
 private let nameCellIdentifier = "nameCell"
 private let propertyCellIdentifier = "propertyCell"
 private let emojiCellIdentifier = "emojiCell"
@@ -16,12 +15,11 @@ private let colorCellIdentifier = "colorCell"
 private let buttonsCellIdentifier = "buttonCell"
 
 enum CollectionSectionType: Int {
-    case days = 0
-    case name = 1
-    case properties = 2
-    case emoji = 3
-    case color = 4
-    case buttons = 5
+    case name = 0
+    case properties = 1
+    case emoji = 2
+    case color = 3
+    case buttons = 4
 }
 
 enum PropertyType: Int, Hashable {
@@ -64,6 +62,7 @@ final class CreateEventViewController: UIViewController {
         titleLabel.font = UIFont.systemFont(ofSize: 32, weight: .bold)
         titleLabel.textColor = UIColor.getAppColors(.blackDay)
         titleLabel.isHidden = true
+
         
         return titleLabel
     }()
@@ -132,7 +131,7 @@ final class CreateEventViewController: UIViewController {
     
     private var selectedColorIndexPath: IndexPath? { didSet { changeStateCreateButtonifNeedIt() } }
     
-    var updateTracker: Tracker?
+    var updateTrackerVM: TrackerViewModel?
     
     override func viewDidLoad() {
         super.viewDidLoad()
@@ -172,14 +171,14 @@ final class CreateEventViewController: UIViewController {
             )
         }
         
-        if let updateTracker = updateTracker {
-            if let habit = updateTracker as? Timetable {
+        if let updateTrackerVM = updateTrackerVM {
+            if let habit = updateTrackerVM.tracker as? Timetable {
                 selectedSchedule = habit.getSchedule()
             }
-            trackerName = updateTracker.name
-            selectedCategory = updateTracker.category
+            trackerName = updateTrackerVM.tracker.name
+            selectedCategory = updateTrackerVM.tracker.category
             
-            guard let emojiIndex = emojies.firstIndex(of: updateTracker.emoji) else {
+            guard let emojiIndex = emojies.firstIndex(of: updateTrackerVM.tracker.emoji) else {
                 assertionFailure("emoji not found")
                 return
             }
@@ -187,7 +186,7 @@ final class CreateEventViewController: UIViewController {
             
             //TODO: убрать force unwrapp
             guard let colorIndex = colors.firstIndex(where: { color in
-                UIColorMarshalling.hexString(from: color!) == UIColorMarshalling.hexString(from: updateTracker.color)
+                UIColorMarshalling.hexString(from: color!) == UIColorMarshalling.hexString(from: updateTrackerVM.tracker.color)
             }) else {
                 assertionFailure("color not found")
                 return
@@ -206,7 +205,7 @@ final class CreateEventViewController: UIViewController {
     private func setupTitle() {
         view.addSubview(titleLabel)
         
-        if let _ = updateTracker {
+        if let _ = updateTrackerVM {
          //TODO: локализовать заголовки
             titleLabel.text = "Редактирование"
         } else {
@@ -228,7 +227,7 @@ final class CreateEventViewController: UIViewController {
         view.addSubview(collectionView)
         
         NSLayoutConstraint.activate([
-            collectionView.topAnchor.constraint(equalTo: titleLabel.bottomAnchor),
+            collectionView.topAnchor.constraint(equalTo: titleLabel.bottomAnchor, constant: 24),
             collectionView.leadingAnchor.constraint(equalTo: view.leadingAnchor, constant: 16),
             collectionView.trailingAnchor.constraint(equalTo: view.trailingAnchor, constant: -8),
             collectionView.bottomAnchor.constraint(equalTo: view.bottomAnchor, constant: -34)
@@ -305,34 +304,26 @@ extension CreateEventViewController: TrackerActionProtocol {
             return
         }
         
-        let newTracker: Tracker
+        var newTracker = Tracker(
+            id: UUID(),
+            name: value,
+            category: selectCategory,
+            emoji: emojies[selectedEmojiIndex.row],
+            color: color
+        )
+        
         if isHabit {
             guard let schedule = selectedSchedule else {
                 print("create habit: schedule is empty")
                 return
             }
             
-            newTracker = Habit(
-                id: UUID(),
-                name: value,
-                category: selectCategory,
-                emoji: emojies[selectedEmojiIndex.row],
-                color: color,
-                schedule: schedule
-            )
-        } else {
-            newTracker = Tracker(
-                id: UUID(),
-                name: value,
-                category: selectCategory,
-                emoji: emojies[selectedEmojiIndex.row],
-                color: color
-            )
+            newTracker = Habit(tracker: newTracker, schedule: schedule)
         }
         
         do {
-            if let updateTracker = updateTracker {
-                newTracker.id = updateTracker.id
+            if let updateTracker = updateTrackerVM {
+                newTracker.id = updateTracker.tracker.id
                 try trackerStore.updateTracker(newTracker)
             } else {
                 try trackerStore.addNewTracker(newTracker)
@@ -364,11 +355,6 @@ extension CreateEventViewController: UICollectionViewDataSource {
         }
         
         switch sectionType {
-        case .days:
-            if updateTracker == 0 {
-                return 0
-            }
-            return 1
         case .name:
             return 1
         case .properties:
@@ -389,11 +375,6 @@ extension CreateEventViewController: UICollectionViewDataSource {
         }
         
         switch sectionType {
-        case .days:
-            if updateTracker == nil {
-                return UICollectionViewCell()
-            }
-            let cell = collectionView.dequeueReusableCell(withReuseIdentifier: , for: <#T##IndexPath#>)
         case .name:
             let cell = collectionView.dequeueReusableCell(withReuseIdentifier: nameCellIdentifier, for: indexPath) as! NameCollectionViewCell
             cell.configure(name: trackerName) { [weak self] name in
@@ -470,7 +451,7 @@ extension CreateEventViewController: UICollectionViewDataSource {
             let create = NSLocalizedString("to.create", comment: "текст кнопки Создать")
             //TODO: локализовать
             let save = "Save"
-            let createButtonText = updateTracker != nil ? save : create
+            let createButtonText = updateTrackerVM != nil ? save : create
             
             cell.setTitle(text: createButtonText)
             
@@ -498,11 +479,30 @@ extension CreateEventViewController: UICollectionViewDataSource {
             return UICollectionReusableView()
         }
         
-        switch indexPath.section {
-        case 2:
+        guard let sectionType = CollectionSectionType(rawValue: indexPath.section) else {
+            assertionFailure("invalid section")
+            return UICollectionReusableView()
+        }
+        
+        switch sectionType {
+        case .name:
+            guard let updateTrackerVM = updateTrackerVM else {
+                return UICollectionReusableView()
+            }
+            view.titleLabel.text = String.localizedStringWithFormat(
+                NSLocalizedString("trackedDays", comment: "Число затреканных дней"),
+                updateTrackerVM.trackedDaysCount
+            )
+            view.titleLabel.font = UIFont.systemFont(ofSize: 32, weight: .bold)
+            view.titleLabel.textAlignment = .center
+        case .emoji:
             view.titleLabel.text = NSLocalizedString("emoji", comment: "заголовок раздела с выбором emoji")
-        case 3:
+            view.titleLabel.font = UIFont.systemFont(ofSize: 19, weight: .bold)
+            view.titleLabel.textAlignment = .left
+        case .color:
             view.titleLabel.text = NSLocalizedString("color", comment: "заголовок раздела с выбором цвета")
+            view.titleLabel.font = UIFont.systemFont(ofSize: 19, weight: .bold)
+            view.titleLabel.textAlignment = .left
         default:
             return view
         }
@@ -512,25 +512,39 @@ extension CreateEventViewController: UICollectionViewDataSource {
 }
 
 extension CreateEventViewController: UICollectionViewDelegateFlowLayout {
-    func collectionView(_ collectionView: UICollectionView, layout collectionViewLayout: UICollectionViewLayout, sizeForItemAt indexPath: IndexPath) -> CGSize {
-        switch indexPath.section {
-        case 0:
-            return CGSize(width: view.bounds.width - 32, height: rowHeight)
-        case 1:
-            return CGSize(width: view.bounds.width - 32, height: rowHeight)
-        case 2, 3:
-            return CGSize(width: collectionView.bounds.width / 6 - 2, height: collectionView.bounds.width / 6 - 2)
-        case 4:
-            return CGSize(width: view.bounds.width - 32 , height: buttonHeight)
-        default:
+    func collectionView(
+        _ collectionView: UICollectionView,
+        layout collectionViewLayout: UICollectionViewLayout,
+        sizeForItemAt indexPath: IndexPath
+    ) -> CGSize {
+        guard let sectionType = CollectionSectionType(rawValue: indexPath.section) else {
             assertionFailure("invalid section")
             return .zero
         }
+        
+        switch sectionType {
+        case .name:
+            return CGSize(width: view.bounds.width - 32, height: rowHeight)
+        case .properties:
+            return CGSize(width: view.bounds.width - 32, height: rowHeight)
+        case .emoji, .color:
+            return CGSize(width: collectionView.bounds.width / 6 - 2, height: collectionView.bounds.width / 6 - 2)
+        case .buttons:
+            return CGSize(width: view.bounds.width - 32 , height: buttonHeight)
+        }
     }
     
-    func collectionView(_ collectionView: UICollectionView, layout collectionViewLayout: UICollectionViewLayout, referenceSizeForHeaderInSection section: Int) -> CGSize {
-        switch section {
-        case 2, 3:
+    func collectionView(
+        _ collectionView: UICollectionView,
+        layout collectionViewLayout: UICollectionViewLayout,
+        referenceSizeForHeaderInSection section: Int
+    ) -> CGSize {
+        guard let sectionType = CollectionSectionType(rawValue: section) else {
+            assertionFailure("invalid section")
+            return .zero
+        }
+        
+        if sectionType == .emoji || sectionType == .color || (sectionType == .name && updateTrackerVM != nil) {
             let indexPath = IndexPath(row: 0, section: section)
             
             let headerView = self.collectionView(collectionView, viewForSupplementaryElementOfKind: UICollectionView.elementKindSectionHeader, at: indexPath)
@@ -539,20 +553,32 @@ extension CreateEventViewController: UICollectionViewDelegateFlowLayout {
                 CGSize(width: collectionView.frame.width, height: UIView.layoutFittingExpandedSize.height),
                 withHorizontalFittingPriority: .required,
                 verticalFittingPriority: .fittingSizeLevel)
-        default:
-            return .zero
         }
+        
+        return .zero
     }
     
-    func collectionView(_ collectionView: UICollectionView, layout collectionViewLayout: UICollectionViewLayout, insetForSectionAt section: Int) -> UIEdgeInsets {
-        switch section {
-        case 0:
-            return UIEdgeInsets(top: 24, left: 0, bottom: 0, right: 10)
-        case 1:
+    func collectionView(
+        _ collectionView: UICollectionView,
+        layout collectionViewLayout: UICollectionViewLayout,
+        insetForSectionAt section: Int
+    ) -> UIEdgeInsets {
+        guard let sectionType = CollectionSectionType(rawValue: section) else {
+            assertionFailure("invalid section")
+            return .zero
+        }
+        
+        switch sectionType {
+        case .name:
+            if updateTrackerVM == nil {
+                return UIEdgeInsets(top: 0, left: 0, bottom: 0, right: 10)
+            }
+            return UIEdgeInsets(top: 40, left: 0, bottom: 0, right: 10)
+        case .properties:
             return UIEdgeInsets(top: 24, left: 0, bottom: 32, right: 10)
-        case 2:
+        case .emoji:
             return UIEdgeInsets(top: 24, left: 0, bottom: 40, right: 10)
-        case 3:
+        case .color:
             return UIEdgeInsets(top: 24, left: 0, bottom: 16, right: 10)
         default:
             return UIEdgeInsets(top: 24, left: 0, bottom: 0, right: 10)

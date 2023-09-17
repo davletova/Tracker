@@ -40,14 +40,24 @@ class StatisticsViewController: UIViewController {
     
     private lazy var averageValue = GradientView(frame: CGRect(x: 0, y: 0, width: view.frame.width - 32, height: 90))
     
+    private let store = TrackerRecordStore()
+    
     override func viewDidLoad() {
         super.viewDidLoad()
         
         view.backgroundColor = UIColor.getAppColors(.whiteDay)
 
+        var bestPeriodDays = 0
+        var idealDayCount = 0
+        do {
+            bestPeriodDays = try store.listTrackerRecords()
+            idealDayCount = try store.idealDaysBlya()
+        } catch {
+            print("failed to get best period days with erro: \(error)")
+        }
         //TODO: сделать локализацию
-        bestPeriodView.configure(numberTitleText: "4", descTitleText: "Лучший период")
-        perfectDays.configure(numberTitleText: "123", descTitleText: "Иделаьные дни")
+        bestPeriodView.configure(numberTitleText: bestPeriodDays.description, descTitleText: "Лучший период")
+        perfectDays.configure(numberTitleText: idealDayCount.description, descTitleText: "Иделаьные дни")
         completedTrackers.configure(numberTitleText: "34567788", descTitleText: "Завершенные трекеры")
         averageValue.configure(numberTitleText: "34", descTitleText: "Среднее значение")
         

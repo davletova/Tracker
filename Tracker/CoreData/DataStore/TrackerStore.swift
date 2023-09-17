@@ -243,7 +243,7 @@ final class TrackerStore: NSObject, TrackerStoreProtocol {
             throw TrackerStoreError.decodingErrorInvalidCategory
         }
         
-        let tracker = Tracker(
+        var tracker = Tracker(
             id: trackerID,
             name: trackerName,
             category: TrackerCategory(id: categoryID, name: categoryName),
@@ -251,6 +251,11 @@ final class TrackerStore: NSObject, TrackerStoreProtocol {
             color: UIColorMarshalling.color(from: trackerColorHex),
             pinned: trackerCoreData.pinned
         )
+        
+        if let schedule = trackerCoreData.schedule {
+            let habit = Habit(tracker: tracker, schedule: getSchedule(scheduleCoreData: schedule, startDate: Date()))
+            tracker = habit
+        }
                 
         guard let records = trackerCoreData.records else {
             return TrackerViewModel(event: tracker, trackedDaysCount: 0, tracked: false)
@@ -268,6 +273,33 @@ final class TrackerStore: NSObject, TrackerStoreProtocol {
         }
         
         return TrackerViewModel(event: tracker, trackedDaysCount: records.count, tracked: tracked)
+    }
+    
+    func getSchedule(scheduleCoreData: TrackerScheduleCoreData, startDate: Date) -> Schedule {
+        var repetition = Set<Weekday>()
+        if scheduleCoreData.monday {
+            repetition.insert(Weekday.monday)
+        }
+        if scheduleCoreData.tuesday {
+            repetition.insert(Weekday.tuesday)
+        }
+        if scheduleCoreData.wednesday {
+            repetition.insert(Weekday.wednesday)
+        }
+        if scheduleCoreData.thursday {
+            repetition.insert(Weekday.thursday)
+        }
+        if scheduleCoreData.friday {
+            repetition.insert(Weekday.friday)
+        }
+        if scheduleCoreData.saturday {
+            repetition.insert(Weekday.saturday)
+        }
+        if scheduleCoreData.sunday {
+            repetition.insert(Weekday.sunday)
+        }
+        
+        return Schedule(startDate: startDate, repetition: repetition)
     }
 }
 
