@@ -303,6 +303,19 @@ final class TrackerStore: NSObject, TrackerStoreProtocol {
     }
 }
 
+extension TrackerStore: ListTrackerProtocol {
+    func listTrackers(withFilter:  NSPredicate?, withSort: [NSSortDescriptor]?) throws -> [TrackerCoreData] {
+        let request = TrackerCoreData.fetchRequest()
+        if let predicate = withFilter {
+            request.predicate = predicate
+        }
+        if let sortDescriptors = withSort {
+            request.sortDescriptors = sortDescriptors
+        }
+        return try context.fetch(request)
+    }
+}
+
 extension TrackerStore: NSFetchedResultsControllerDelegate {
     func controllerDidChangeContent(_ controller: NSFetchedResultsController<NSFetchRequestResult>) {
         NotificationCenter.default.post(

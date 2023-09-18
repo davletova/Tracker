@@ -10,7 +10,17 @@ import UIKit
 
 let statisticCellHeight = CGFloat(90)
 
+protocol StatisticsViewModelProtocol {
+    func getTrackersCount() throws -> Int
+    func getBestPeriod() throws -> Int
+    func getCountOfIdealDays() throws -> Int
+    func getTotalPerformedHabits() throws -> Int
+    func getAverrage() throws -> Int
+}
+
 class StatisticsViewController: UIViewController {
+    private let viewModel: StatisticsViewModelProtocol
+    
     private lazy var statisticTitle: UILabel = {
         let label = UILabel()
         label.translatesAutoresizingMaskIntoConstraints = false
@@ -40,22 +50,90 @@ class StatisticsViewController: UIViewController {
     
     private lazy var averageValue = GradientView(frame: CGRect(x: 0, y: 0, width: view.frame.width - 32, height: 90))
     
-    private let store = TrackerRecordStore()
+    private lazy var emptyCollectionView: UIView = {
+        let view = UIView()
+        let imageView = UIImageView(image: UIImage(named: "empty"))
+        let label = UILabel()
+        //TODO: localize
+        label.text = NSLocalizedString("empty statistic", comment: "текст для пустого списка категорий")
+        label.numberOfLines = 0
+        label.textAlignment = .center
+        label.font = UIFont.systemFont(ofSize: 12, weight: .medium)
+        
+        view.translatesAutoresizingMaskIntoConstraints = false
+        imageView.translatesAutoresizingMaskIntoConstraints = false
+        label.translatesAutoresizingMaskIntoConstraints = false
+        
+        view.addSubview(imageView)
+        view.addSubview(label)
+        
+        NSLayoutConstraint.activate([
+            imageView.topAnchor.constraint(equalTo: view.topAnchor),
+            imageView.centerXAnchor.constraint(equalTo: view.centerXAnchor),
+            label.topAnchor.constraint(equalTo: imageView.bottomAnchor, constant: 10),
+            label.centerXAnchor.constraint(equalTo: view.centerXAnchor)
+        ])
+        
+        return view
+    }()
+    
+    init(viewModel: StatisticsViewModelProtocol) {
+        self.viewModel = viewModel
+        
+        super.init(nibName: nil, bundle: nil)
+    }
+    
+    required init?(coder: NSCoder) {
+        fatalError("init(coder:) has not been implemented")
+    }
     
     override func viewDidAppear(_ animated: Bool) {
         super.viewDidAppear(animated)
+        
+        var trackresCount = 0
+        do {
+            trackresCount = try viewModel.getTrackersCount()
+        } catch {
+            print("failed to getTrackersCount with error \(error)")
+            statisticStack.isHidden = true
+            showEmptyView()
+        }
+        
+        if trackresCount == 0 {
+            showEmptyView()
+            statisticStack.isHidden = true
+            return
+        } else {
+            hideEmptyView()
+            statisticStack.isHidden = false
+        }
         
         var bestPeriodDays = 0
         var idealDayCount = 0
         var totalPerformedHabits = 0
         var average = 0
         do {
-            bestPeriodDays = try store.listTrackerRecords()
-            idealDayCount = try store.idealDaysBlya()
-            totalPerformedHabits = try store.getTotalPerformedHabits()
-            average = try store.getAverrage()
+            bestPeriodDays = try viewModel.getBestPeriod()
         } catch {
             print("failed to get best period days with erro: \(error)")
+        }
+        
+        do {
+            idealDayCount = try viewModel.getCountOfIdealDays()
+        } catch {
+            print("failed to getCountOfIdealDays with erro: \(error)")
+        }
+        
+        do {
+            totalPerformedHabits = try viewModel.getTotalPerformedHabits()
+        } catch {
+            print("failed to getTotalPerformedHabits with erro: \(error)")
+        }
+        
+        do {
+            average = try viewModel.getAverrage()
+        } catch {
+            print("failed to getAverrage with erro: \(error)")
         }
         
         bestPeriodView.configure(numberTitleText: bestPeriodDays.description, descTitleText: "Лучший период")
@@ -70,7 +148,6 @@ class StatisticsViewController: UIViewController {
         view.backgroundColor = UIColor.getAppColors(.whiteDay)
 
         //TODO: сделать локализацию
-        
         view.addSubview(statisticTitle)
         view.addSubview(statisticStack)
         
@@ -83,25 +160,22 @@ class StatisticsViewController: UIViewController {
             statisticStack.leadingAnchor.constraint(equalTo: view.leadingAnchor, constant: 16),
             statisticStack.trailingAnchor.constraint(equalTo: view.trailingAnchor, constant: -16),
             
-//            bestPeriodView.topAnchor.constraint(equalTo: statisticTitle.bottomAnchor, constant: 77),
-//            bestPeriodView.leadingAnchor.constraint(equalTo: view.leadingAnchor, constant: 16),
-//            bestPeriodView.trailingAnchor.constraint(equalTo: view.trailingAnchor, constant: -16),
             bestPeriodView.heightAnchor.constraint(equalToConstant: statisticCellHeight),
-//
-//            perfectDays.topAnchor.constraint(equalTo: bestPeriodView.bottomAnchor, constant: 12),
             perfectDays.heightAnchor.constraint(equalToConstant: statisticCellHeight),
-//            perfectDays.leadingAnchor.constraint(equalTo: view.leadingAnchor, constant: 16),
-//            perfectDays.trailingAnchor.constraint(equalTo: view.trailingAnchor, constant: -16),
-//
-//            completedTrackers.topAnchor.constraint(equalTo: perfectDays.bottomAnchor, constant: 12),
             completedTrackers.heightAnchor.constraint(equalToConstant: statisticCellHeight),
-//            completedTrackers.leadingAnchor.constraint(equalTo: view.leadingAnchor, constant: 16),
-//            completedTrackers.trailingAnchor.constraint(equalTo: view.trailingAnchor, constant: -16),
-//
-//            averageValue.topAnchor.constraint(equalTo: completedTrackers.bottomAnchor, constant: 12),
             averageValue.heightAnchor.constraint(equalToConstant: statisticCellHeight),
-//            averageValue.leadingAnchor.constraint(equalTo: view.leadingAnchor, constant: 16),
-//            averageValue.trailingAnchor.constraint(equalTo: view.trailingAnchor, constant: -16),
         ])
+    }
+    
+    private func showEmptyView() {
+        view.addSubview(emptyCollectionView)
+        
+        NSLayoutConstraint.activate([
+            emptyCollectionView.centerXAnchor.constraint(equalTo: view.safeAreaLayoutGuide.centerXAnchor),
+            emptyCollectionView.centerYAnchor.constraint(equalTo: view.safeAreaLayoutGuide.centerYAnchor)
+        ])
+    }
+    func hideEmptyView() {
+        emptyCollectionView.removeFromSuperview()
     }
 }

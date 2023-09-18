@@ -26,6 +26,9 @@
 		4D3BD0DD2AB440AB00CACF66 /* AnalyticsService.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4D3BD0DC2AB440AB00CACF66 /* AnalyticsService.swift */; };
 		4D68390E2AB607BA0041AF1B /* View.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4D68390D2AB607BA0041AF1B /* View.swift */; };
 		4D6839102AB70BC30041AF1B /* GradientView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4D68390F2AB70BC30041AF1B /* GradientView.swift */; };
+		4D6839122AB838300041AF1B /* StatisticsViewModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4D6839112AB838300041AF1B /* StatisticsViewModel.swift */; };
+		4D6839142AB87E1C0041AF1B /* TrackerSheduleStore.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4D6839132AB87E1C0041AF1B /* TrackerSheduleStore.swift */; };
+		4D6839162AB8B0B10041AF1B /* TrackerCollectionViewModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4D6839152AB8B0B10041AF1B /* TrackerCollectionViewModel.swift */; };
 		4D6923F02A9D0FD200B9261F /* TrackerStoreProtocol.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4D6923EF2A9D0FD200B9261F /* TrackerStoreProtocol.swift */; };
 		4D6923F22A9D10FD00B9261F /* TrackerRecordStoreProtocol.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4D6923F12A9D10FD00B9261F /* TrackerRecordStoreProtocol.swift */; };
 		4D6923F42A9D1A4F00B9261F /* TrackerViewModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4D6923F32A9D1A4F00B9261F /* TrackerViewModel.swift */; };
@@ -36,7 +39,7 @@
 		4D6923FE2A9E7B2500B9261F /* TrackerActionProtocol.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4D6923FD2A9E7B2500B9261F /* TrackerActionProtocol.swift */; };
 		4D6924022A9F23B500B9261F /* ChangeButtonStateProtocol.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4D6924012A9F23B500B9261F /* ChangeButtonStateProtocol.swift */; };
 		4D6924042A9F2CF300B9261F /* SelectableCellProtocol.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4D6924032A9F2CF300B9261F /* SelectableCellProtocol.swift */; };
-		4D6B34C42A8B85BB00C1902C /* Statistics.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4D6B34C32A8B85BB00C1902C /* Statistics.swift */; };
+		4D6B34C42A8B85BB00C1902C /* StatisticsViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4D6B34C32A8B85BB00C1902C /* StatisticsViewController.swift */; };
 		4D83A11D2AAE439300A7F55D /* Localizable.stringsdict in Resources */ = {isa = PBXBuildFile; fileRef = 4D83A11F2AAE439300A7F55D /* Localizable.stringsdict */; };
 		4D83A1202AAE439600A7F55D /* Localizable.strings in Resources */ = {isa = PBXBuildFile; fileRef = 4D83A1222AAE439600A7F55D /* Localizable.strings */; };
 		4D83A1252AAE43A700A7F55D /* Localizable.strings in Resources */ = {isa = PBXBuildFile; fileRef = 4D83A1272AAE43A700A7F55D /* Localizable.strings */; };
@@ -101,6 +104,9 @@
 		4D3BD0DC2AB440AB00CACF66 /* AnalyticsService.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AnalyticsService.swift; sourceTree = "<group>"; };
 		4D68390D2AB607BA0041AF1B /* View.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = View.swift; sourceTree = "<group>"; };
 		4D68390F2AB70BC30041AF1B /* GradientView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = GradientView.swift; sourceTree = "<group>"; };
+		4D6839112AB838300041AF1B /* StatisticsViewModel.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = StatisticsViewModel.swift; sourceTree = "<group>"; };
+		4D6839132AB87E1C0041AF1B /* TrackerSheduleStore.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TrackerSheduleStore.swift; sourceTree = "<group>"; };
+		4D6839152AB8B0B10041AF1B /* TrackerCollectionViewModel.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TrackerCollectionViewModel.swift; sourceTree = "<group>"; };
 		4D6923EF2A9D0FD200B9261F /* TrackerStoreProtocol.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TrackerStoreProtocol.swift; sourceTree = "<group>"; };
 		4D6923F12A9D10FD00B9261F /* TrackerRecordStoreProtocol.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TrackerRecordStoreProtocol.swift; sourceTree = "<group>"; };
 		4D6923F32A9D1A4F00B9261F /* TrackerViewModel.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TrackerViewModel.swift; sourceTree = "<group>"; };
@@ -111,7 +117,7 @@
 		4D6923FD2A9E7B2500B9261F /* TrackerActionProtocol.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TrackerActionProtocol.swift; sourceTree = "<group>"; };
 		4D6924012A9F23B500B9261F /* ChangeButtonStateProtocol.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ChangeButtonStateProtocol.swift; sourceTree = "<group>"; };
 		4D6924032A9F2CF300B9261F /* SelectableCellProtocol.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SelectableCellProtocol.swift; sourceTree = "<group>"; };
-		4D6B34C32A8B85BB00C1902C /* Statistics.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Statistics.swift; sourceTree = "<group>"; };
+		4D6B34C32A8B85BB00C1902C /* StatisticsViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = StatisticsViewController.swift; sourceTree = "<group>"; };
 		4D83A11E2AAE439300A7F55D /* en */ = {isa = PBXFileReference; lastKnownFileType = text.plist.stringsdict; name = en; path = en.lproj/Localizable.stringsdict; sourceTree = "<group>"; };
 		4D83A1212AAE439600A7F55D /* en */ = {isa = PBXFileReference; lastKnownFileType = text.plist.strings; name = en; path = en.lproj/Localizable.strings; sourceTree = "<group>"; };
 		4D83A12B2AAE43CB00A7F55D /* ru */ = {isa = PBXFileReference; lastKnownFileType = text.plist.strings; name = ru; path = ru.lproj/Localizable.strings; sourceTree = "<group>"; };
@@ -270,6 +276,7 @@
 			isa = PBXGroup;
 			children = (
 				4D1A9C012A726B4C007E527A /* TrackerCollectionView.swift */,
+				4D6839152AB8B0B10041AF1B /* TrackerCollectionViewModel.swift */,
 				4D2706EA2A77AE0900F106CA /* TrackerCollectionViewCell.swift */,
 				4D1A3D2C2A7B87EB003026E6 /* SupplementaryView.swift */,
 			);
@@ -315,8 +322,9 @@
 		4D6B34C22A8B85A700C1902C /* Statistics */ = {
 			isa = PBXGroup;
 			children = (
-				4D6B34C32A8B85BB00C1902C /* Statistics.swift */,
+				4D6B34C32A8B85BB00C1902C /* StatisticsViewController.swift */,
 				4D68390F2AB70BC30041AF1B /* GradientView.swift */,
+				4D6839112AB838300041AF1B /* StatisticsViewModel.swift */,
 			);
 			path = Statistics;
 			sourceTree = "<group>";
@@ -405,6 +413,7 @@
 				4DDC8E232A98C45B00F85E5D /* TrackerRecordStore.swift */,
 				4DDC8E252A98C6FB00F85E5D /* TrackerStore.swift */,
 				4D17AA452A9C6C3700BC5999 /* TrackerCategoryStore.swift */,
+				4D6839132AB87E1C0041AF1B /* TrackerSheduleStore.swift */,
 			);
 			path = DataStore;
 			sourceTree = "<group>";
@@ -589,6 +598,7 @@
 				4D6923F62A9E00F900B9261F /* Color.swift in Sources */,
 				4DA5C9742A82A9CB0046C149 /* CreateCategoryViewController.swift in Sources */,
 				4D1A3D2D2A7B87EB003026E6 /* SupplementaryView.swift in Sources */,
+				4D6839162AB8B0B10041AF1B /* TrackerCollectionViewModel.swift in Sources */,
 				4D6924022A9F23B500B9261F /* ChangeButtonStateProtocol.swift in Sources */,
 				4DA5C9722A82313B0046C149 /* ListCategoriesViewController.swift in Sources */,
 				4D8F668A2AB2E9CD00B42FA7 /* TabBarViewController.swift in Sources */,
@@ -622,8 +632,10 @@
 				4D6924042A9F2CF300B9261F /* SelectableCellProtocol.swift in Sources */,
 				4D6923FE2A9E7B2500B9261F /* TrackerActionProtocol.swift in Sources */,
 				4DDC8E212A98B15100F85E5D /* Model.xcdatamodeld in Sources */,
+				4D6839142AB87E1C0041AF1B /* TrackerSheduleStore.swift in Sources */,
+				4D6839122AB838300041AF1B /* StatisticsViewModel.swift in Sources */,
 				4D6923F82A9E437400B9261F /* NameCollectionViewCell.swift in Sources */,
-				4D6B34C42A8B85BB00C1902C /* Statistics.swift in Sources */,
+				4D6B34C42A8B85BB00C1902C /* StatisticsViewController.swift in Sources */,
 				4D84608D2AA1DB6C0041BED7 /* PageViewController.swift in Sources */,
 				4DA5C97E2A83EA8E0046C149 /* ColorCollectionViewCell.swift in Sources */,
 			);

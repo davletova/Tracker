@@ -22,7 +22,12 @@ final class TabBarViewController: UITabBarController {
             tag: 0
         )
         
-        let statisticsViewController = StatisticsViewController()
+        let statisticsViewModel = StatisticsViewModel(
+            recordStore: TrackerRecordStore(),
+            scheduleStore: TrackerScheduleStore(),
+            trackerStore: TrackerStore()
+        )
+        let statisticsViewController = StatisticsViewController(viewModel: statisticsViewModel)
         statisticsViewController.tabBarItem = UITabBarItem(
             title: NSLocalizedString("statistic", comment: "кнопка перехода на статистику"),
             image: UIImage(named: "hare.fill"),
