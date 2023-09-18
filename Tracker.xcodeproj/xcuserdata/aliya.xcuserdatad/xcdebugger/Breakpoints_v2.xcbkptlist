@@ -62,8 +62,8 @@
             filePath = "Tracker/CoreData/DataStore/TrackerRecordStore.swift"
             startingColumnNumber = "9223372036854775807"
             endingColumnNumber = "9223372036854775807"
-            startingLineNumber = "170"
-            endingLineNumber = "170"
+            startingLineNumber = "208"
+            endingLineNumber = "208"
             landmarkName = "addNewRecord(_:)"
             landmarkType = "7">
             <Locations>
@@ -140,8 +140,8 @@
             filePath = "Tracker/CoreData/DataStore/TrackerRecordStore.swift"
             startingColumnNumber = "9223372036854775807"
             endingColumnNumber = "9223372036854775807"
-            startingLineNumber = "160"
-            endingLineNumber = "160"
+            startingLineNumber = "198"
+            endingLineNumber = "198"
             landmarkName = "addNewRecord(_:)"
             landmarkType = "7">
             <Locations>
@@ -219,8 +219,8 @@
             filePath = "Tracker/CoreData/DataStore/TrackerRecordStore.swift"
             startingColumnNumber = "9223372036854775807"
             endingColumnNumber = "9223372036854775807"
-            startingLineNumber = "177"
-            endingLineNumber = "177"
+            startingLineNumber = "215"
+            endingLineNumber = "215"
             landmarkName = "deleteRecord(_:)"
             landmarkType = "7">
             <Locations>
@@ -410,8 +410,8 @@
             filePath = "Tracker/CoreData/DataStore/TrackerRecordStore.swift"
             startingColumnNumber = "9223372036854775807"
             endingColumnNumber = "9223372036854775807"
-            startingLineNumber = "159"
-            endingLineNumber = "159"
+            startingLineNumber = "197"
+            endingLineNumber = "197"
             landmarkName = "addNewRecord(_:)"
             landmarkType = "7">
             <Locations>
@@ -630,8 +630,8 @@
             filePath = "Tracker/CoreData/DataStore/TrackerRecordStore.swift"
             startingColumnNumber = "9223372036854775807"
             endingColumnNumber = "9223372036854775807"
-            startingLineNumber = "167"
-            endingLineNumber = "167"
+            startingLineNumber = "205"
+            endingLineNumber = "205"
             landmarkName = "addNewRecord(_:)"
             landmarkType = "7">
          </BreakpointContent>

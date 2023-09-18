@@ -156,6 +156,44 @@ final class TrackerRecordStore: NSObject, TrackerRecordStoreProtocol {
         return idealDaysCount
     }
     
+    func getTotalPerformedHabits() throws -> Int {
+        let request = TrackerCoreData.fetchRequest()
+        request.predicate = NSPredicate(format: "%K != nil", #keyPath(TrackerCoreData.schedule))
+        let trackers = try context.fetch(request)
+
+        var totalPerformedHabits = 0
+        
+        trackers.forEach { tracker in
+            if let records = tracker.records,
+               records.count > 0
+            {
+                totalPerformedHabits += 1
+            }
+        }
+        
+        return totalPerformedHabits
+    }
+    
+    func getAverrage() throws -> Int {
+        let request = TrackerRecordCoreData.fetchRequest()
+        request.predicate = NSPredicate(format: "%K != nil", #keyPath(TrackerScheduleCoreData.tracker.schedule))
+        let records = try context.fetch(request)
+
+        var idealDaysCount = 0
+        
+        // data: records
+        let dict = Dictionary(grouping: records) { $0.date! }
+        let totalDays = dict.keys.count
+        
+        var totalTracked = 0
+        
+        dict.forEach { (_: Date, value: [TrackerRecordCoreData])  in
+                totalTracked += value.count
+            }
+        
+        return Int(round(Double(totalTracked)/Double(totalDays)))
+    }
+    
     func addNewRecord(_ trackerRecord: TrackerRecord) throws {
         let request = TrackerCoreData.fetchRequest()
         

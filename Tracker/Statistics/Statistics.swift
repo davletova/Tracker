@@ -42,24 +42,34 @@ class StatisticsViewController: UIViewController {
     
     private let store = TrackerRecordStore()
     
+    override func viewDidAppear(_ animated: Bool) {
+        super.viewDidAppear(animated)
+        
+        var bestPeriodDays = 0
+        var idealDayCount = 0
+        var totalPerformedHabits = 0
+        var average = 0
+        do {
+            bestPeriodDays = try store.listTrackerRecords()
+            idealDayCount = try store.idealDaysBlya()
+            totalPerformedHabits = try store.getTotalPerformedHabits()
+            average = try store.getAverrage()
+        } catch {
+            print("failed to get best period days with erro: \(error)")
+        }
+        
+        bestPeriodView.configure(numberTitleText: bestPeriodDays.description, descTitleText: "Лучший период")
+        perfectDays.configure(numberTitleText: idealDayCount.description, descTitleText: "Иделаьные дни")
+        completedTrackers.configure(numberTitleText: totalPerformedHabits.description, descTitleText: "Завершенные трекеры")
+        averageValue.configure(numberTitleText: average.description, descTitleText: "Среднее значение")
+    }
+    
     override func viewDidLoad() {
         super.viewDidLoad()
         
         view.backgroundColor = UIColor.getAppColors(.whiteDay)
 
-        var bestPeriodDays = 0
-        var idealDayCount = 0
-        do {
-            bestPeriodDays = try store.listTrackerRecords()
-            idealDayCount = try store.idealDaysBlya()
-        } catch {
-            print("failed to get best period days with erro: \(error)")
-        }
         //TODO: сделать локализацию
-        bestPeriodView.configure(numberTitleText: bestPeriodDays.description, descTitleText: "Лучший период")
-        perfectDays.configure(numberTitleText: idealDayCount.description, descTitleText: "Иделаьные дни")
-        completedTrackers.configure(numberTitleText: "34567788", descTitleText: "Завершенные трекеры")
-        averageValue.configure(numberTitleText: "34", descTitleText: "Среднее значение")
         
         view.addSubview(statisticTitle)
         view.addSubview(statisticStack)
