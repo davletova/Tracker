@@ -58,13 +58,9 @@ final class TrackerStore: NSObject, TrackerStoreProtocol {
     }
     
     func getTrackers(by date: Date, withName name: String?) -> [TrackersByCategory] {
-        let request = TrackerCoreData.fetchRequest()
-        request.returnsObjectsAsFaults = false
-        request.sortDescriptors = [NSSortDescriptor(key: "createDate", ascending: true)]
-                
-        let dayOfWeek = String(describing: date.dayNumberOfWeek())
+       let dayOfWeek = String(describing: date.dayNumberOfWeek())
         
-        var requestPredicate = NSCompoundPredicate.init(type: .or, subpredicates: [
+        var predicate = NSCompoundPredicate.init(type: .or, subpredicates: [
             NSCompoundPredicate.init(type: .and, subpredicates: [
                 NSPredicate(format: "%K != nil", #keyPath(TrackerCoreData.schedule)),
                 NSPredicate(format: "%K.\(dayOfWeek) = true", #keyPath(TrackerCoreData.schedule)),
@@ -73,15 +69,13 @@ final class TrackerStore: NSObject, TrackerStoreProtocol {
         ])
         
         if let name = name, !name.isEmpty {
-            requestPredicate = NSCompoundPredicate.init(type: .and, subpredicates: [
-                requestPredicate,
+            predicate = NSCompoundPredicate.init(type: .and, subpredicates: [
+                predicate,
                 NSPredicate(format: "%K CONTAINS[cd] %@", #keyPath(TrackerCoreData.name), name)
             ])
         }
         
-        request.predicate = requestPredicate
-        
-        guard let trackers = try? context.fetch(request) else {
+        guard let trackers = try? listTrackers(withFilter: predicate, withSort: nil) else {
             print("trackerStore: getTrackers request failed")
             return [TrackersByCategory]()
         }
