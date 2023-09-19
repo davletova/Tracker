@@ -92,6 +92,7 @@ final class TrackerCollectionView: UIViewController {
         button.setTitleColor(.white, for: .normal)
         button.backgroundColor  = .getAppColors(.blue)
         button.layer.cornerRadius = 16
+        button.isHidden = true
         
         return button
     }()
@@ -205,9 +206,10 @@ final class TrackerCollectionView: UIViewController {
     }
     
     func showEmptyView() {
+        hideEmptyView()
+        
         filterButton.isHidden = true
         
-        hideEmptyView()
         if let search = searchTextField.text,
            !search.isEmpty
         {
