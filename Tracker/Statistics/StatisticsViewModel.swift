@@ -20,7 +20,6 @@ protocol ListTrackerProtocol {
 }
 
 final class StatisticsViewModel {
-    //TODO: use protocol
     let recordStore: ListTrackerRecordsProtocol
     let scheduleStore: ListScheduleProtocol
     let trackerStore: ListTrackerProtocol

@@ -27,7 +27,7 @@ struct TrackerStoreUpdate {
     let updatedIndexes: IndexSet
 }
 
-final class TrackerStore: NSObject, TrackerStoreProtocol {
+final class TrackerStore: NSObject, TrackerStoreProtocol, ListTrackerProtocol {
     private let context: NSManagedObjectContext
     
     private lazy var fetchedResultsController: NSFetchedResultsController<TrackerCoreData> = {
@@ -57,6 +57,17 @@ final class TrackerStore: NSObject, TrackerStoreProtocol {
         try fetchedResultsController.performFetch()
     }
     
+    func listTrackers(withFilter:  NSPredicate?, withSort: [NSSortDescriptor]?) throws -> [TrackerCoreData] {
+        let request = TrackerCoreData.fetchRequest()
+        if let predicate = withFilter {
+            request.predicate = predicate
+        }
+        if let sortDescriptors = withSort {
+            request.sortDescriptors = sortDescriptors
+        }
+        return try context.fetch(request)
+    }
+    
     func getTrackers(by date: Date, withName name: String?) -> [TrackersByCategory] {
        let dayOfWeek = String(describing: date.dayNumberOfWeek())
         
@@ -74,7 +85,7 @@ final class TrackerStore: NSObject, TrackerStoreProtocol {
                 NSPredicate(format: "%K CONTAINS[cd] %@", #keyPath(TrackerCoreData.name), name)
             ])
         }
-        
+    
         guard let trackers = try? listTrackers(withFilter: predicate, withSort: nil) else {
             print("trackerStore: getTrackers request failed")
             return [TrackersByCategory]()
@@ -294,19 +305,6 @@ final class TrackerStore: NSObject, TrackerStoreProtocol {
         }
         
         return Schedule(startDate: startDate, repetition: repetition)
-    }
-}
-
-extension TrackerStore: ListTrackerProtocol {
-    func listTrackers(withFilter:  NSPredicate?, withSort: [NSSortDescriptor]?) throws -> [TrackerCoreData] {
-        let request = TrackerCoreData.fetchRequest()
-        if let predicate = withFilter {
-            request.predicate = predicate
-        }
-        if let sortDescriptors = withSort {
-            request.sortDescriptors = sortDescriptors
-        }
-        return try context.fetch(request)
     }
 }
 

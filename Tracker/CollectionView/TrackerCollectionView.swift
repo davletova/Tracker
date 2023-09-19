@@ -42,6 +42,8 @@ final class TrackerCollectionView: UIViewController {
         return datePicker
     }()
     
+    private var trackerFilter: TrackerFilterType = .all
+    
     private let params = GeometricParams(cellCount: 2, leftInset: 10, rightInset: 10, cellSpacing: 10)
     
     private let searchTextField: UISearchTextField = {
@@ -77,6 +79,29 @@ final class TrackerCollectionView: UIViewController {
         
         return collectionView
     }()
+    
+    private let filterButton: UIButton = {
+        var button = UIButton()
+        button.translatesAutoresizingMaskIntoConstraints = false
+        
+        button.setTitle(
+            NSLocalizedString("Filters", comment: ""),
+            for: .normal
+        )
+        button.titleLabel?.font = .systemFont(ofSize: 17, weight: .regular)
+        button.setTitleColor(.white, for: .normal)
+        button.backgroundColor  = .getAppColors(.blue)
+        button.layer.cornerRadius = 16
+        
+        return button
+    }()
+    
+    @objc private func showFilter() {
+        let filterController = FiltersViewController(initialFilter: trackerFilter)
+        filterController.delegate = self
+        filterController.modalPresentationStyle = .popover
+        self.present(filterController, animated: true)
+    }
     
     private lazy var emptyCollectionView: UIView = {
         let view = UIView()
@@ -152,6 +177,7 @@ final class TrackerCollectionView: UIViewController {
         
         setupSearchTextField()
         setupCollection()
+        setupFilterButton()
         
         view.backgroundColor = UIColor.getAppColors(.whiteDay)
         
@@ -178,7 +204,9 @@ final class TrackerCollectionView: UIViewController {
         self.view.endEditing(true)
     }
     
-    func showEmptyCollection() {
+    func showEmptyView() {
+        filterButton.isHidden = true
+        
         hideEmptyView()
         if let search = searchTextField.text,
            !search.isEmpty
@@ -201,6 +229,8 @@ final class TrackerCollectionView: UIViewController {
     func hideEmptyView() {
         emptyCollectionView.removeFromSuperview()
         errorCollectionView.removeFromSuperview()
+        
+        filterButton.isHidden = false
     }
     
     private func createNavigationBar() {
@@ -254,6 +284,18 @@ final class TrackerCollectionView: UIViewController {
             collectionView.bottomAnchor.constraint(equalTo: view.safeAreaLayoutGuide.bottomAnchor),
             collectionView.leadingAnchor.constraint(equalTo: view.leadingAnchor),
             collectionView.trailingAnchor.constraint(equalTo: view.trailingAnchor)
+        ])
+    }
+    
+    private func setupFilterButton() {
+        filterButton.addTarget(self, action: #selector(showFilter), for: .touchUpInside)
+        view.addSubview(filterButton)
+        
+        NSLayoutConstraint.activate([
+            filterButton.heightAnchor.constraint(equalToConstant: 50),
+            filterButton.widthAnchor.constraint(equalToConstant: 114),
+            filterButton.bottomAnchor.constraint(equalTo: view.safeAreaLayoutGuide.bottomAnchor, constant: -16),
+            filterButton.centerXAnchor.constraint(equalTo: view.centerXAnchor),
         ])
     }
     
@@ -382,10 +424,17 @@ extension TrackerCollectionView: TrackEventProtocol {
     }
 }
 
+extension TrackerCollectionView: FiltersViewControllerDelegate {
+    func selectFilter(_ trackerFilter: TrackerFilterType) {
+        self.trackerFilter = trackerFilter
+        dismiss(animated: true)
+    }
+}
+
 extension TrackerCollectionView: UICollectionViewDataSource {
     func numberOfSections(in collectionView: UICollectionView) -> Int {
         if visibleCategories.count == 0 {
-            showEmptyCollection()
+            showEmptyView()
         } else {
             hideEmptyView()
         }
