@@ -9,7 +9,7 @@ import Foundation
 import UIKit
 
 enum AppColor {
-    case backgroundDay, backgroundNight, blackDay, blackNight, blue, gray
+    case backgroundDay, backgroundNight, blackDay, blackNight, blue, gray, datePickerBackground, datePickerTitle
     case lightGray, red, whiteDay, whiteNight, tabBarBorder, gradient1, gradient2, gradient3
     
     func getColor() -> UIColor {
@@ -98,6 +98,18 @@ enum AppColor {
                 return UIColor.blue
             }
             return gradient3
+        case .datePickerBackground:
+            guard let datePickerBackground = UIColor(named: "DatePickerBackground") else {
+                assertionFailure("datePickerBackground not found")
+                return UIColor.lightGray
+            }
+            return datePickerBackground
+        case .datePickerTitle:
+            guard let datePickerTitle = UIColor(named: "DatePickerTitle") else {
+                assertionFailure("datePickerdatePickerTitleBackground not found")
+                return UIColor.black
+            }
+            return datePickerTitle
         }
     }
 }

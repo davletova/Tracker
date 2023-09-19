@@ -32,9 +32,9 @@ final class TypeSelectionViewController: UIViewController {
             NSLocalizedString("habit", comment: "кнопка с выбором привычки"),
             for: .normal
         )
-        habitButton.titleLabel?.font = UIFont.systemFont(ofSize: 16)
-        habitButton.titleLabel?.textColor = UIColor.getAppColors(.whiteDay)
         habitButton.titleLabel?.textAlignment = .center
+        habitButton.titleLabel?.font = UIFont.systemFont(ofSize: 16, weight: .medium)
+        habitButton.setTitleColor(UIColor.getAppColors(.whiteDay), for: .normal)
         
         return habitButton
     }()
@@ -48,9 +48,9 @@ final class TypeSelectionViewController: UIViewController {
             NSLocalizedString("irregular.event", comment: "кнопка с выбором нерегулярного события"),
             for: .normal
         )
-        eventButton.titleLabel?.font = UIFont.systemFont(ofSize: 16)
-        eventButton.titleLabel?.textColor = UIColor.getAppColors(.whiteDay)
+        eventButton.titleLabel?.font = UIFont.systemFont(ofSize: 16, weight: .medium)
         eventButton.titleLabel?.textAlignment = .center
+        eventButton.setTitleColor(UIColor.getAppColors(.whiteDay), for: .normal)
         
         return eventButton
     }()

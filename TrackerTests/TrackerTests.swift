@@ -6,14 +6,17 @@
 //
 
 import XCTest
-//import SnapshotTesting
+import SnapshotTesting
 @testable import Tracker
 
 final class TrackerTests: XCTestCase {
     func testViewController() {
-        XCTAssertTrue(true)
-//        let vc = TabBarViewController() // 1
-//
-//        assertSnapshot(matching: vc, as: .image)                                             // 2
+        let vc = TabBarViewController()
+        assertSnapshot(matching: vc, as: .image(traits: .init(userInterfaceStyle: .light)))
+    }
+    
+    func testDarkMode() {
+        let vc = TabBarViewController()
+        assertSnapshot(matching: vc, as: .image(traits: .init(userInterfaceStyle: .dark)))
     }
 }

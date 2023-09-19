@@ -49,8 +49,8 @@ final class ListCategoriesViewController: UIViewController {
             for: .normal
         )
         button.titleLabel?.font = UIFont.systemFont(ofSize: 16, weight: .medium)
-        button.titleLabel?.textColor = UIColor.getAppColors(.whiteDay)
         button.titleLabel?.textAlignment = .center
+        button.setTitleColor(UIColor.getAppColors(.whiteDay), for: .normal)
         
         return button
     }()

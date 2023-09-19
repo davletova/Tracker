@@ -63,6 +63,8 @@
 		4DA5C97E2A83EA8E0046C149 /* ColorCollectionViewCell.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4DA5C97D2A83EA8E0046C149 /* ColorCollectionViewCell.swift */; };
 		4DA5C9802A84CD650046C149 /* ScheduleViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4DA5C97F2A84CD650046C149 /* ScheduleViewController.swift */; };
 		4DA970302A9BA390006CED88 /* Context.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4DA9702F2A9BA390006CED88 /* Context.swift */; };
+		4DCF25B52AB9E03D008E33F4 /* InlineSnapshotTesting in Frameworks */ = {isa = PBXBuildFile; productRef = 4DCF25B42AB9E03D008E33F4 /* InlineSnapshotTesting */; };
+		4DCF25B72AB9E03D008E33F4 /* SnapshotTesting in Frameworks */ = {isa = PBXBuildFile; productRef = 4DCF25B62AB9E03D008E33F4 /* SnapshotTesting */; };
 		4DDC8E0D2A96026900F85E5D /* TrackersByCategory.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4DDC8E0C2A96026900F85E5D /* TrackersByCategory.swift */; };
 		4DDC8E132A960F2E00F85E5D /* DailySchedule.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4DDC8E122A960F2E00F85E5D /* DailySchedule.swift */; };
 		4DDC8E1D2A989C7400F85E5D /* Constants.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4DDC8E1C2A989C7400F85E5D /* Constants.swift */; };
@@ -166,6 +168,8 @@
 			isa = PBXFrameworksBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				4DCF25B52AB9E03D008E33F4 /* InlineSnapshotTesting in Frameworks */,
+				4DCF25B72AB9E03D008E33F4 /* SnapshotTesting in Frameworks */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -475,6 +479,8 @@
 			);
 			name = TrackerTests;
 			packageProductDependencies = (
+				4DCF25B42AB9E03D008E33F4 /* InlineSnapshotTesting */,
+				4DCF25B62AB9E03D008E33F4 /* SnapshotTesting */,
 			);
 			productName = TrackerTests;
 			productReference = 4D8F66922AB32D3E00B42FA7 /* TrackerTests.xctest */;
@@ -510,6 +516,7 @@
 			);
 			mainGroup = 4D1A9BF12A726B4C007E527A;
 			packageReferences = (
+				4DCF25B32AB9E03D008E33F4 /* XCRemoteSwiftPackageReference "swift-snapshot-testing" */,
 			);
 			productRefGroup = 4D1A9BFB2A726B4C007E527A /* Products */;
 			projectDirPath = "";
@@ -762,7 +769,7 @@
 				GCC_WARN_UNINITIALIZED_AUTOS = YES_AGGRESSIVE;
 				GCC_WARN_UNUSED_FUNCTION = YES;
 				GCC_WARN_UNUSED_VARIABLE = YES;
-				IPHONEOS_DEPLOYMENT_TARGET = 16.4;
+				IPHONEOS_DEPLOYMENT_TARGET = 14.2;
 				MTL_ENABLE_DEBUG_INFO = INCLUDE_SOURCE;
 				MTL_FAST_MATH = YES;
 				ONLY_ACTIVE_ARCH = YES;
@@ -817,7 +824,7 @@
 				GCC_WARN_UNINITIALIZED_AUTOS = YES_AGGRESSIVE;
 				GCC_WARN_UNUSED_FUNCTION = YES;
 				GCC_WARN_UNUSED_VARIABLE = YES;
-				IPHONEOS_DEPLOYMENT_TARGET = 16.4;
+				IPHONEOS_DEPLOYMENT_TARGET = 14.2;
 				MTL_ENABLE_DEBUG_INFO = NO;
 				MTL_FAST_MATH = YES;
 				SDKROOT = iphoneos;
@@ -966,6 +973,30 @@
 			defaultConfigurationName = Release;
 		};
 /* End XCConfigurationList section */
+
+/* Begin XCRemoteSwiftPackageReference section */
+		4DCF25B32AB9E03D008E33F4 /* XCRemoteSwiftPackageReference "swift-snapshot-testing" */ = {
+			isa = XCRemoteSwiftPackageReference;
+			repositoryURL = "https://github.com/pointfreeco/swift-snapshot-testing";
+			requirement = {
+				kind = upToNextMajorVersion;
+				minimumVersion = 1.0.0;
+			};
+		};
+/* End XCRemoteSwiftPackageReference section */
+
+/* Begin XCSwiftPackageProductDependency section */
+		4DCF25B42AB9E03D008E33F4 /* InlineSnapshotTesting */ = {
+			isa = XCSwiftPackageProductDependency;
+			package = 4DCF25B32AB9E03D008E33F4 /* XCRemoteSwiftPackageReference "swift-snapshot-testing" */;
+			productName = InlineSnapshotTesting;
+		};
+		4DCF25B62AB9E03D008E33F4 /* SnapshotTesting */ = {
+			isa = XCSwiftPackageProductDependency;
+			package = 4DCF25B32AB9E03D008E33F4 /* XCRemoteSwiftPackageReference "swift-snapshot-testing" */;
+			productName = SnapshotTesting;
+		};
+/* End XCSwiftPackageProductDependency section */
 
 /* Begin XCVersionGroup section */
 		4DDC8E1F2A98B15100F85E5D /* Model.xcdatamodeld */ = {

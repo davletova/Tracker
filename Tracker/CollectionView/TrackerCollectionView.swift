@@ -39,6 +39,7 @@ final class TrackerCollectionView: UIViewController {
         var datePickerCalendar = Calendar(identifier: .gregorian)
         datePickerCalendar.firstWeekday = 2
         datePicker.calendar = datePickerCalendar
+        
         return datePicker
     }()
     
@@ -69,6 +70,7 @@ final class TrackerCollectionView: UIViewController {
     
     private let collectionView: UICollectionView = {
         let collectionView = UICollectionView(frame: .zero, collectionViewLayout: UICollectionViewFlowLayout())
+        collectionView.backgroundColor = UIColor.getAppColors(.whiteDay)
         
         collectionView.translatesAutoresizingMaskIntoConstraints = false
         
@@ -238,7 +240,7 @@ final class TrackerCollectionView: UIViewController {
     private func createNavigationBar() {
         if let navigationBar = navigationController?.navigationBar {
             navigationBar.backgroundColor = UIColor.getAppColors(.whiteDay)
-            navigationBar.tintColor = .black
+            navigationBar.tintColor = UIColor.getAppColors(.blackDay)
             
             navigationItem.leftBarButtonItem = UIBarButtonItem(image: UIImage(named: "add"), style: .plain, target: self, action: #selector(clickButtonCreateEvent))
             navigationItem.leftBarButtonItem?.imageInsets = UIEdgeInsets(top: 0, left: -10, bottom: 0, right: 0)

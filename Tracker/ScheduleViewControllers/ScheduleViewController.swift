@@ -38,6 +38,8 @@ final class ScheduleViewController: UIViewController {
             NSLocalizedString("done", comment: "текст кнопки Готово"),
             for: .normal
         )
+        doneButton.setTitleColor(UIColor.getAppColors(.whiteDay), for: .normal)
+        
         doneButton.addTarget(self, action: #selector(selectSchedule), for: .touchUpInside)
         
         view.addSubview(doneButton)
