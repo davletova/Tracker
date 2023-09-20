@@ -6,25 +6,90 @@
   
 */
 
+// Onboarding
 "onboarding.page1" = "Отслеживайте только то, что хотите";
 "onboarding.page2" = "Даже если это не литры воды или йога";
 "onboarding.button" = "Вот это технологии";
-"trackers" = "Трекеры";
-"statistic" = "Статистика";
-"tracker.creation.title" = "Создание нового трекера";
-"habit" = "Привычка";
-"irregular.event" = "Нерегулярное событие";
-"category" = "Категория";
-"emoji" = "Emoji";
-"color" = "Цвет";
-"to.create" = "Создать";
-"cancel" = "Отмена";
-"new.habit" = "Новая привычка";
-"new.event" = "Новое нерегулярное событие";
-"empty.list.of.trackers" = "Что будем отслеживать?";
-"no.trackers.found" = "Ничего не найдено";
-"schedule" = "Расписание";
-"empty.list.of.categories" = "Привычки и события можно объединить по смыслу";
-"new.category" = "Новая категория";
-"add.category" = "Добавить категорию";
-"done" = "Готово";
+
+// Main
+"main.title.trackers" = "Трекеры";
+"main.tabbar.trackers" = "Трекеры";
+"main.tabbar.statistic" = "Статистика";
+"main.empty.list.of.trackers" = "Что будем отслеживать?";
+"main.no.trackers.found" = "Ничего не найдено";
+"main.searchField.placeholder" = "Поиск";
+"main.filter" = "Фильтр";
+"main.section.pinned.title" = "Закрепленные";
+"main.context.menu.pinned" = "Закрепить";
+"main.context.menu.unpinned" = "Открепить";
+"main.context.menu.edit" = "Редактировать";
+"main.context.menu.delete" = "Удалить";
+"main.delete.alert.action.delete" = "Удалить";
+"main.delete.alert.action.cancel" = "Отменить";
+"main.delete.alert.title" = "Уверены, что хотите удалить трекер?";
+
+
+// Tracker type selection
+"type.selection.title" = "Создание нового трекера";
+"type.selection.habit" = "Привычка";
+"type.selection.irregular.event" = "Нерегулярное событие";
+
+
+// CreateTracker
+"create.tracker.habit.title" = "Новая привычка";
+"create.tracker.event.title" = "Новое нерегулярное событие";
+"create.tracker.category" = "Категория";
+"create.tracker.emoji" = "Emoji";
+"create.tracker.color" = "Цвет";
+"create.tracker.schedule" = "Расписание";
+"create.tracker.button.create" = "Создать";
+"create.tracker.button.cancel" = "Отмена";
+"create.tracker.name.placeholder" = "Введите название трекера";
+
+
+// List categories
+"list.categories.title" = "Категория";
+"list.categories.empty.list.of.categories" = "Привычки и события можно объединить по смыслу";
+"list.categories.button.create" = "Добавить категорию";
+
+
+// Create category
+"create.category.title" = "Новая категория";
+"create.category.button.done" = "Готово";
+"create.category.name.placeholder" = "Введите название категории";
+
+
+// Schedule
+"schedule.title" = "Расписание";
+"schedule.button.done" = "Готово";
+"schedule.monday" = "Понедельник";
+"schedule.monday.short" = "Пн";
+"schedule.tuesday" = "Вторник";
+"schedule.tuesday.short" = "Вт";
+"schedule.wednesday" = "Среда";
+"schedule.wednesday.short" = "Ср";
+"schedule.thursday" = "Четверг";
+"schedule.thursday.short" = "Чт";
+"schedule.friday" = "Пятница";
+"schedule.friday.short" = "Пт";
+"schedule.saturday" = "Суббота";
+"schedule.saturday.short" = "Сб";
+"schedule.sunday" = "Воскресенье";
+"schedule.sunday.short" = "Вс";
+
+
+// Statistic
+"statistic.title" = "Статистика";
+"statistic.empty.view" = "Анализировать пока нечего";
+"statistic.best.period" = "Лучший период";
+"statistic.ideal.days" = "Идеальные дни";
+"statistic.completed.trackers" = "Трекеров завершено";
+"statistic.average.value" = "Среднее значение";
+
+
+// Filter
+"filters.title" = "Фильтры";
+"filters.all" = "Все трекеры";
+"filters.today" = "Трекеры на сегодня";
+"filters.finished" = "Завершенные";
+"filters.unfinished" = "Не завершенные";

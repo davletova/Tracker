@@ -15,7 +15,7 @@ final class ButtonCollectionViewCell: UICollectionViewCell {
         cancelButton.backgroundColor = UIColor.getAppColors(.whiteDay)
         cancelButton.layer.cornerRadius = 16
         cancelButton.setTitle(
-            NSLocalizedString("cancel", comment: "текст кнопки с отменой действия"),
+            NSLocalizedString("create.tracker.button.cancel", comment: "текст кнопки с отменой действия"),
             for: .normal
         )
         cancelButton.titleLabel?.font = UIFont.systemFont(ofSize: 16, weight: .medium)

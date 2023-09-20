@@ -27,7 +27,7 @@ class StatisticsViewController: UIViewController {
         label.font = UIFont.systemFont(ofSize: 34, weight: .bold)
         label.textColor = UIColor.getAppColors(.blackDay)
         label.textAlignment = .left
-        label.text = "Статистика"
+        label.text = NSLocalizedString("statistic.title", comment: "заголовок страницы со статистикой")
         
         return label
     }()
@@ -55,7 +55,7 @@ class StatisticsViewController: UIViewController {
         let imageView = UIImageView(image: UIImage(named: "empty"))
         let label = UILabel()
         //TODO: localize
-        label.text = NSLocalizedString("empty statistic", comment: "текст для пустого списка категорий")
+        label.text = NSLocalizedString("statistic.empty.view", comment: "текст для пустого списка категорий")
         label.numberOfLines = 0
         label.textAlignment = .center
         label.font = UIFont.systemFont(ofSize: 12, weight: .medium)
@@ -136,10 +136,22 @@ class StatisticsViewController: UIViewController {
             print("failed to getAverrage with erro: \(error)")
         }
         
-        bestPeriodView.configure(numberTitleText: bestPeriodDays.description, descTitleText: "Лучший период")
-        perfectDays.configure(numberTitleText: idealDayCount.description, descTitleText: "Иделаьные дни")
-        completedTrackers.configure(numberTitleText: totalPerformedHabits.description, descTitleText: "Завершенные трекеры")
-        averageValue.configure(numberTitleText: average.description, descTitleText: "Среднее значение")
+        bestPeriodView.configure(
+            numberTitleText: bestPeriodDays.description,
+            descTitleText: NSLocalizedString("statistic.best.period", comment: "показатель лучший период")
+        )
+        perfectDays.configure(
+            numberTitleText: idealDayCount.description,
+            descTitleText: NSLocalizedString("statistic.ideal.days", comment: "показатель идеальный дни")
+        )
+        completedTrackers.configure(
+            numberTitleText: totalPerformedHabits.description,
+            descTitleText: NSLocalizedString("statistic.completed.trackers", comment: "показатель завершенные трекеры")
+        )
+        averageValue.configure(
+            numberTitleText: average.description,
+            descTitleText: NSLocalizedString("statistic.average.value", comment: "показатель среднее значение")
+        )
     }
     
     override func viewDidLoad() {

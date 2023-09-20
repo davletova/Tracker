@@ -49,7 +49,7 @@ final class TrackerCollectionViewCell: UICollectionViewCell {
     
     private let trackedDaysLabel: UILabel = {
         let trackedDaysLabel = UILabel()
-        trackedDaysLabel.textColor = .black
+        trackedDaysLabel.textColor = .getAppColors(.blackDay)
         trackedDaysLabel.translatesAutoresizingMaskIntoConstraints = false
         trackedDaysLabel.textAlignment = .center
         trackedDaysLabel.font = UIFont.systemFont(ofSize: 12, weight: .medium)

@@ -8,7 +8,7 @@
 import Foundation
 
 protocol ListTrackerRecordsProtocol {
-    func listRecords(withFilter: NSPredicate?, withSort: [NSSortDescriptor]?) throws -> [TrackerRecordCoreData]
+    func listRecords(withFilter: NSPredicate?, withSort: [NSSortDescriptor]) throws -> [TrackerRecordCoreData]
 }
 
 protocol ListScheduleProtocol {
@@ -16,7 +16,7 @@ protocol ListScheduleProtocol {
 }
 
 protocol ListTrackerProtocol {
-    func listTrackers(withFilter:  NSPredicate?, withSort: [NSSortDescriptor]?) throws -> [TrackerCoreData]
+    func listTrackers(withFilter:  NSPredicate?, withSort: [NSSortDescriptor]) throws -> [TrackerCoreData]
 }
 
 final class StatisticsViewModel {
@@ -148,7 +148,7 @@ extension StatisticsViewModel: StatisticsViewModelProtocol {
     func getCountOfIdealDays() throws -> Int {
         let records = try recordStore.listRecords(
             withFilter: NSPredicate(format: "%K != nil", #keyPath(TrackerRecordCoreData.tracker.schedule)),
-            withSort: nil
+            withSort: []
         )
         
         let trackerIDsByWeekday = try getTrackerIDsByWeekday()
@@ -169,7 +169,7 @@ extension StatisticsViewModel: StatisticsViewModelProtocol {
     func getTotalPerformedHabits() throws -> Int {
         let trackers = try trackerStore.listTrackers(
             withFilter: NSPredicate(format: "%K != nil", #keyPath(TrackerCoreData.schedule)),
-            withSort: nil
+            withSort: []
         )
         
         var totalPerformedHabits = 0
@@ -186,7 +186,7 @@ extension StatisticsViewModel: StatisticsViewModelProtocol {
     func getAverrage() throws -> Int {
         let records = try recordStore.listRecords(
             withFilter: NSPredicate(format: "%K != nil", #keyPath(TrackerRecordCoreData.tracker.schedule)),
-            withSort:  nil
+            withSort:  []
         )
     
         let recordsByDate = Dictionary(grouping: records) { $0.date! }
@@ -208,7 +208,7 @@ extension StatisticsViewModel: StatisticsViewModelProtocol {
     func getTrackersCount() throws -> Int {
         return try trackerStore.listTrackers(
             withFilter: nil,
-            withSort: nil
+            withSort: []
         ).count
     }
 }

@@ -10,4 +10,5 @@ import Foundation
 protocol TrackerRecordStoreProtocol: AnyObject {
     func addNewRecord(_ trackerRecord: TrackerRecord) throws
     func deleteRecord(_ trackerRecord: TrackerRecord) throws
+    func listRecords(withFilter:  NSPredicate?, withSort: [NSSortDescriptor]) throws -> [TrackerRecordCoreData]
 }

@@ -138,7 +138,7 @@ final class CreateEventViewController: UIViewController {
         view.backgroundColor = UIColor.getAppColors(.whiteDay)
         
         trackerProperties[.category] = TrackerProperty(
-            name: NSLocalizedString("category", comment: "кнопка с выбором категории на странице создания трекера"),
+            name: NSLocalizedString("create.tracker.category", comment: "кнопка с выбором категории на странице создания трекера"),
             callback: { [weak self] in
                 guard let self = self else {
                     assertionFailure("open list of category callback: self is empty")
@@ -155,7 +155,7 @@ final class CreateEventViewController: UIViewController {
         )
         if isHabit {
             trackerProperties[.schedule] = TrackerProperty(
-                name: NSLocalizedString("schedule", comment: "кнопка с выбором расписания на странице создания трекера"),
+                name: NSLocalizedString("create.tracker", comment: "кнопка с выбором расписания на странице создания трекера"),
                 callback: { [weak self] in
                     guard let self = self else {
                         assertionFailure("open schedule callback: self is empty")
@@ -209,7 +209,7 @@ final class CreateEventViewController: UIViewController {
          //TODO: локализовать заголовки
             titleLabel.text = "Редактирование"
         } else {
-            let localizeTitlekey = isHabit ? "new.habit" : "new.event"
+            let localizeTitlekey = isHabit ? "create.tracker.habit.title" : "create.tracker.event.title"
             titleLabel.text = NSLocalizedString(localizeTitlekey, comment: "заголовок страницы с созданием трекера")
         }
         
@@ -448,7 +448,7 @@ extension CreateEventViewController: UICollectionViewDataSource {
             return cell
         case .buttons:
             let cell = collectionView.dequeueReusableCell(withReuseIdentifier: buttonsCellIdentifier, for: indexPath) as! ButtonCollectionViewCell
-            let create = NSLocalizedString("to.create", comment: "текст кнопки Создать")
+            let create = NSLocalizedString("create.tracker.button.create", comment: "текст кнопки Создать")
             //TODO: локализовать
             let save = "Save"
             let createButtonText = updateTrackerVM != nil ? save : create
@@ -496,11 +496,11 @@ extension CreateEventViewController: UICollectionViewDataSource {
             view.titleLabel.font = UIFont.systemFont(ofSize: 32, weight: .bold)
             view.titleLabel.textAlignment = .center
         case .emoji:
-            view.titleLabel.text = NSLocalizedString("emoji", comment: "заголовок раздела с выбором emoji")
+            view.titleLabel.text = NSLocalizedString("create.tracker.emoji", comment: "заголовок раздела с выбором emoji")
             view.titleLabel.font = UIFont.systemFont(ofSize: 19, weight: .bold)
             view.titleLabel.textAlignment = .left
         case .color:
-            view.titleLabel.text = NSLocalizedString("color", comment: "заголовок раздела с выбором цвета")
+            view.titleLabel.text = NSLocalizedString("create.tracker.color", comment: "заголовок раздела с выбором цвета")
             view.titleLabel.font = UIFont.systemFont(ofSize: 19, weight: .bold)
             view.titleLabel.textAlignment = .left
         default:

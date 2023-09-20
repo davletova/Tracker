@@ -87,14 +87,12 @@ final class TrackerRecordStore: NSObject, TrackerRecordStoreProtocol {
 }
 
 extension TrackerRecordStore: ListTrackerRecordsProtocol {
-    func listRecords(withFilter:  NSPredicate? = nil ,withSort: [NSSortDescriptor]? = nil) throws -> [TrackerRecordCoreData] {
+    func listRecords(withFilter:  NSPredicate?, withSort: [NSSortDescriptor]) throws -> [TrackerRecordCoreData] {
         let request = TrackerRecordCoreData.fetchRequest()
         if let predicate = withFilter {
             request.predicate = predicate
         }
-        if let sortDescriptors = withSort {
-            request.sortDescriptors = sortDescriptors
-        }
+        request.sortDescriptors = withSort
         return try context.fetch(request)
     }
 }

@@ -17,7 +17,7 @@ final class TabBarViewController: UITabBarController {
         
         let navigationController = UINavigationController(rootViewController: TrackerCollectionView())
         navigationController.tabBarItem = UITabBarItem(
-            title: NSLocalizedString("trackers", comment: "кнопка перехода на список трекеров"),
+            title: NSLocalizedString("main.tabbar.trackers", comment: "кнопка перехода на список трекеров"),
             image: UIImage(named: "record.circle.fill"),
             tag: 0
         )
@@ -29,7 +29,7 @@ final class TabBarViewController: UITabBarController {
         )
         let statisticsViewController = StatisticsViewController(viewModel: statisticsViewModel)
         statisticsViewController.tabBarItem = UITabBarItem(
-            title: NSLocalizedString("statistic", comment: "кнопка перехода на статистику"),
+            title: NSLocalizedString("main.tabbar.statistic", comment: "кнопка перехода на статистику"),
             image: UIImage(named: "hare.fill"),
             tag: 1
         )

@@ -13,6 +13,19 @@ enum TrackerFilterType: Int, CaseIterable {
     case today
     case finished
     case unfinished
+
+    var localizedLabel: String {
+        switch self {
+        case .all:
+            return NSLocalizedString("filters.all", comment: "")
+        case .today:
+            return NSLocalizedString("filters.today", comment: "")
+        case .finished:
+            return NSLocalizedString("filters.finished", comment: "")
+        case .unfinished:
+            return NSLocalizedString("filters.unfinished", comment: "")
+        }
+    }
 }
 
 protocol FiltersViewControllerDelegate: AnyObject {
@@ -27,7 +40,7 @@ final class FiltersViewController: UIViewController, UITableViewDataSource, UITa
     private let titleLabel: UILabel = {
         let title = UILabel()
         title.translatesAutoresizingMaskIntoConstraints = false
-        title.text = NSLocalizedString("filters", comment: "TODO")
+        title.text = NSLocalizedString("filters.title", comment: "TODO")
         title.textAlignment = .center
         
         title.font = UIFont.systemFont(ofSize: 16, weight: .medium)
@@ -104,7 +117,7 @@ final class FiltersViewController: UIViewController, UITableViewDataSource, UITa
         }
         
         // TODO: add locazation
-        cell.configure(title: NSLocalizedString(String(describing: filter), comment: ""))
+        cell.configure(title: NSLocalizedString(filter.localizedLabel, comment: ""))
         if filter == currentFilter {
             cell.selectRow()
         }

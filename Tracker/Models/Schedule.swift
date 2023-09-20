@@ -15,6 +15,25 @@ enum Weekday: Int, CaseIterable {
     case friday = 6
     case saturday = 7
     case sunday = 1
+    
+    var localizeLabel: String {
+        switch self {
+        case .monday:
+            return NSLocalizedString("schedule.monday", comment: "поле Понедельник в таблице с расписанием")
+        case .tuesday:
+            return NSLocalizedString("schedule.tuesday", comment: "поле Вторник в таблице с расписанием")
+        case .wednesday:
+            return NSLocalizedString("schedule.wednesday", comment: "поле Среда в таблице с расписанием")
+        case .thursday:
+            return NSLocalizedString("schedule.thursday", comment: "поле Четверг в таблице с расписанием")
+        case .friday:
+            return NSLocalizedString("schedule.friday", comment: "поле Пятница в таблице с расписанием")
+        case .saturday:
+            return NSLocalizedString("schedule.saturday", comment: "поле Суббота в таблице с расписанием")
+        case .sunday:
+            return NSLocalizedString("schedule.sunday", comment: "поле Воскресенье в таблице с расписанием")
+        }
+    }
 }
 
 struct Schedule {

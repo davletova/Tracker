@@ -29,7 +29,7 @@ struct GeometricParams {
 final class TrackerCollectionView: UIViewController {
     static let TrackerSavedNotification = Notification.Name(rawValue: "CreateEvent")
     
-    private var trackerStore: TrackerStoreProtocol
+    private var viewModel: TrackerCollectionViewModelProtocol
     private var trackerRecordStore: TrackerRecordStoreProtocol
     
     private var visibleCategories = [TrackersByCategory]()
@@ -60,7 +60,7 @@ final class TrackerCollectionView: UIViewController {
             NSAttributedString.Key.foregroundColor: UIColor(named: "Gray")
         ]
         let attributedPlaceholder = NSAttributedString(
-            string: "Поиск",
+            string: NSLocalizedString("main.searchField.placeholder", comment: "плейсхолдер на поле поиска"),
             attributes: attributes
         )
         textField.attributedPlaceholder = attributedPlaceholder
@@ -87,7 +87,7 @@ final class TrackerCollectionView: UIViewController {
         button.translatesAutoresizingMaskIntoConstraints = false
         
         button.setTitle(
-            NSLocalizedString("Filters", comment: ""),
+            NSLocalizedString("Filters", comment: "тайтл на кнопке Фильтр"),
             for: .normal
         )
         button.titleLabel?.font = .systemFont(ofSize: 17, weight: .regular)
@@ -110,7 +110,7 @@ final class TrackerCollectionView: UIViewController {
         let view = UIView()
         let imageView = UIImageView(image: UIImage(named: "star"))
         let label = UILabel()
-        label.text = NSLocalizedString("empty.list.of.trackers", comment: "текст на месте пустого списока трекеров")
+        label.text = NSLocalizedString("main.empty.list.of.trackers", comment: "текст на месте пустого списока трекеров")
         label.textAlignment = .center
         label.font = UIFont.systemFont(ofSize: 12, weight: .medium)
         
@@ -135,7 +135,7 @@ final class TrackerCollectionView: UIViewController {
         let view = UIView()
         let imageView = UIImageView(image: UIImage(named: "error"))
         let label = UILabel()
-        label.text = NSLocalizedString("no.trackers.found", comment: "Empty list of filtered trackers")
+        label.text = NSLocalizedString("main.no.trackers.found", comment: "Empty list of filtered trackers")
         label.textAlignment = .center
         label.font = UIFont.systemFont(ofSize: 12, weight: .medium)
         
@@ -157,7 +157,7 @@ final class TrackerCollectionView: UIViewController {
     }()
     
     init() {
-        trackerStore = TrackerStore()
+        viewModel = TrackerCollectionViewModel(trackerStore: TrackerStore())
         trackerRecordStore = TrackerRecordStore()
         super.init(nibName: nil, bundle: nil)
     }
@@ -168,15 +168,20 @@ final class TrackerCollectionView: UIViewController {
     
     override func viewDidLoad() {
         super.viewDidLoad()
-                
+        
         NotificationCenter.default.addObserver(
             self,
             selector: #selector(updateVisibleCategories),
             name: TrackerCollectionView.TrackerSavedNotification,
             object: nil
         )
-                
-        visibleCategories = trackerStore.getTrackers(by: datePicker.date, withName:  nil)
+        
+        do {
+            visibleCategories = try viewModel.listTrackers(for: datePicker.date, withName: "", withFilter: trackerFilter)
+        } catch {
+            print("failed to get trackers with error: \(error)")
+            visibleCategories = []
+        }
         
         setupSearchTextField()
         setupCollection()
@@ -199,8 +204,14 @@ final class TrackerCollectionView: UIViewController {
     }
     
     @objc func updateVisibleCategories() {
-        self.visibleCategories = trackerStore.getTrackers(by: datePicker.date, withName: nil)
-        self.collectionView.reloadData()
+        do {
+            visibleCategories = try viewModel.listTrackers(for: datePicker.date, withName: "", withFilter: trackerFilter)
+        } catch {
+            print("failed to get trackers with error: \(error)")
+            visibleCategories = []
+        }
+        
+        collectionView.reloadData()
     }
     
     @objc private func hideKeyboard() {
@@ -259,7 +270,7 @@ final class TrackerCollectionView: UIViewController {
                 NSAttributedString.Key.font: UIFont.systemFont(ofSize: 34, weight: UIFont.Weight.bold),
                 NSAttributedString.Key.paragraphStyle: paragraphStyle
             ] as [NSAttributedString.Key : Any]
-            navigationItem.title =  NSLocalizedString("trackers", comment: "заголовок списка трекеров")
+            navigationItem.title =  NSLocalizedString("main.title.trackers", comment: "заголовок списка трекеров")
             
             navigationBar.prefersLargeTitles = true
         }
@@ -311,9 +322,8 @@ final class TrackerCollectionView: UIViewController {
         self.present(typeSelectionViewController, animated: true)
     }
     
-    @objc func changeDateOnDatePicker(_ datePicker: UIDatePicker) {
-        visibleCategories = trackerStore.getTrackers(by: datePicker.date, withName: nil)
-        collectionView.reloadData()
+    @objc func changeDateOnDatePicker(_ : UIDatePicker) {
+        updateVisibleCategories()
         presentedViewController?.dismiss(animated: true)
     }
 }
@@ -326,14 +336,14 @@ extension TrackerCollectionView: UISearchTextFieldDelegate {
             return false
         }
         
-        if searchText.isEmpty {
-            visibleCategories = trackerStore.getTrackers(by: datePicker.date, withName: nil)
-        } else {
-            visibleCategories = trackerStore.getTrackers(by: datePicker.date, withName: searchText)
+        do {
+            visibleCategories = try viewModel.listTrackers(for: datePicker.date, withName: searchText, withFilter: trackerFilter)
+        } catch {
+            print("failed to get trackers with error: \(error)")
+            visibleCategories = []
         }
         
         collectionView.reloadData()
-        
         return true
     }
 }
@@ -352,7 +362,7 @@ extension TrackerCollectionView: TrackEventProtocol {
             let tracker = trackerVM.tracker
             tracker.pinned = pinned
             
-            try trackerStore.updateTracker(trackerVM.tracker)
+            try viewModel.updateTracker(trackerVM.tracker)
         } catch {
             print("failed to pin tracker \(error)")
         }
@@ -374,12 +384,15 @@ extension TrackerCollectionView: TrackEventProtocol {
         } else {
             editTrackerVC.isHabit = false
         }
-            
+        
         self.present(editTrackerVC, animated: true)
     }
     
     func deleteTracker(indexPath: IndexPath) {
-        let destroyAction = UIAlertAction(title: "Delete", style: .destructive) { [weak self] (action) in
+        let destroyAction = UIAlertAction(
+            title: NSLocalizedString("main.delete.alert.title", comment: "Заголовок алерта с подтверждением удаления"),
+            style: .destructive
+        ) { [weak self] (action) in
             guard
                 let category = self!.visibleCategories[at: indexPath.section],
                 let trackerVM = category.trackers[at: indexPath.row]
@@ -387,14 +400,24 @@ extension TrackerCollectionView: TrackEventProtocol {
                 return
             }
             
-            try! self!.trackerStore.deleteTracker(trackerVM.tracker)
-           }
+            try! self!.viewModel.deleteTracker(trackerVM.tracker)
+        }
         
-        let cancelAction = UIAlertAction(title: "Cancel", style: .cancel)
+        let cancelAction = UIAlertAction(
+            title: NSLocalizedString(
+                "main.delete.alert.action.cancel",
+                comment: "алерт с подтверждением удаления, кнопка Отмена"
+            ),
+            style: .cancel
+        )
         
-        let alert = UIAlertController(title: "Delete the image?",
-                       message: "",
-                       preferredStyle: .actionSheet)
+        let alert = UIAlertController(
+            title: NSLocalizedString(
+                "main.delete.alert.action.delete",
+                comment: "алерт с подтверждением удаления, кнопка Удалить"
+            ),
+            message: "",
+            preferredStyle: .actionSheet)
         alert.addAction(destroyAction)
         alert.addAction(cancelAction)
         
@@ -424,13 +447,24 @@ extension TrackerCollectionView: TrackEventProtocol {
             }
         }
         
-        visibleCategories = trackerStore.getTrackers(by: datePicker.date, withName:  nil)
+        do {
+            visibleCategories = try viewModel.listTrackers(for: datePicker.date, withName: "", withFilter: trackerFilter)
+        } catch {
+            visibleCategories = []
+        }
     }
 }
 
 extension TrackerCollectionView: FiltersViewControllerDelegate {
     func selectFilter(_ trackerFilter: TrackerFilterType) {
         self.trackerFilter = trackerFilter
+        do {
+            self.visibleCategories = try viewModel.listTrackers(for: datePicker.date, withName: "", withFilter: trackerFilter)
+        } catch {
+            self.visibleCategories = []
+        }
+        self.collectionView.reloadData()
+
         dismiss(animated: true)
     }
 }
@@ -470,13 +504,13 @@ extension TrackerCollectionView: UICollectionViewDataSource {
             print("failed to get element from section: \(section.categoryName) by index \(indexPath.row)")
             return UICollectionViewCell()
         }
-                
+        
         cell.indexPath = indexPath
         cell.delegate = self
         cell.contentView.layer.cornerRadius = 16
         
         cell.configureCell(cellTracker: trackerCell)
-       
+        
         if Calendar.current.startOfDay(for: datePicker.date) > Date() {
             cell.disableTrackButton()
         } else {

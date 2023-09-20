@@ -60,6 +60,22 @@ final class TrackerCategoryStore: NSObject {
         
         return trackerCategory
     }
+    
+    func getCategory(by id: UUID) throws -> TrackerCategoryCoreData {
+        let request = TrackerCategoryCoreData.fetchRequest()
+        request.returnsObjectsAsFaults = false
+        request.predicate = NSPredicate(format: "%K == %@", #keyPath(TrackerCategoryCoreData.categoryID), id.uuidString)
+        request.fetchLimit = 1
+        
+        guard
+            let results = try? context.fetch(request),
+            let category = results.first
+        else {
+            throw TrackerCategoryStoreError.getCategoryFailed
+        }
+        
+        return category
+    }
 }
 
 extension TrackerCategoryStore: TrackerCategoryStoreProtocol {

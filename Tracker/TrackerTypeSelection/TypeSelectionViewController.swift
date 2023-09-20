@@ -13,7 +13,7 @@ final class TypeSelectionViewController: UIViewController {
     private lazy var titleLabel: UILabel = {
         let titleLabel = UILabel()
         titleLabel.translatesAutoresizingMaskIntoConstraints = false
-        titleLabel.text = NSLocalizedString("tracker.creation.title", comment: "заголовок страницы с выбором типа создаваемого трекера")
+        titleLabel.text = NSLocalizedString("type.selection.title", comment: "заголовок страницы с выбором типа создаваемого трекера")
         titleLabel.textAlignment = .center
         titleLabel.font = UIFont.systemFont(ofSize: 16, weight: .medium)
         titleLabel.textColor = UIColor.getAppColors(.blackDay)
@@ -29,7 +29,7 @@ final class TypeSelectionViewController: UIViewController {
         habitButton.translatesAutoresizingMaskIntoConstraints = false
         habitButton.layer.cornerRadius = 16
         habitButton.setTitle(
-            NSLocalizedString("habit", comment: "кнопка с выбором привычки"),
+            NSLocalizedString("type.selection.habit", comment: "кнопка с выбором привычки"),
             for: .normal
         )
         habitButton.titleLabel?.textAlignment = .center
@@ -45,7 +45,7 @@ final class TypeSelectionViewController: UIViewController {
         eventButton.translatesAutoresizingMaskIntoConstraints = false
         eventButton.layer.cornerRadius = 16
         eventButton.setTitle(
-            NSLocalizedString("irregular.event", comment: "кнопка с выбором нерегулярного события"),
+            NSLocalizedString("type.selection.irregular.event", comment: "кнопка с выбором нерегулярного события"),
             for: .normal
         )
         eventButton.titleLabel?.font = UIFont.systemFont(ofSize: 16, weight: .medium)

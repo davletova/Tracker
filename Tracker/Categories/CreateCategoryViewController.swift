@@ -39,7 +39,7 @@ final class CreateCategoryViewController: UIViewController {
         input.translatesAutoresizingMaskIntoConstraints = false
         input.backgroundColor = UIColor.getAppColors(.backgroundDay)
         input.layer.cornerRadius = 16
-        input.placeholder = "Введите название категории"
+        input.placeholder = NSLocalizedString("create.category.name.placeholder", comment: "плейсхолдер на текстовом инпуте с именем категории")
         input.leftView = UIView(frame: CGRectMake(0, 0, 16, input.frame.height))
         input.leftViewMode = .always
         view.addSubview(input)
@@ -53,7 +53,7 @@ final class CreateCategoryViewController: UIViewController {
         button.translatesAutoresizingMaskIntoConstraints = false
         button.layer.cornerRadius = 16
         button.setTitle(
-            NSLocalizedString("add.category", comment: "текст кнопки с созданием категории"),
+            NSLocalizedString("create.category.button.done", comment: "текст кнопки с созданием категории"),
             for: .normal
         )
         button.titleLabel?.font = UIFont.systemFont(ofSize: 16, weight: .medium)
