@@ -8,7 +8,7 @@
 import Foundation
 import UIKit
 
-class CreateEventSupplementaryView: UICollectionReusableView {
+class CreateTrackerSupplementaryView: UICollectionReusableView {
     let titleLabel: UILabel = {
         let titleLabel = UILabel()
         titleLabel.translatesAutoresizingMaskIntoConstraints = false

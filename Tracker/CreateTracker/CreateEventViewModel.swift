@@ -6,22 +6,12 @@
 //
 
 import Foundation
-protocol CreateEventViewModelProtocol {
-    func updateTracker(_ tracker: Tracker) throws
-    func createTracker(_ tracker: Tracker) throws
-}
 
 protocol GetCategoryProtocol {
     func getCategory(by id: UUID) throws -> TrackerCategoryCoreData
 }
 
-protocol TrackerModifierProtocol {
-    func makeSchedule(_ makeFunc: (TrackerScheduleCoreData) throws -> Void) throws -> TrackerScheduleCoreData
-    func createTracker(_ createFunc: (TrackerCoreData) throws -> Void) throws -> TrackerCoreData
-    func updateTracker(by id: UUID, _ updateFunc: (TrackerCoreData) throws -> Void) throws
-}
-
-final class CreateEventViewModel: CreateEventViewModelProtocol {
+final class CreateTrackerViewModel: CreateTrackerViewModelProtocol {
     let categoryStore: GetCategoryProtocol
     let trackerStore: TrackerModifierProtocol
     
@@ -37,35 +27,35 @@ final class CreateEventViewModel: CreateEventViewModelProtocol {
             trackerCoreData.colorHex = UIColorMarshalling.hexString(from: tracker.color)
             trackerCoreData.pinned = tracker.pinned
             
-            if tracker.category.id == trackerCoreData.category!.categoryID {
-                return
+            if let category = trackerCoreData.category,
+               tracker.category.id != category.categoryID
+            {
+                trackerCoreData.category = try categoryStore.getCategory(by: tracker.category.id)
             }
             
-            let category = try categoryStore.getCategory(by: tracker.category.id)
-            trackerCoreData.category = category
-            
             if let habit = tracker as? Timetable {
-                guard let _ = trackerCoreData.schedule else {
-                    assertionFailure("should never be happen")
+
+                guard let schedule = trackerCoreData.schedule else {
+                    assertionFailure("failed to get schedule from trackerCoreData")
                     return
                 }
                         
-                for weekDay in habit.getSchedule().repetition {
+                for weekDay in Weekday.allCases {
                     switch weekDay {
                     case .monday:
-                        trackerCoreData.schedule!.monday = true
+                        schedule.monday = habit.getSchedule().repetition.contains(.monday)
                     case .tuesday:
-                        trackerCoreData.schedule!.tuesday = true
+                        schedule.tuesday = habit.getSchedule().repetition.contains(.tuesday)
                     case .wednesday:
-                        trackerCoreData.schedule!.wednesday = true
+                        schedule.wednesday = habit.getSchedule().repetition.contains(.wednesday)
                     case .thursday:
-                        trackerCoreData.schedule!.thursday = true
+                        schedule.thursday = habit.getSchedule().repetition.contains(.thursday)
                     case .friday:
-                        trackerCoreData.schedule!.friday = true
+                        schedule.friday = habit.getSchedule().repetition.contains(.friday)
                     case .saturday:
-                        trackerCoreData.schedule!.saturday = true
+                        schedule.saturday = habit.getSchedule().repetition.contains(.saturday)
                     case .sunday:
-                        trackerCoreData.schedule!.sunday = true
+                        schedule.sunday = habit.getSchedule().repetition.contains(.sunday)
                     }
                 }
             }

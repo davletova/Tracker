@@ -40,7 +40,7 @@ final class FiltersViewController: UIViewController, UITableViewDataSource, UITa
     private let titleLabel: UILabel = {
         let title = UILabel()
         title.translatesAutoresizingMaskIntoConstraints = false
-        title.text = NSLocalizedString("filters.title", comment: "TODO")
+        title.text = NSLocalizedString("filters.title", comment: "")
         title.textAlignment = .center
         
         title.font = UIFont.systemFont(ofSize: 16, weight: .medium)
@@ -116,7 +116,6 @@ final class FiltersViewController: UIViewController, UITableViewDataSource, UITa
             return UITableViewCell()
         }
         
-        // TODO: add locazation
         cell.configure(title: NSLocalizedString(filter.localizedLabel, comment: ""))
         if filter == currentFilter {
             cell.selectRow()

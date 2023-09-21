@@ -189,21 +189,33 @@ extension TrackerCollectionViewCell: UIContextMenuInteractionDelegate {
                                           previewProvider: nil,
                                           actionProvider: { [weak self] suggestedActions in
             guard let self = self else {
-                assertionFailure("this should be never happen!")
+                assertionFailure("contextMenuInteraction: self is empty")
                 return UIMenu()
             }
             let pinAction = UIAction(
                 title: NSLocalizedString(self.pinned ? "main.context.menu.unpinned" : "main.context.menu.pinned", comment: ""))
             { action in
-                self.delegate?.pinTracker(indexPath: self.indexPath!, pinned: !self.pinned)
+                guard let indexPath = self.indexPath,
+                      let delegate = self.delegate
+                else {
+                    assertionFailure("contextMenuInteraction: failed action")
+                    return
+                }
+                
+                delegate.pinTracker(indexPath: indexPath, pinned: !self.pinned)
             }
                 
             let editAction = UIAction(
                 title: NSLocalizedString("main.context.menu.edit", comment: ""))
             { action in
                 AnalyticsService.sendEvent(event: "click", screen: "Main", item: "edit")
-                                    
-                self.delegate?.editTracker(indexPath: self.indexPath!)
+                
+                guard let delegate = self.delegate else {
+                    assertionFailure("contextMenuInteraction: delegate is empty")
+                    return
+                }
+                
+                delegate.editTracker(indexPath: self.indexPath!)
             }
             
             let deleteAction = UIAction(
@@ -212,7 +224,12 @@ extension TrackerCollectionViewCell: UIContextMenuInteractionDelegate {
             ) { action in
                 AnalyticsService.sendEvent(event: "click", screen: "Main", item: "delete")
                 
-                self.delegate?.deleteTracker(indexPath: self.indexPath!)
+                guard let delegate = self.delegate else {
+                    assertionFailure("contextMenuInteraction: delegate is empty")
+                    return
+                }
+                
+                delegate.deleteTracker(indexPath: self.indexPath!)
             }
                                             
             return UIMenu(title: "", children: [pinAction, editAction, deleteAction])

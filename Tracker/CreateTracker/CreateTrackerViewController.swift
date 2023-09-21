@@ -34,7 +34,7 @@ struct TrackerProperty {
     var selectedValue: String?
 }
 
-final class CreateEventViewController: UIViewController {
+final class CreateTrackerViewController: UIViewController {
     private var trackerProperties = [PropertyType: TrackerProperty]()
     private let emojies = [
         "🙂", "😻", "🌺", "🐶", "❤️", "😱",
@@ -43,7 +43,7 @@ final class CreateEventViewController: UIViewController {
     ]
     private let colors = (1...18).map{ UIColor(named: "ColorSelection\($0)") }
     
-    private let viewModel: CreateEventViewModelProtocol
+    private let viewModel: CreateTrackerViewModelProtocol
     
     private let titleLabel: UILabel = {
         let titleLabel = UILabel()
@@ -87,7 +87,7 @@ final class CreateEventViewController: UIViewController {
         collectionView.register(ColorCollectionViewCell.self, forCellWithReuseIdentifier: colorCellIdentifier)
         collectionView.register(ButtonCollectionViewCell.self, forCellWithReuseIdentifier: buttonsCellIdentifier)
         
-        collectionView.register(CreateEventSupplementaryView.self,
+        collectionView.register(CreateTrackerSupplementaryView.self,
                                 forSupplementaryViewOfKind: UICollectionView.elementKindSectionHeader,
                                 withReuseIdentifier: "header")
         
@@ -133,7 +133,7 @@ final class CreateEventViewController: UIViewController {
     
     var updateTrackerVM: TrackerViewModel?
     
-    init(viewModel: CreateEventViewModelProtocol) {
+    init(viewModel: CreateTrackerViewModelProtocol) {
         self.viewModel = viewModel
         super.init(nibName: nil, bundle: nil)
     }
@@ -164,7 +164,7 @@ final class CreateEventViewController: UIViewController {
         )
         if isHabit {
             trackerProperties[.schedule] = TrackerProperty(
-                name: NSLocalizedString("create.tracker", comment: "кнопка с выбором расписания на странице создания трекера"),
+                name: NSLocalizedString("create.tracker.schedule", comment: "кнопка с выбором расписания на странице создания трекера"),
                 callback: { [weak self] in
                     guard let self = self else {
                         assertionFailure("open schedule callback: self is empty")
@@ -193,9 +193,13 @@ final class CreateEventViewController: UIViewController {
             }
             selectedEmojiIndexPath = IndexPath(row: emojiIndex, section: CollectionSectionType.emoji.rawValue)
             
-            //TODO: убрать force unwrapp
             guard let colorIndex = colors.firstIndex(where: { color in
-                UIColorMarshalling.hexString(from: color!) == UIColorMarshalling.hexString(from: updateTrackerVM.tracker.color)
+                var updateColor: UIColor = .clear
+                if let color = color {
+                    updateColor = color
+                }
+                
+                return UIColorMarshalling.hexString(from: updateColor) == UIColorMarshalling.hexString(from: updateTrackerVM.tracker.color)
             }) else {
                 assertionFailure("color not found")
                 return
@@ -215,8 +219,8 @@ final class CreateEventViewController: UIViewController {
         view.addSubview(titleLabel)
         
         if let _ = updateTrackerVM {
-         //TODO: локализовать заголовки
-            titleLabel.text = "Редактирование"
+            let localizeTitlekey = isHabit ? "edit.tracker.habit.title" : "edit.tracker.event.title"
+            titleLabel.text = NSLocalizedString(localizeTitlekey, comment: "заголовок страницы с редактированием трекера")
         } else {
             let localizeTitlekey = isHabit ? "create.tracker.habit.title" : "create.tracker.event.title"
             titleLabel.text = NSLocalizedString(localizeTitlekey, comment: "заголовок страницы с созданием трекера")
@@ -270,19 +274,19 @@ final class CreateEventViewController: UIViewController {
     }
 }
 
-extension CreateEventViewController: ListCategoriesViewControllerDelegate {
+extension CreateTrackerViewController: ListCategoriesViewControllerDelegate {
     func selectCategory(_ category: TrackerCategory) {
         self.selectedCategory = category
     }
 }
 
-extension CreateEventViewController: ScheduleViewControllerDelegate {
+extension CreateTrackerViewController: ScheduleViewControllerDelegate {
     func selectSchedule(_ schedule: Schedule) {
         self.selectedSchedule = schedule
     }
 }
 
-extension CreateEventViewController: TrackerActionProtocol {
+extension CreateTrackerViewController: TrackerActionProtocol {
     func cancelCreateEvent() {
         self.view.window?.rootViewController?.dismiss(animated: true, completion: nil)
     }
@@ -347,13 +351,13 @@ extension CreateEventViewController: TrackerActionProtocol {
 }
 
 // SetTrackerNameClosure for NameCollectionViewCell
-extension CreateEventViewController {
+extension CreateTrackerViewController {
     func setTrackerName(name: String) {
         trackerName = name
     }
 }
 
-extension CreateEventViewController: UICollectionViewDataSource {
+extension CreateTrackerViewController: UICollectionViewDataSource {
     func numberOfSections(in collectionView: UICollectionView) -> Int {
         5
     }
@@ -459,8 +463,7 @@ extension CreateEventViewController: UICollectionViewDataSource {
         case .buttons:
             let cell = collectionView.dequeueReusableCell(withReuseIdentifier: buttonsCellIdentifier, for: indexPath) as! ButtonCollectionViewCell
             let create = NSLocalizedString("create.tracker.button.create", comment: "текст кнопки Создать")
-            //TODO: локализовать
-            let save = "Save"
+            let save = NSLocalizedString("create.tracker.button.save", comment: "кнопка сохранения")
             let createButtonText = updateTrackerVM != nil ? save : create
             
             cell.setTitle(text: createButtonText)
@@ -484,7 +487,7 @@ extension CreateEventViewController: UICollectionViewDataSource {
             return UICollectionReusableView()
         }
         
-        guard let view = collectionView.dequeueReusableSupplementaryView(ofKind: kind, withReuseIdentifier: id, for: indexPath) as? CreateEventSupplementaryView else {
+        guard let view = collectionView.dequeueReusableSupplementaryView(ofKind: kind, withReuseIdentifier: id, for: indexPath) as? CreateTrackerSupplementaryView else {
             print("fialed to convert SupplementaryView")
             return UICollectionReusableView()
         }
@@ -521,7 +524,7 @@ extension CreateEventViewController: UICollectionViewDataSource {
     }
 }
 
-extension CreateEventViewController: UICollectionViewDelegateFlowLayout {
+extension CreateTrackerViewController: UICollectionViewDelegateFlowLayout {
     func collectionView(
         _ collectionView: UICollectionView,
         layout collectionViewLayout: UICollectionViewLayout,

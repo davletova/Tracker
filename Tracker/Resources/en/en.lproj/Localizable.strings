@@ -45,6 +45,12 @@
 "create.tracker.button.create" = "Create";
 "create.tracker.button.cancel" = "Cancel";
 "create.tracker.name.placeholder" = "Enter the name of the tracker";
+"create.tracker.button.save" = "Save";
+
+
+// Edit tracker
+"edit.tracker.habit.title" = "Edit habit";
+"edit.tracker.event.title" = "Edit event";
 
 
 // List categories

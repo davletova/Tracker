@@ -40,61 +40,112 @@ final class StatisticsViewModel {
         var schedulesDict = [Int: [UUID]]()
         
         for s in schedules {
-            //TODO: убрать force unwrap
             if s.sunday {
+                guard
+                    let tracker = s.tracker,
+                    let trackerID = tracker.trackerID
+                else {
+                    print("failed to get planned trackers by weekday \(Weekday.sunday)")
+                    continue
+                }
+                
                 if var foo = schedulesDict[1] {
-                    foo.append(s.tracker!.trackerID!)
+                    foo.append(trackerID)
                     schedulesDict[1] = foo
                 } else {
-                    schedulesDict[1] = [s.tracker!.trackerID!]
+                    schedulesDict[1] = [trackerID]
                 }
             }
             if s.monday {
+                guard
+                    let tracker = s.tracker,
+                    let trackerID = tracker.trackerID
+                else {
+                    print("failed to get planned trackers by weekday \(Weekday.monday)")
+                    continue
+                }
                 if var foo = schedulesDict[2] {
-                    foo.append(s.tracker!.trackerID!)
+                    foo.append(trackerID)
                     schedulesDict[2] = foo
                 } else {
-                    schedulesDict[2] = [s.tracker!.trackerID!]
+                    schedulesDict[2] = [trackerID]
                 }
             }
             if s.tuesday {
+                guard
+                    let tracker = s.tracker,
+                    let trackerID = tracker.trackerID
+                else {
+                    print("failed to get planned trackers by weekday \(Weekday.tuesday)")
+                    continue
+                }
                 if var foo = schedulesDict[3] {
-                    foo.append(s.tracker!.trackerID!)
+                    foo.append(trackerID)
                     schedulesDict[3] = foo
                 } else {
-                    schedulesDict[3] = [s.tracker!.trackerID!]
+                    schedulesDict[3] = [trackerID]
                 }
             }
             if s.wednesday {
+                guard
+                    let tracker = s.tracker,
+                    let trackerID = tracker.trackerID
+                else {
+                    print("failed to get planned trackers by weekday \(Weekday.wednesday)")
+                    continue
+                }
                 if var foo = schedulesDict[4] {
-                    foo.append(s.tracker!.trackerID!)
+                    foo.append(trackerID)
                     schedulesDict[4] = foo
                 } else {
-                    schedulesDict[4] = [s.tracker!.trackerID!]
+                    schedulesDict[4] = [trackerID]
                 }
             }
             if s.thursday {
+                guard
+                    let tracker = s.tracker,
+                    let trackerID = tracker.trackerID
+                else {
+                    print("failed to get planned trackers by weekday \(Weekday.sunday)")
+                    continue
+                }
                 if var foo = schedulesDict[5] {
-                    foo.append(s.tracker!.trackerID!)
+                    foo.append(trackerID)
                     schedulesDict[5] = foo
                 } else {
-                    schedulesDict[5] = [s.tracker!.trackerID!]
+                    schedulesDict[5] = [trackerID]
                 }
             }
             if s.friday {
+                guard
+                    let tracker = s.tracker,
+                    let trackerID = tracker.trackerID
+                else {
+                    print("failed to get planned trackers by weekday \(Weekday.friday)")
+                    continue
+                }
+                
                 if var foo = schedulesDict[6] {
-                    foo.append(s.tracker!.trackerID!)
+                    foo.append(trackerID)
                     schedulesDict[6] = foo
                 } else {
-                    schedulesDict[6] = [s.tracker!.trackerID!]
+                    schedulesDict[6] = [trackerID]
                 }
             }
             if s.saturday {
+                guard
+                    let tracker = s.tracker,
+                    let trackerID = tracker.trackerID
+                else {
+                    print("failed to get planned trackers by weekday \(Weekday.saturday)")
+                    continue
+                }
+                
                 if var foo = schedulesDict[7] {
-                    foo.append(s.tracker!.trackerID!)
+                    foo.append(trackerID)
                     schedulesDict[7] = foo
                 } else {
-                    schedulesDict[7] = [s.tracker!.trackerID!]
+                    schedulesDict[7] = [trackerID]
                 }
             }
         }
@@ -118,12 +169,24 @@ extension StatisticsViewModel: StatisticsViewModelProtocol {
         
         var bestContinousDays = 1
         var bestContinousDaysForTracker = 1
-        //TODO: fix force unwrap
-        var currentTrackerID = records.first!.tracker!.trackerID
+        
+        guard let record = records.first,
+              let tracker = record.tracker
+        else {
+            print("failed to get tracker from records")
+            return 0
+        }
+        
+        var currentTrackerID = tracker.trackerID
         
         for i in 1..<records.count {
-            if records[i].tracker!.trackerID != currentTrackerID {
-                currentTrackerID = records[i].tracker!.trackerID
+            guard let tracker = records[i].tracker else {
+                print("failed to get tracker from records")
+                return 0
+            }
+            
+            if tracker.trackerID != currentTrackerID {
+                currentTrackerID = tracker.trackerID
                 bestContinousDays = max(bestContinousDays, bestContinousDaysForTracker)
                 bestContinousDaysForTracker = 1
                 continue
@@ -155,10 +218,20 @@ extension StatisticsViewModel: StatisticsViewModelProtocol {
         
         var idealDaysCount = 0
         
-        Dictionary(grouping: records) { $0.date! }
+        Dictionary(grouping: records) { record in
+            guard let date = record.date else {
+                assertionFailure("failed to get date from record")
+                return Date()
+            }
+            return date
+        }
             .forEach { (key: Date, value: [TrackerRecordCoreData]) in
-                let weekday = Calendar.current.dateComponents([.weekday], from: key).weekday!
-                if value.count == trackerIDsByWeekday[weekday]?.count {
+                guard let weekday = Calendar.current.dateComponents([.weekday], from: key).weekday else {
+                    assertionFailure("failed to get weekday")
+                    return
+                }
+                if let trackersIDs = trackerIDsByWeekday[weekday],
+                   value.count == trackersIDs.count {
                     idealDaysCount += 1
                 }
             }
@@ -189,7 +262,13 @@ extension StatisticsViewModel: StatisticsViewModelProtocol {
             withSort:  []
         )
     
-        let recordsByDate = Dictionary(grouping: records) { $0.date! }
+        let recordsByDate = Dictionary(grouping: records) { record in
+            guard let date = record.date else {
+                assertionFailure("failed to get date from record")
+                return Date()
+            }
+            return date
+        }
         let totalDays = recordsByDate.keys.count
         
         var totalTracked = 0

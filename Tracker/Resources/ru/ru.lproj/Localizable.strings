@@ -45,6 +45,12 @@
 "create.tracker.button.create" = "Создать";
 "create.tracker.button.cancel" = "Отмена";
 "create.tracker.name.placeholder" = "Введите название трекера";
+"create.tracker.button.save" = "Сохранить";
+
+
+// Edit tracker
+"edit.tracker.habit.title" = "Редактирование привычки";
+"edit.tracker.event.title" = "Редактирование события";
 
 
 // List categories

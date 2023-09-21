@@ -74,7 +74,6 @@ class TrackerCollectionViewModel: TrackerCollectionViewModelProtocol {
         
         let trackers = try trackerStore.listTrackers(withFilter: predicate, withSort: [])
         let trackersByCategory = Dictionary(grouping: trackers) { (tracker) -> String in
-            // TODO: fix localize
             guard
                 let category = tracker.category,
                 let categoryName = tracker.pinned ?

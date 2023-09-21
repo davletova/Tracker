@@ -53,19 +53,19 @@ struct Schedule {
             .map({ weekday in
             switch weekday {
             case .monday:
-                return "Пн"
+                return NSLocalizedString("schedule.monday.short", comment: "")
             case .tuesday:
-                return "Вт"
+                return NSLocalizedString("schedule.tuesday.short", comment: "")
             case .wednesday:
-                 return "Ср"
+                 return NSLocalizedString("schedule.wednesday.short", comment: "")
             case .thursday:
-                return "Чт"
+                return NSLocalizedString("schedule.thursday.short", comment: "")
             case .friday:
-                return "Пт"
+                return NSLocalizedString("schedule.friday.short", comment: "")
             case .saturday:
-                return "Сб"
+                return NSLocalizedString("schedule.saturday.short", comment: "")
             case .sunday:
-                return "Вс"
+                return NSLocalizedString("schedule.sunday.short", comment: "")
             }
         })
         

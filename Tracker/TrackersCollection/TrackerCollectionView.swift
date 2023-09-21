@@ -370,8 +370,8 @@ extension TrackerCollectionView: TrackEventProtocol {
             return
         }
         
-        let viewModel = CreateEventViewModel(categoryStore: TrackerCategoryStore(), trackerStore: TrackerStore())
-        let editTrackerVC = CreateEventViewController(viewModel: viewModel)
+        let viewModel = CreateTrackerViewModel(categoryStore: TrackerCategoryStore(), trackerStore: TrackerStore())
+        let editTrackerVC = CreateTrackerViewController(viewModel: viewModel)
         editTrackerVC.updateTrackerVM = trackerVM
         if let _ = trackerVM.tracker as? Timetable {
             editTrackerVC.isHabit = true
@@ -387,14 +387,22 @@ extension TrackerCollectionView: TrackEventProtocol {
             title: NSLocalizedString("main.delete.alert.title", comment: "Заголовок алерта с подтверждением удаления"),
             style: .destructive
         ) { [weak self] (action) in
+            guard let self = self else {
+                assertionFailure("deleteTracker: self is empty")
+                return
+            }
             guard
-                let category = self!.visibleCategories[at: indexPath.section],
+                let category = self.visibleCategories[at: indexPath.section],
                 let trackerVM = category.trackers[at: indexPath.row]
             else {
                 return
             }
             
-            try! self!.viewModel.deleteTracker(trackerVM.tracker)
+            do {
+                try self.viewModel.deleteTracker(trackerVM.tracker)
+            } catch {
+                print("failed to delete tracker with error \(error)")
+            }
         }
         
         let cancelAction = UIAlertAction(

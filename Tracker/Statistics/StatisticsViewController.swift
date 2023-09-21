@@ -10,14 +10,6 @@ import UIKit
 
 let statisticCellHeight = CGFloat(90)
 
-protocol StatisticsViewModelProtocol {
-    func getTrackersCount() throws -> Int
-    func getBestPeriod() throws -> Int
-    func getCountOfIdealDays() throws -> Int
-    func getTotalPerformedHabits() throws -> Int
-    func getAverrage() throws -> Int
-}
-
 class StatisticsViewController: UIViewController {
     private let viewModel: StatisticsViewModelProtocol
     
@@ -54,7 +46,6 @@ class StatisticsViewController: UIViewController {
         let view = UIView()
         let imageView = UIImageView(image: UIImage(named: "empty"))
         let label = UILabel()
-        //TODO: localize
         label.text = NSLocalizedString("statistic.empty.view", comment: "текст для пустого списка категорий")
         label.numberOfLines = 0
         label.textAlignment = .center
@@ -159,7 +150,6 @@ class StatisticsViewController: UIViewController {
         
         view.backgroundColor = UIColor.getAppColors(.whiteDay)
 
-        //TODO: сделать локализацию
         view.addSubview(statisticTitle)
         view.addSubview(statisticStack)
         
