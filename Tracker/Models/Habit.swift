@@ -26,7 +26,8 @@ final class Habit: Tracker {
             name: tracker.name,
             category: tracker.category,
             emoji: tracker.emoji,
-            color: tracker.color
+            color: tracker.color,
+            pinned: tracker.pinned
         )
     }
 }

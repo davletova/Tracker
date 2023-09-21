@@ -43,7 +43,7 @@
 "create.tracker.color" = "Color";
 "create.tracker.schedule" = "Schedule";
 "create.tracker.button.create" = "Create";
-"create.tracker.button.cancel" = "Cancek";
+"create.tracker.button.cancel" = "Cancel";
 "create.tracker.name.placeholder" = "Enter the name of the tracker";
 
 

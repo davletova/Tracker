@@ -89,13 +89,15 @@ final class TypeSelectionViewController: UIViewController {
     }
     
     @objc func goToCreateEvent() {
-        let addingEventViewController = CreateEventViewController()
+        let viewModel = CreateEventViewModel(categoryStore: TrackerCategoryStore(), trackerStore: TrackerStore())
+        let addingEventViewController = CreateEventViewController(viewModel: viewModel)
         addingEventViewController.isHabit = false
         self.present(addingEventViewController, animated: true)
     }
     
     @objc func goToCreateHabit() {
-        let addingEventViewController = CreateEventViewController()
+        let viewModel = CreateEventViewModel(categoryStore: TrackerCategoryStore(), trackerStore: TrackerStore())
+        let addingEventViewController = CreateEventViewController(viewModel: viewModel)
         addingEventViewController.isHabit = true
         self.present(addingEventViewController, animated: true)
     }

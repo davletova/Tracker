@@ -103,7 +103,6 @@ final class CreateCategoryViewController: UIViewController {
         createButton.trailingAnchor.constraint(equalTo: view.trailingAnchor, constant: -20).isActive = true
         createButton.heightAnchor.constraint(equalToConstant: 60).isActive = true
         createButton.bottomAnchor.constraint(equalTo: view.bottomAnchor, constant: -39).isActive = true
-        
     }
     
     @objc private func textFieldDidChange(textField: UITextField) {

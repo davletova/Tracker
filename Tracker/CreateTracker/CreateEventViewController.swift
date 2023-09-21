@@ -43,7 +43,7 @@ final class CreateEventViewController: UIViewController {
     ]
     private let colors = (1...18).map{ UIColor(named: "ColorSelection\($0)") }
     
-    private let trackerStore = TrackerStore()
+    private let viewModel: CreateEventViewModelProtocol
     
     private let titleLabel: UILabel = {
         let titleLabel = UILabel()
@@ -132,6 +132,15 @@ final class CreateEventViewController: UIViewController {
     private var selectedColorIndexPath: IndexPath? { didSet { changeStateCreateButtonifNeedIt() } }
     
     var updateTrackerVM: TrackerViewModel?
+    
+    init(viewModel: CreateEventViewModelProtocol) {
+        self.viewModel = viewModel
+        super.init(nibName: nil, bundle: nil)
+    }
+    
+    required init?(coder: NSCoder) {
+        fatalError("init(coder:) has not been implemented")
+    }
     
     override func viewDidLoad() {
         super.viewDidLoad()
@@ -309,7 +318,8 @@ extension CreateEventViewController: TrackerActionProtocol {
             name: value,
             category: selectCategory,
             emoji: emojies[selectedEmojiIndex.row],
-            color: color
+            color: color,
+            pinned: false
         )
         
         if isHabit {
@@ -324,9 +334,9 @@ extension CreateEventViewController: TrackerActionProtocol {
         do {
             if let updateTracker = updateTrackerVM {
                 newTracker.id = updateTracker.tracker.id
-                try trackerStore.updateTracker(newTracker)
+                try viewModel.updateTracker(newTracker)
             } else {
-                try trackerStore.addNewTracker(newTracker)
+                try viewModel.createTracker(newTracker)
             }
         } catch {
             print("failed to create tracker: \(error)")

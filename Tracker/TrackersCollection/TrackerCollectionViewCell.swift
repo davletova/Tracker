@@ -185,7 +185,6 @@ final class TrackerCollectionViewCell: UICollectionViewCell {
 extension TrackerCollectionViewCell: UIContextMenuInteractionDelegate {
     func contextMenuInteraction(_ interaction: UIContextMenuInteraction,
                                 configurationForMenuAtLocation location: CGPoint) -> UIContextMenuConfiguration? {
-        //TODO: убрать иконки на действиях
         return UIContextMenuConfiguration(identifier: nil,
                                           previewProvider: nil,
                                           actionProvider: { [weak self] suggestedActions in
@@ -193,29 +192,28 @@ extension TrackerCollectionViewCell: UIContextMenuInteractionDelegate {
                 assertionFailure("this should be never happen!")
                 return UIMenu()
             }
-            let pinAction =
-            UIAction(title: NSLocalizedString(self.pinned ? "Открепить" : "Закрепить", comment: ""),
-                         image: UIImage(systemName: "arrow.up.square")) { action in
-                
+            let pinAction = UIAction(
+                title: NSLocalizedString(self.pinned ? "main.context.menu.unpinned" : "main.context.menu.pinned", comment: ""))
+            { action in
                 self.delegate?.pinTracker(indexPath: self.indexPath!, pinned: !self.pinned)
-                }
+            }
                 
-            let editAction =
-                UIAction(title: NSLocalizedString("Редактировать", comment: ""),
-                         image: UIImage(systemName: "plus.square.on.square")) { action in
-                    AnalyticsService.sendEvent(event: "click", screen: "Main", item: "edit")
-                                        
-                    self.delegate?.editTracker(indexPath: self.indexPath!)
-                }
+            let editAction = UIAction(
+                title: NSLocalizedString("main.context.menu.edit", comment: ""))
+            { action in
+                AnalyticsService.sendEvent(event: "click", screen: "Main", item: "edit")
+                                    
+                self.delegate?.editTracker(indexPath: self.indexPath!)
+            }
+            
+            let deleteAction = UIAction(
+                title: NSLocalizedString("main.context.menu.delete", comment: ""),
+                attributes: .destructive
+            ) { action in
+                AnalyticsService.sendEvent(event: "click", screen: "Main", item: "delete")
                 
-            let deleteAction =
-                UIAction(title: NSLocalizedString("Удалить", comment: ""),
-                         image: UIImage(systemName: "trash"),
-                         attributes: .destructive) { action in
-                    AnalyticsService.sendEvent(event: "click", screen: "Main", item: "delete")
-                    
-                    self.delegate?.deleteTracker(indexPath: self.indexPath!)
-                }
+                self.delegate?.deleteTracker(indexPath: self.indexPath!)
+            }
                                             
             return UIMenu(title: "", children: [pinAction, editAction, deleteAction])
         })

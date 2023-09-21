@@ -7,26 +7,38 @@
 
 import Foundation
 
+enum TrackerCoreDataError: Error {
+    case decodingErrorInvalidId
+    case decodingErrorInvalidName
+    case decodingErrorInvalidCategory
+    case decodingErrorInvalidCategoryName
+    case decodingErrorInvalidEmojies
+    case decodingErrorInvalidColorHex
+    case categoryNotFound
+    case generateURLError
+    case getTrackerError
+}
+
 extension TrackerCoreData {
     func toTracker() throws -> Tracker {
         guard let trackerID = self.trackerID else {
-            throw TrackerStoreError.decodingErrorInvalidId
+            throw TrackerCoreDataError.decodingErrorInvalidId
         }
         guard let trackerName = self.name else {
-            throw TrackerStoreError.decodingErrorInvalidName
+            throw TrackerCoreDataError.decodingErrorInvalidName
         }
         guard let trackerEmoji = self.emoji else {
-            throw TrackerStoreError.decodingErrorInvalidEmojies
+            throw TrackerCoreDataError.decodingErrorInvalidEmojies
         }
         guard let trackerColorHex = self.colorHex else {
-            throw TrackerStoreError.decodingErrorInvalidColorHex
+            throw TrackerCoreDataError.decodingErrorInvalidColorHex
         }
         guard
             let categoryCoreData = self.category,
             let categoryID = categoryCoreData.categoryID,
             let categoryName = categoryCoreData.name
         else {
-            throw TrackerStoreError.decodingErrorInvalidCategory
+            throw TrackerCoreDataError.decodingErrorInvalidCategory
         }
         
         let tracker = Tracker(

@@ -94,7 +94,6 @@ final class TrackerCollectionView: UIViewController {
         button.setTitleColor(.white, for: .normal)
         button.backgroundColor  = .getAppColors(.blue)
         button.layer.cornerRadius = 16
-        button.isHidden = true
         
         return button
     }()
@@ -221,8 +220,6 @@ final class TrackerCollectionView: UIViewController {
     func showEmptyView() {
         hideEmptyView()
         
-        filterButton.isHidden = true
-        
         if let search = searchTextField.text,
            !search.isEmpty
         {
@@ -244,8 +241,6 @@ final class TrackerCollectionView: UIViewController {
     func hideEmptyView() {
         emptyCollectionView.removeFromSuperview()
         errorCollectionView.removeFromSuperview()
-        
-        filterButton.isHidden = false
     }
     
     private func createNavigationBar() {
@@ -359,10 +354,8 @@ extension TrackerCollectionView: TrackEventProtocol {
         }
         
         do {
-            let tracker = trackerVM.tracker
-            tracker.pinned = pinned
-            
-            try viewModel.updateTracker(trackerVM.tracker)
+            trackerVM.tracker.pinned = pinned
+            try viewModel.togglePinnedTracker(trackerVM.tracker)
         } catch {
             print("failed to pin tracker \(error)")
         }
@@ -377,7 +370,8 @@ extension TrackerCollectionView: TrackEventProtocol {
             return
         }
         
-        let editTrackerVC = CreateEventViewController()
+        let viewModel = CreateEventViewModel(categoryStore: TrackerCategoryStore(), trackerStore: TrackerStore())
+        let editTrackerVC = CreateEventViewController(viewModel: viewModel)
         editTrackerVC.updateTrackerVM = trackerVM
         if let _ = trackerVM.tracker as? Timetable {
             editTrackerVC.isHabit = true

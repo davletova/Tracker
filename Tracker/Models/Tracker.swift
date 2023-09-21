@@ -22,7 +22,7 @@ class Tracker {
         category: TrackerCategory,
         emoji: String,
         color: UIColor,
-        pinned: Bool = false
+        pinned: Bool
     ) {
         self.id = id
         self.name = name

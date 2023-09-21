@@ -9,7 +9,7 @@ import Foundation
 
 protocol TrackerCollectionViewModelProtocol {
     func deleteTracker(_ tracker: Tracker) throws
-    func updateTracker(_ tracker: Tracker) throws
+    func togglePinnedTracker(_ tracker: Tracker) throws
     func listTrackers(for date: Date, withName name: String, withFilter filter: TrackerFilterType) throws -> [TrackersByCategory]
 }
 
@@ -25,19 +25,9 @@ class TrackerCollectionViewModel: TrackerCollectionViewModelProtocol {
         try trackerStore.deleteTracker(by: tracker.id)
     }
     
-    func updateTracker(_ tracker: Tracker) throws {
+    func togglePinnedTracker(_ tracker: Tracker) throws {
         try trackerStore.updateTracker(by: tracker.id) { trackerCoreData in
-            trackerCoreData.name = tracker.name
-            trackerCoreData.emoji = tracker.emoji
-            trackerCoreData.colorHex = UIColorMarshalling.hexString(from: tracker.color)
             trackerCoreData.pinned = tracker.pinned
-            
-            if tracker.category.id == trackerCoreData.category!.categoryID {
-                return
-            }
-            
-            let category = try trackerCategoryStore.getCategory(by: tracker.category.id)
-            trackerCoreData.category = category
         }
     }
     
@@ -77,8 +67,9 @@ class TrackerCollectionViewModel: TrackerCollectionViewModelProtocol {
                 predicate,
                 NSPredicate(format: "(ANY records.date == %@)", Calendar.current.startOfDay(for: Date()) as NSDate)
             ])
-        default:
-            print("")
+        case .all:
+            // ничего не делаем и так по умолчанию все должны выбираться
+            break
         }
         
         let trackers = try trackerStore.listTrackers(withFilter: predicate, withSort: [])
@@ -86,7 +77,8 @@ class TrackerCollectionViewModel: TrackerCollectionViewModelProtocol {
             // TODO: fix localize
             guard
                 let category = tracker.category,
-                let categoryName = tracker.pinned ? "Закреп" : category.name
+                let categoryName = tracker.pinned ?
+                    NSLocalizedString("main.section.pinned.title", comment: "Секция закрепленных трекеров") : category.name
             else {
                 assertionFailure("failed to get category name of tarcker \(tracker.id)")
                 return ""
@@ -118,11 +110,11 @@ class TrackerCollectionViewModel: TrackerCollectionViewModelProtocol {
             
             return TrackersByCategory(categoryName: categoryName, trackers: trackerViewModels)
         }.sorted { cat1, cat2 in
-            if cat1.categoryName == "Закреп" {
+            if cat1.categoryName == NSLocalizedString("main.section.pinned.title", comment: "") {
                 return true
             }
             
-            if cat2.categoryName == "Закреп" {
+            if cat2.categoryName == NSLocalizedString("main.section.pinned.title", comment: "") {
                 return false
             }
             
