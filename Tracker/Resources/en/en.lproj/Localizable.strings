@@ -18,7 +18,7 @@
 "main.empty.list.of.trackers" = "What are we tracking?";
 "main.no.trackers.found" = "Nothing found";
 "main.searchField.placeholder" = "Search";
-"main.filter" = "Filter";
+"main.filters" = "Filters";
 "main.section.pinned.title" = "Pinned";
 "main.context.menu.pinned" = "Pinned";
 "main.context.menu.unpinned" = "Unpinned";

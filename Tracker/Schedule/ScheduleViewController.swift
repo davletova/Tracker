@@ -142,7 +142,6 @@ extension ScheduleViewController: UITableViewDataSource {
     
     func tableView(_ tableView: UITableView, cellForRowAt indexPath: IndexPath) -> UITableViewCell {
         let dateFormatter = DateFormatter()
-//        dateFormatter.locale = Locale()
         
         let switcher = UISwitch(frame: CGRect(x: 0, y: 0, width: 51, height: 31))
         switcher.onTintColor = UIColor.getAppColors(.blue)

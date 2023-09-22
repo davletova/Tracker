@@ -62,7 +62,7 @@ final class CreateTrackerViewController: UIViewController {
         titleLabel.font = UIFont.systemFont(ofSize: 32, weight: .bold)
         titleLabel.textColor = UIColor.getAppColors(.blackDay)
         titleLabel.isHidden = true
-
+        
         
         return titleLabel
     }()
@@ -218,7 +218,7 @@ final class CreateTrackerViewController: UIViewController {
     private func setupTitle() {
         view.addSubview(titleLabel)
         
-        if let _ = updateTrackerVM {
+        if updateTrackerVM != nil {
             let localizeTitlekey = isHabit ? "edit.tracker.habit.title" : "edit.tracker.event.title"
             titleLabel.text = NSLocalizedString(localizeTitlekey, comment: "заголовок страницы с редактированием трекера")
         } else {

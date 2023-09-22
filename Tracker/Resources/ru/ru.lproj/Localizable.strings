@@ -18,7 +18,7 @@
 "main.empty.list.of.trackers" = "Что будем отслеживать?";
 "main.no.trackers.found" = "Ничего не найдено";
 "main.searchField.placeholder" = "Поиск";
-"main.filter" = "Фильтр";
+"main.filters" = "Фильтр";
 "main.section.pinned.title" = "Закрепленные";
 "main.context.menu.pinned" = "Закрепить";
 "main.context.menu.unpinned" = "Открепить";

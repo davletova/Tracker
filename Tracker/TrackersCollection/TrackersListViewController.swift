@@ -26,7 +26,7 @@ struct GeometricParams {
     }
 }
 
-final class TrackerCollectionView: UIViewController {
+final class TrackersListViewController: UIViewController {
     static let TrackerSavedNotification = Notification.Name(rawValue: "CreateEvent")
     
     private var viewModel: TrackerCollectionViewModelProtocol
@@ -74,7 +74,7 @@ final class TrackerCollectionView: UIViewController {
         
         collectionView.translatesAutoresizingMaskIntoConstraints = false
         
-        collectionView.register(TrackerCollectionViewCell.self, forCellWithReuseIdentifier: cellIdentifier)
+        collectionView.register(TrackersListViewControllerCell.self, forCellWithReuseIdentifier: cellIdentifier)
         collectionView.register(SupplementaryView.self,
                                 forSupplementaryViewOfKind: UICollectionView.elementKindSectionHeader,
                                 withReuseIdentifier: headerIdentifier)
@@ -87,7 +87,7 @@ final class TrackerCollectionView: UIViewController {
         button.translatesAutoresizingMaskIntoConstraints = false
         
         button.setTitle(
-            NSLocalizedString("Filters", comment: "тайтл на кнопке Фильтр"),
+            NSLocalizedString("main.filters", comment: "тайтл на кнопке Фильтр"),
             for: .normal
         )
         button.titleLabel?.font = .systemFont(ofSize: 17, weight: .regular)
@@ -99,6 +99,8 @@ final class TrackerCollectionView: UIViewController {
     }()
     
     @objc private func showFilter() {
+        AnalyticsService.sendEvent(event: "click", screen: "Main", item: "filter")
+        
         let filterController = FiltersViewController(initialFilter: trackerFilter)
         filterController.delegate = self
         filterController.modalPresentationStyle = .popover
@@ -156,7 +158,7 @@ final class TrackerCollectionView: UIViewController {
     }()
     
     init() {
-        viewModel = TrackerCollectionViewModel(trackerStore: TrackerStore())
+        viewModel = TrackersListViewModel(trackerStore: TrackerStore())
         trackerRecordStore = TrackerRecordStore()
         super.init(nibName: nil, bundle: nil)
     }
@@ -171,7 +173,7 @@ final class TrackerCollectionView: UIViewController {
         NotificationCenter.default.addObserver(
             self,
             selector: #selector(updateVisibleCategories),
-            name: TrackerCollectionView.TrackerSavedNotification,
+            name: TrackersListViewController.TrackerSavedNotification,
             object: nil
         )
         
@@ -323,7 +325,7 @@ final class TrackerCollectionView: UIViewController {
     }
 }
 
-extension TrackerCollectionView: UISearchTextFieldDelegate {
+extension TrackersListViewController: UISearchTextFieldDelegate {
     func textFieldShouldReturn(_ textField: UITextField) -> Bool {
         textField.resignFirstResponder()
         
@@ -343,7 +345,7 @@ extension TrackerCollectionView: UISearchTextFieldDelegate {
     }
 }
 
-extension TrackerCollectionView: TrackEventProtocol {
+extension TrackersListViewController: TrackEventProtocol {
     func pinTracker(indexPath: IndexPath, pinned: Bool) {
         guard
             let category = visibleCategories[at: indexPath.section],
@@ -457,7 +459,7 @@ extension TrackerCollectionView: TrackEventProtocol {
     }
 }
 
-extension TrackerCollectionView: FiltersViewControllerDelegate {
+extension TrackersListViewController: FiltersViewControllerDelegate {
     func selectFilter(_ trackerFilter: TrackerFilterType) {
         self.trackerFilter = trackerFilter
         do {
@@ -471,7 +473,7 @@ extension TrackerCollectionView: FiltersViewControllerDelegate {
     }
 }
 
-extension TrackerCollectionView: UICollectionViewDataSource {
+extension TrackersListViewController: UICollectionViewDataSource {
     func numberOfSections(in collectionView: UICollectionView) -> Int {
         if visibleCategories.count == 0 {
             showEmptyView()
@@ -492,7 +494,7 @@ extension TrackerCollectionView: UICollectionViewDataSource {
     }
     
     func collectionView(_ collectionView: UICollectionView, cellForItemAt indexPath: IndexPath) -> UICollectionViewCell {
-        guard let cell = collectionView.dequeueReusableCell(withReuseIdentifier: cellIdentifier, for: indexPath) as? TrackerCollectionViewCell else {
+        guard let cell = collectionView.dequeueReusableCell(withReuseIdentifier: cellIdentifier, for: indexPath) as? TrackersListViewControllerCell else {
             print("failed to convert cell to TrackerCollectionViewCell")
             return UICollectionViewCell()
         }
@@ -544,7 +546,7 @@ extension TrackerCollectionView: UICollectionViewDataSource {
     }
 }
 
-extension TrackerCollectionView: UICollectionViewDelegateFlowLayout {
+extension TrackersListViewController: UICollectionViewDelegateFlowLayout {
     func collectionView(_ collectionView: UICollectionView, layout collectionViewLayout: UICollectionViewLayout, sizeForItemAt indexPath: IndexPath) -> CGSize {
         let availableWidth = collectionView.frame.width - self.params.paddingWidth
         let cellWidth =  availableWidth / CGFloat(self.params.cellCount)

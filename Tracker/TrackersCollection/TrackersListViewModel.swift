@@ -13,7 +13,7 @@ protocol TrackerCollectionViewModelProtocol {
     func listTrackers(for date: Date, withName name: String, withFilter filter: TrackerFilterType) throws -> [TrackersByCategory]
 }
 
-class TrackerCollectionViewModel: TrackerCollectionViewModelProtocol {
+class TrackersListViewModel: TrackerCollectionViewModelProtocol {
     private let trackerStore: TrackerStoreProtocol
     private let trackerCategoryStore: TrackerCategoryStore = TrackerCategoryStore()
     

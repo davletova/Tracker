@@ -15,7 +15,7 @@ final class TabBarViewController: UITabBarController {
         
         self.tabBar.addSubview(lineView)
         
-        let navigationController = UINavigationController(rootViewController: TrackerCollectionView())
+        let navigationController = UINavigationController(rootViewController: TrackersListViewController())
         navigationController.tabBarItem = UITabBarItem(
             title: NSLocalizedString("main.tabbar.trackers", comment: "кнопка перехода на список трекеров"),
             image: UIImage(named: "record.circle.fill"),

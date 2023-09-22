@@ -112,7 +112,7 @@ final class TrackerStore: NSObject, TrackerStoreProtocol, ListTrackerProtocol, T
 extension TrackerStore: NSFetchedResultsControllerDelegate {
     func controllerDidChangeContent(_ controller: NSFetchedResultsController<NSFetchRequestResult>) {
         NotificationCenter.default.post(
-            name: TrackerCollectionView.TrackerSavedNotification,
+            name: TrackersListViewController.TrackerSavedNotification,
             object: nil
         )
     }

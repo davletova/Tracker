@@ -15,7 +15,7 @@ protocol TrackEventProtocol: AnyObject {
     func deleteTracker(indexPath: IndexPath)
 }
 
-final class TrackerCollectionViewCell: UICollectionViewCell {
+final class TrackersListViewControllerCell: UICollectionViewCell {
     static let TrackerRecordSavedNotification = Notification.Name(rawValue: "CreateRecord")
     
     private let emogiLabel: UILabel = {
@@ -182,7 +182,7 @@ final class TrackerCollectionViewCell: UICollectionViewCell {
     func enableTrackButton() { trackButton.isEnabled = true }
 }
 
-extension TrackerCollectionViewCell: UIContextMenuInteractionDelegate {
+extension TrackersListViewControllerCell: UIContextMenuInteractionDelegate {
     func contextMenuInteraction(_ interaction: UIContextMenuInteraction,
                                 configurationForMenuAtLocation location: CGPoint) -> UIContextMenuConfiguration? {
         return UIContextMenuConfiguration(identifier: nil,
