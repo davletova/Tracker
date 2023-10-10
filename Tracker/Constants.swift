@@ -9,8 +9,8 @@ import Foundation
 import UIKit
 
 enum AppColor {
-    case backgroundDay, backgroundNight, blackDay, blackNight, blue, gray
-    case lightGray, red, whiteDay, whiteNight, tabBarBorder
+    case backgroundDay, backgroundNight, blackDay, blackNight, blue, gray, datePickerBackground, datePickerTitle
+    case lightGray, red, whiteDay, whiteNight, tabBarBorder, gradient1, gradient2, gradient3
     
     func getColor() -> UIColor {
         switch self {
@@ -80,7 +80,36 @@ enum AppColor {
                 return UIColor.lightGray
             }
             return tabBarBorder
-            
+        case .gradient1:
+            guard let gradient1 = UIColor(named: "Gradient1") else {
+                assertionFailure("Gradient1 not found")
+                return UIColor.red
+            }
+            return gradient1
+        case .gradient2:
+            guard let gradient2 = UIColor(named: "Gradient2") else {
+                assertionFailure("Gradient2 not found")
+                return UIColor.green
+            }
+            return gradient2
+        case .gradient3:
+            guard let gradient3 = UIColor(named: "Gradient3") else {
+                assertionFailure("Gradient3 not found")
+                return UIColor.blue
+            }
+            return gradient3
+        case .datePickerBackground:
+            guard let datePickerBackground = UIColor(named: "DatePickerBackground") else {
+                assertionFailure("datePickerBackground not found")
+                return UIColor.lightGray
+            }
+            return datePickerBackground
+        case .datePickerTitle:
+            guard let datePickerTitle = UIColor(named: "DatePickerTitle") else {
+                assertionFailure("datePickerdatePickerTitleBackground not found")
+                return UIColor.black
+            }
+            return datePickerTitle
         }
     }
 }

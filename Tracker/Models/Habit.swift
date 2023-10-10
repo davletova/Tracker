@@ -17,15 +17,18 @@ final class Habit: Tracker {
     var schedule: Schedule
     
     init(
-        id: UUID,
-        name: String,
-        category: TrackerCategory,
-        emoji: String,
-        color: UIColor,
+        tracker: Tracker,
         schedule: Schedule
     ) {
         self.schedule = schedule
-        super.init(id: id, name: name, category: category, emoji: emoji, color: color)
+        super.init(
+            id: tracker.id,
+            name: tracker.name,
+            category: tracker.category,
+            emoji: tracker.emoji,
+            color: tracker.color,
+            pinned: tracker.pinned
+        )
     }
 }
 

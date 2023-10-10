@@ -72,7 +72,7 @@ final class TrackerRecordStore: NSObject, TrackerRecordStoreProtocol {
         }
         
         let dateEqualPredicate = NSPredicate(format: "%K == %@", #keyPath(TrackerRecordCoreData.date), Calendar.current.startOfDay(for: trackerRecord.date) as NSDate)
-        var filteredRecords = records.filtered(using: dateEqualPredicate)
+        let filteredRecords = records.filtered(using: dateEqualPredicate)
         
         if filteredRecords.count < 1 || filteredRecords.count > 1 {
             throw TrackerRecordStoreError.getRecordError
@@ -86,3 +86,13 @@ final class TrackerRecordStore: NSObject, TrackerRecordStoreProtocol {
     }
 }
 
+extension TrackerRecordStore: ListTrackerRecordsProtocol {
+    func listRecords(withFilter:  NSPredicate?, withSort: [NSSortDescriptor]) throws -> [TrackerRecordCoreData] {
+        let request = TrackerRecordCoreData.fetchRequest()
+        if let predicate = withFilter {
+            request.predicate = predicate
+        }
+        request.sortDescriptors = withSort
+        return try context.fetch(request)
+    }
+}

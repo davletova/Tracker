@@ -8,6 +8,8 @@
 import Foundation
 
 protocol TrackerStoreProtocol: AnyObject {
-    func getTrackers(by date: Date, withName name: String?) -> [TrackersByCategory]
-    func addNewTracker(_ tracker: Tracker) throws
+    func listTrackers(withFilter:  NSPredicate?, withSort: [NSSortDescriptor]) throws -> [TrackerCoreData]
+    
+    func updateTracker(by id: UUID, _ updateFunc: (TrackerCoreData) throws -> Void) throws
+    func deleteTracker(by id: UUID) throws
 }

@@ -10,22 +10,25 @@ import UIKit
 
 class Tracker {
     var id: UUID
-    let name: String
-    let category: TrackerCategory
-    let emoji: String
-    let color: UIColor
+    var name: String
+    var category: TrackerCategory
+    var emoji: String
+    var color: UIColor
+    var pinned: Bool
     
     init(
         id: UUID,
         name: String,
         category: TrackerCategory,
         emoji: String,
-        color: UIColor
+        color: UIColor,
+        pinned: Bool
     ) {
         self.id = id
         self.name = name
         self.category = category
         self.emoji = emoji
         self.color = color
+        self.pinned = pinned
     }
 }

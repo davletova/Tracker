@@ -38,7 +38,7 @@ final class TrackerCategoryStore: NSObject {
         let context = (UIApplication.shared.delegate as! AppDelegate).persistentContainer.viewContext
         try! self.init(context: context)
     }
-
+    
     init(context: NSManagedObjectContext) throws {
         self.context = context
         super.init()
@@ -47,18 +47,23 @@ final class TrackerCategoryStore: NSObject {
         
         try fetchedResultsController.performFetch()
     }
-    
-    private func makeTrackerCategory(from trackerCategoryCoreData: TrackerCategoryCoreData) throws -> TrackerCategory {
-        guard let categoryName = trackerCategoryCoreData.name else {
-            throw TrackerCategoryStoreError.decodeCategoriesNameFailed
-        }
-        guard let categoryID = trackerCategoryCoreData.categoryID else {
-            throw TrackerCategoryStoreError.decodeCategoriesIdFailed
+}
+
+extension TrackerCategoryStore: GetCategoryProtocol {
+    func getCategory(by id: UUID) throws -> TrackerCategoryCoreData {
+        let request = TrackerCategoryCoreData.fetchRequest()
+        request.returnsObjectsAsFaults = false
+        request.predicate = NSPredicate(format: "%K == %@", #keyPath(TrackerCategoryCoreData.categoryID), id.uuidString)
+        request.fetchLimit = 1
+        
+        guard
+            let results = try? context.fetch(request),
+            let category = results.first
+        else {
+            throw TrackerCategoryStoreError.getCategoryFailed
         }
         
-        var trackerCategory = TrackerCategory(id: categoryID, name: categoryName)
-        
-        return trackerCategory
+        return category
     }
 }
 

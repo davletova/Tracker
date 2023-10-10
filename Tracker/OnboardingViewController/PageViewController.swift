@@ -28,7 +28,8 @@ class PageViewController: UIViewController {
         button.titleLabel?.font = UIFont.systemFont(ofSize: 16, weight: .medium)
         button.layer.cornerRadius = 16
         button.backgroundColor = UIColor.getAppColors(.blackDay)
-        button.setTitle("Вот это технологии!", for: .normal)
+        let title = NSLocalizedString("onboarding.button", comment: "buttn title on he onboarding page")
+        button.setTitle(title, for: .normal)
         button.setTitleColor(UIColor.getAppColors(.whiteDay), for: .normal)
         
         return button
@@ -88,27 +89,7 @@ class PageViewController: UIViewController {
     }
     
     @objc func goToTrackersView() {
-        print("dasfsf")
-        let tabBar = UITabBarController()
-
-        let lineView = UIView(frame: CGRect(x: 0, y: 0, width:tabBar.tabBar.frame.size.width, height: 1))
-        lineView.backgroundColor = UIColor.getAppColors(.tabBarBorder)
-        tabBar.tabBar.addSubview(lineView)
-
-        let navigationController = UINavigationController(rootViewController: TrackerCollectionView())
-        navigationController.tabBarItem = UITabBarItem(
-            title: "Трекеры",
-            image: UIImage(named: "record.circle.fill"),
-            tag: 0
-        )
-
-        let statisticsViewController = StatisticsViewController()
-        statisticsViewController.tabBarItem = UITabBarItem(
-            title: "Статистика",
-            image: UIImage(named: "hare.fill"),
-            tag: 1
-        )
-        tabBar.setViewControllers([navigationController, statisticsViewController], animated: true)
+        let tabBar = TabBarViewController()
         
         guard let window = UIApplication.shared.windows.first else {
             assertionFailure("PageViewController: failed to get UIApplication.shared.windows.first")
