@@ -78,6 +78,7 @@
 		4DDC8E212A98B15100F85E5D /* Model.xcdatamodeld in Sources */ = {isa = PBXBuildFile; fileRef = 4DDC8E1F2A98B15100F85E5D /* Model.xcdatamodeld */; };
 		4DDC8E242A98C45B00F85E5D /* TrackerRecordStore.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4DDC8E232A98C45B00F85E5D /* TrackerRecordStore.swift */; };
 		4DDC8E262A98C6FB00F85E5D /* TrackerStore.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4DDC8E252A98C6FB00F85E5D /* TrackerStore.swift */; };
+		4DFE5B5D2B1E359700F079A3 /* Readme.md in Resources */ = {isa = PBXBuildFile; fileRef = 4DFE5B5C2B1E359700F079A3 /* Readme.md */; };
 		837C1D45347ADAB48B53DFAB /* Pods_Tracker.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = AF459C456AEFEC4CB7DA3397 /* Pods_Tracker.framework */; };
 /* End PBXBuildFile section */
 
@@ -165,6 +166,7 @@
 		4DDC8E202A98B15100F85E5D /* Model.xcdatamodel */ = {isa = PBXFileReference; lastKnownFileType = wrapper.xcdatamodel; path = Model.xcdatamodel; sourceTree = "<group>"; };
 		4DDC8E232A98C45B00F85E5D /* TrackerRecordStore.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TrackerRecordStore.swift; sourceTree = "<group>"; };
 		4DDC8E252A98C6FB00F85E5D /* TrackerStore.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TrackerStore.swift; sourceTree = "<group>"; };
+		4DFE5B5C2B1E359700F079A3 /* Readme.md */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = net.daringfireball.markdown; path = Readme.md; sourceTree = "<group>"; };
 		AF459C456AEFEC4CB7DA3397 /* Pods_Tracker.framework */ = {isa = PBXFileReference; explicitFileType = wrapper.framework; includeInIndex = 0; path = Pods_Tracker.framework; sourceTree = BUILT_PRODUCTS_DIR; };
 		C64CB1BE762373A155D1B947 /* Pods-Tracker.debug.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-Tracker.debug.xcconfig"; path = "Target Support Files/Pods-Tracker/Pods-Tracker.debug.xcconfig"; sourceTree = "<group>"; };
 /* End PBXFileReference section */
@@ -252,6 +254,7 @@
 		4D1A9BF12A726B4C007E527A = {
 			isa = PBXGroup;
 			children = (
+				4DFE5B5C2B1E359700F079A3 /* Readme.md */,
 				4D1A9BFC2A726B4C007E527A /* Tracker */,
 				4D8F66932AB32D3E00B42FA7 /* TrackerTests */,
 				4D1A9BFB2A726B4C007E527A /* Products */,
@@ -562,6 +565,7 @@
 			isa = PBXResourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				4DFE5B5D2B1E359700F079A3 /* Readme.md in Resources */,
 				4D83A1202AAE439600A7F55D /* Localizable.strings in Resources */,
 				4D1A9C0A2A726B50007E527A /* LaunchScreen.storyboard in Resources */,
 				4D83A11D2AAE439300A7F55D /* Localizable.stringsdict in Resources */,
