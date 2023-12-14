@@ -18,6 +18,10 @@
  - трекинг привычек;
  - просмотр и фильтрация привычек по дням недели, названию;
  - просмотр прогресса (статистики)  по привычкам.
+<img width="300" height="660" alt="Снимок экрана 2023-12-14 в 17 30 34" src="https://github.com/davletova/Tracker/assets/14953951/222c6f57-a472-4f77-b402-3e7a9256abe0">
+<img width="300" height="660" alt="Снимок экрана 2023-12-14 в 17 29 13" src="https://github.com/davletova/Tracker/assets/14953951/98108942-2f44-4bff-ba36-5e58e561b1e2">
+<img width="300" height="660" alt="Снимок экрана 2023-12-14 в 17 33 43" src="https://github.com/davletova/Tracker/assets/14953951/ba9395ef-7039-4c9a-a0aa-e84ee71bdd58">
+<img width="300" height="660" alt="Снимок экрана 2023-12-14 в 17 33 14" src="https://github.com/davletova/Tracker/assets/14953951/a4bc2a20-190a-4e72-9e9f-38db32b07966">
 
 ## Онбординг
 При первом входе в приложение пользователь попадает на экран онбординга.
